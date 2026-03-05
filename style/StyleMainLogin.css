@@ -1,0 +1,128 @@
+.portal-section {
+    padding: 90px 20px 80px;
+    background-color: #f9fbfd;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* biar konten center horizontal juga */
+    text-align: center;
+}
+
+.portal-title {
+    color: #003B73;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+}
+
+.portal-subtitle {
+    color: #555;
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container untuk barisan kartu */
+.role-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 60px;
+}
+
+/* Desain Kartu */
+.role-card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 40px 20px;
+    width: 220px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    border: 1px solid #f0f0f0;
+}
+
+/* Hover effect */
+.role-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* Lingkaran ikon */
+.role-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+}
+
+/* Warna ikon */
+.icon-siswa {
+    color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.icon-calon {
+    color: #f59e0b;
+    background-color: #fffbeb;
+}
+
+.icon-pengajar {
+    color: #10b981;
+    background-color: #ecfdf5;
+}
+
+.icon-pimpinan {
+    color: #6b7280;
+    background-color: #f3f4f6;
+}
+
+.icon-admin {
+    color: #8b5cf6;
+    background-color: #f5f3ff;
+}
+
+/* Teks dalam kartu */
+.role-card h3 {
+    color: #003B73;
+    font-size: 1.1rem;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 8px;
+}
+
+.role-card p {
+    color: #888;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Tombol Outline */
+.btn-outline-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid #003B73;
+    color: #003B73;
+    padding: 12px 35px;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: transparent;
+    text-decoration: none;
+}
+
+.btn-outline-primary:hover {
+    background-color: #003B73;
+    color: #ffffff;
+}
