@@ -1,0 +1,366 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #EFEFEF;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 5%;
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 10;
+}
+.nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #F8D377;
+}
+.nav-menu {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+.nav-menu li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+.nav-menu li a:hover {
+    color: #F8D377;
+}
+.btn-login {
+    background-color: #F8D377;
+    color: #113A71;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Hero Section */
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    padding: 120px 5% 150px;
+    text-align: center;
+    color: white;
+}
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(rgba(17, 58, 113, 0.8), rgba(17, 58, 113, 0.95));
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+.breadcrumb {
+    font-size: 0.9rem;
+    color: #F8D377;
+    margin-bottom: 1rem;
+}
+.hero-content h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    margin: 0;
+}
+
+/* Main Container (Overlap) */
+.main-container {
+    max-width: 1100px;
+    margin: -100px auto 50px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 5;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Form Section */
+.content-section {
+    flex: 1;
+    padding: 3rem;
+}
+.content-section h2 {
+    font-family: 'Playfair Display', serif;
+    color: #113A71;
+    margin-top: 0;
+    font-size: 2rem;
+}
+.content-section p.subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #113A71;
+    margin-bottom: 0.5rem;
+}
+.form-group label .required {
+    color: red;
+}
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Document Upload Styles */
+.upload-info {
+    background-color: #F0F4FF;
+    border: 1px solid #D6E4FF;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #333;
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+.upload-info i {
+    color: #4A7BFF;
+    margin-top: 0.2rem;
+}
+.upload-info a {
+    color: #113A71;
+    font-weight: 600;
+    text-decoration: none;
+}
+.upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.upload-item {
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: #888;
+    background-color: #FAFAFA;
+    cursor: pointer;
+}
+.upload-item:hover {
+    background-color: #F0F4FF;
+    border-color: #4A7BFF;
+}
+.upload-item i {
+    font-size: 2rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+}
+.upload-item.full-width {
+    grid-column: span 2;
+}
+.upload-note {
+    font-size: 0.8rem;
+    color: #999;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}
+
+.agreement {
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 0.5rem;
+}
+.btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background-color: #F8D377;
+    color: #113A71;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+.btn-submit:hover {
+    background-color: #E2BC5F;
+}
+
+/* Image Section */
+.image-section {
+    flex: 1;
+    background-image: url('../assets/ImgPendaftaran.png');
+    background-size: scale-down;
+    background-position: left;
+    min-height: fit-content;
+}
+
+/* Success Styles */
+.success-icon {
+    font-size: 3rem;
+    color: #27AE60;
+    background: #E8F5E9;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+.success-container {
+    text-align: center;
+}
+.data-box {
+    background-color: #FAFAFA;
+    border: 1px solid #EEE;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: left;
+    margin: 2rem 0;
+}
+.data-item {
+    margin-bottom: 1rem;
+}
+.data-item:last-child {
+    margin-bottom: 0;
+}
+.data-item label {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+}
+.data-value {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #DDD;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    background: #FFF;
+    font-weight: 600;
+    color: #113A71;
+}
+.data-value i {
+    color: #999;
+    cursor: pointer;
+}
+.warning-box {
+    background-color: #FFF9E6;
+    border: 1px solid #FDEBB4;
+    padding: 1rem;
+    border-radius: 6px;
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #D48806;
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+.btn-blue {
+    flex: 1;
+    background-color: #113A71;
+    color: white;
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn-outline {
+    flex: 1;
+    background-color: white;
+    color: #113A71;
+    border: 1px solid #113A71;
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Footer (reused layout) */
+.footer {
+    background-color: #113A71;
+    color: white;
+    padding: 3rem 5% 1rem;
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+.footer-logo {
+    font-family: 'Playfair Display', serif;
+    color: #F8D377;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.footer h4 {
+    color: #F8D377;
+    margin-bottom: 1.5rem;
+}
+.footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer ul li {
+    margin-bottom: 0.8rem;
+}
+.footer ul li a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.footer p {
+    color: #ccc;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+.footer-legal a {
+    color: #aaa;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+
