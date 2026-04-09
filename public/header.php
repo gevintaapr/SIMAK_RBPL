@@ -12,7 +12,7 @@
 <body>
         <header class="navbar">
         <div class="container nav-container">
-            <a href="../public/MainPage.php" class="logo" style="text-decoration: none; color: inherit;">HCTS</a>
+            <a href="../public/MainPage.php" class="logo" style="text-decoration: none; color: #EBC372;">HCTS</a>
             <nav>
                 <ul class="nav-links">
                     <li><a href="../public/MainPage.php#home">Home</a></li>

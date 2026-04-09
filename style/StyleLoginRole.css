@@ -1,18 +1,19 @@
 .status-section {
     background-color: #fdf9ec;
     /* Warna latar krem muda sesuai desain */
-    min-height: 80vh;
+    flex: 1;
+    min-height: calc(100vh - 70px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 120px 20px 80px;
+    padding: 20px;
 }
 
 .status-card {
     background: #ffffff;
     width: 100%;
     max-width: 450px;
-    padding: 40px;
+    padding: 30px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     text-align: center;
@@ -26,16 +27,15 @@
 .status-title {
     color: #003B73;
     font-size: 1.8rem;
-    margin-bottom: 10px;
     font-family: "Playfair Display", serif;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .status-desc {
     color: #6b7280;
     font-size: 0.9rem;
     line-height: 1.5;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .status-form {
@@ -215,7 +215,8 @@ body {
     /* Warna background abu-abu terang */
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* --- NAVBAR STYLING --- */
