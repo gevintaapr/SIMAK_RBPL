@@ -1,0 +1,264 @@
+/* style/input_penilaian.css */
+.eval-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin: 0 auto 40px auto;
+    max-width: 1000px;
+}
+
+.eval-title {
+    font-family: 'Playfair Display', serif;
+    color: #0b3d6e;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 16px;
+}
+
+.section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0b3d6e;
+    margin-bottom: 12px;
+    display: inline-block;
+    background: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.select-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.select-student {
+    width: 100%;
+    padding: 14px 20px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #4a5568;
+    outline: none;
+    transition: all 0.3s ease;
+    appearance: none;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0aec0' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E") no-repeat calc(100% - 20px) center;
+}
+
+.select-student:focus {
+    border-color: #0b3d6e;
+    box-shadow: 0 0 0 3px rgba(11, 61, 110, 0.1);
+}
+
+.student-card {
+    display: none;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.student-avatar {
+    width: 60px;
+    height: 60px;
+    background: #e1effe;
+    color: #0b3d6e;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-right: 20px;
+}
+
+.student-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #0b3d6e;
+    margin: 0 0 4px 0;
+}
+
+.student-info p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+.period-badge {
+    margin-left: auto;
+    background: #e1effe;
+    color: #0b3d6e;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.eval-table-container {
+    display: none;
+    overflow-x: auto;
+    margin-bottom: 30px;
+}
+
+.eval-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.eval-table th {
+    padding: 16px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0b3d6e;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.eval-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.eval-table td:first-child {
+    font-weight: 600;
+    border-left: 1px solid #e2e8f0;
+}
+
+.eval-table td:last-child {
+    border-right: 1px solid #e2e8f0;
+}
+
+.eval-table tr:first-child td {
+    border-top: 1px solid #e2e8f0;
+}
+
+.input-score {
+    width: 80px;
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.input-score:focus {
+    border-color: #0b3d6e;
+    box-shadow: 0 0 0 2px rgba(11, 61, 110, 0.1);
+}
+
+.input-score.error {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.grade-display {
+    font-weight: 800;
+    font-size: 16px;
+    color: #0f172a;
+    display: block;
+    text-align: center;
+}
+
+.input-note {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.input-note:focus {
+    border-color: #0b3d6e;
+    box-shadow: 0 0 0 2px rgba(11, 61, 110, 0.1);
+}
+
+.form-actions {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 1px dashed #cbd5e0;
+}
+
+.form-msg {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.form-msg.error-msg {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.btn-group {
+    display: flex;
+    gap: 16px;
+}
+
+.btn-batal {
+    background: transparent;
+    color: #0b3d6e;
+    border: 2px solid #0b3d6e;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-batal:hover {
+    background: #f1f5f9;
+}
+
+.btn-simpan {
+    background: #0b3d6e;
+    color: #fff;
+    border: 2px solid #0b3d6e;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-simpan:hover {
+    background: #082d52;
+    border-color: #082d52;
+}
+
+.btn-simpan i {
+    font-size: 14px;
+}
+/* Modal Styling from Riwayat */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-content { background: #fff; border-radius: 20px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; border-bottom: 4px solid #e2e8f0; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 28px; color: #0b3d6e; font-weight: 800; margin: 0; }
+.modal-close { background: #fff; color: #0b3d6e; border: 3px solid #0b3d6e; border-radius: 8px; width: 40px; height: 40px; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.modal-close:hover { background: #0b3d6e; color: #fff; }
+.modal-body { padding: 30px 40px; overflow-y: auto; }
+.info-box { border: 3px solid #cbd5e0; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.info-box-title { font-size: 20px; color: #0b3d6e; font-weight: 800; margin: 0; }
