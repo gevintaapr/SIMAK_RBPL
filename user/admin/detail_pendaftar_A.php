@@ -11,7 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../style/detail_pendaftar_A.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../../style/detail_pendaftar_A.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../../style/popup_admin.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -33,7 +34,7 @@
                 <i class="fa-solid fa-briefcase"></i>
                 <span>Magang (OJT)</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="akademik_admin.php" class="sidebar-link">
                 <i class="fa-solid fa-book"></i>
                 <span>Akademik</span>
             </a>
@@ -215,80 +216,43 @@
 
                 <!-- Verify Button -->
                 <div class="action-section">
-                    <button class="btn-verify">Verifikasi</button>
+                    <button class="btn-verify" onclick="openPopupAdminVerif()">Verifikasi</button>
                 </div>
             </section>
 
-        </main>
+        </main>.
 
-        <!-- ===== FOOTER ===== -->
-        <footer class="footer">
-            <div class="footer-top">
-                <div class="footer-col footer-brand-col">
-                    <h3 class="footer-brand">HCTS</h3>
-                    <p class="footer-desc">Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
-                    <div class="footer-socials">
-                        <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="#" class="social-btn" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-                    </div>
-                </div>
 
-                <div class="footer-col">
-                    <h4 class="footer-heading">Aksi Cepat</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Our Programs</a></li>
-                        <li><a href="#">Admission Process</a></li>
-                        <li><a href="#">Career Opportunities</a></li>
-                        <li><a href="#">Student Stories</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4 class="footer-heading">Program Kami</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Hotel Management</a></li>
-                        <li><a href="#">Cruise Ship Operations</a></li>
-                        <li><a href="#">Culinary Arts</a></li>
-                        <li><a href="#">Hospitality Services</a></li>
-                        <li><a href="#">Tourism Management</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4 class="footer-heading">Kontak Kami</h4>
-                    <ul class="footer-contact">
-                        <li>
-                            <i class="fa-solid fa-location-dot"></i>
-                            <span>123 Maritime Avenue, Harbor District, HD 12345</span>
-                        </li>
-                        <li>
-                            <i class="fa-solid fa-phone"></i>
-                            <span>+1 (555) 123-4567</span>
-                        </li>
-                        <li>
-                            <i class="fa-regular fa-envelope"></i>
-                            <span>info@hcts.edu</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p class="footer-copy">&copy; 2025 HCTS International. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Cookie Policy</a>
-                </div>
-            </div>
-        </footer>
 
     </div>
 
+    <!-- Popup Verifikasi -->
+    <div id="popupAdminVerif" class="popup-overlay" style="display: none;">
+        <div class="popup-admin-box">
+            <button class="popup-admin-close" onclick="closePopupAdminVerif()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="popup-admin-title">Verifikasi Berhasil!</h2>
+            <hr class="popup-admin-divider">
+            <div class="verif-list">
+                <div class="verif-item">
+                    <div class="verif-icon"><i class="fa-solid fa-check"></i></div>
+                    <span>Status Pendaftaran Berhasil Diperbarui</span>
+                </div>
+                <div class="verif-item">
+                    <div class="verif-icon"><i class="fa-solid fa-check"></i></div>
+                    <span>Data Siswa Berhasil diKirim ke Pengajar</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function openPopupAdminVerif() {
+            document.getElementById('popupAdminVerif').style.display = 'flex';
+        }
+        function closePopupAdminVerif() {
+            document.getElementById('popupAdminVerif').style.display = 'none';
+        }
+
         const sidebar = document.getElementById('sidebar');
         const mainWrapper = document.getElementById('mainWrapper');
         const toggleBtn = document.getElementById('sidebarToggle');

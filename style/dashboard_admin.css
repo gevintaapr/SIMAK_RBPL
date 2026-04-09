@@ -435,6 +435,9 @@ button {
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     padding: 36px 40px;
+    max-width: 1350px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .stat-card {
@@ -551,6 +554,9 @@ button {
     padding: 0 40px 40px;
     flex: 1;
     align-items: start;
+    max-width: 1350px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 /* ============================================================
@@ -771,7 +777,9 @@ button {
     grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
     gap: 40px;
     padding: 56px 40px 48px;
-    max-width: 100%;
+    max-width: 1350px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 /* Footer Brand Column */

@@ -1,0 +1,254 @@
+/* akademik_admin.css */
+
+/* Navigation Pill Buttons */
+.akademik-nav-group {
+    display: flex;
+    gap: 16px;
+    padding: 30px 40px 10px;
+    flex-wrap: wrap;
+    max-width: 1350px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.akademik-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    border-radius: 40px;
+    border: 3px solid #003B73;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #003B73;
+    background: #fff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.akademik-nav-btn i {
+    font-size: 1.25rem;
+}
+
+.akademik-nav-btn.active,
+.akademik-nav-btn:hover {
+    background: #003B73;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 59, 115, 0.2);
+}
+
+.akademik-nav-btn.active i {
+    color: #fff;
+}
+
+/* Stats Cards for Akademik */
+.akademik-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 20px 40px 30px;
+    max-width: 1350px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.ak-stat-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px 35px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ak-stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ak-stat-num {
+    font-size: 3rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    color: #003B73;
+    line-height: 1;
+}
+
+.ak-stat-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.ak-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #E5E7EB;
+    color: #005792;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Data Siswa */
+.akademik-card-section {
+    padding: 0 40px 40px;
+    max-width: 1350px;
+    width: 100%;
+    margin: 0 auto;
+    flex: 1;
+}
+
+.ak-card {
+    background: #fff;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 35px 40px;
+}
+
+.ak-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #003B73;
+    font-weight: 800;
+    margin-bottom: 25px;
+}
+
+.ak-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.ak-select {
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: 1px solid #D1D5DB;
+    font-size: 1rem;
+    color: #111;
+    font-weight: 500;
+    outline: none;
+    font-family: inherit;
+    min-width: 180px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: url('data:image/svg+xml;utf8,<svg fill="none" class="w-6 h-6" stroke="%23374151" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>') no-repeat right 15px center;
+    background-size: 16px;
+    background-color: #fff;
+}
+
+.ak-search {
+    display: flex;
+    align-items: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #D1D5DB;
+    min-width: 350px;
+    gap: 10px;
+    background: #fff;
+    margin-left: auto;
+    /* push to the right */
+}
+
+.ak-search i {
+    color: #6B7280;
+}
+
+.ak-search input {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    flex: 1;
+    width: 100%;
+}
+
+.ak-search .clear-search {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #111;
+    font-size: 1.1rem;
+}
+
+/* Ak Table */
+.ak-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ak-table th {
+    padding: 18px 15px;
+    border-bottom: 3px solid #E5E7EB;
+    font-weight: 800;
+    color: #003B73;
+    text-align: center;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.ak-table th:nth-child(2),
+.ak-table th:nth-child(3) {
+    text-align: left;
+}
+
+.ak-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #EFF2F5;
+    font-size: 1rem;
+    color: #111;
+    text-align: center;
+}
+
+.ak-table td:nth-child(2),
+.ak-table td:nth-child(3) {
+    text-align: left;
+}
+
+.ak-table tr:hover {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+.badge-ak-magang {
+    background: #DCFCE7;
+    color: #16A34A;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.badge-ak-reguler {
+    background: #DBEAFE;
+    color: #2563EB;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.badge-ak-magang:hover,
+.badge-ak-reguler:hover {
+    opacity: 0.9;
+    cursor: default;
+}
+
+.btn-ak-detail {
+    background: #003B73;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-ak-detail:hover {
+    background: #00234a;
+}

@@ -1,0 +1,81 @@
+/* Popup Khusus Admin (General Validation) */
+.popup-admin-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    width: 650px;
+    max-width: 90vw;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.popup-admin-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: 3px solid #003B73;
+    color: #003B73;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.popup-admin-close:hover {
+    background: #003B73;
+    color: #fff;
+}
+
+.popup-admin-title {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: #003B73;
+    font-weight: 800;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.popup-admin-divider {
+    border: none;
+    height: 4px;
+    background: #EBC372;
+    margin-bottom: 35px;
+}
+
+.verif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 0 10px;
+    margin-bottom: 20px;
+}
+
+.verif-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #003B73;
+}
+
+.verif-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid #003B73;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #003B73;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
