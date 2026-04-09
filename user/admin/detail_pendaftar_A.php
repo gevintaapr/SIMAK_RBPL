@@ -1,5 +1,14 @@
 <?php
-// PHP logic if needed
+require_once __DIR__ . '/../../config/config.php';
+
+$id = $_GET['id'] ?? '';
+$query = mysqli_query($conn, "SELECT * FROM pendaftaran WHERE id_pendaftaran = '$id'");
+$data = mysqli_fetch_assoc($query);
+
+if (!$data) {
+    header("Location: pendaftaran_admin.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -94,7 +103,7 @@
                 <div class="banner-content">
                     <div class="banner-text-wrapper">
                         <p class="breadcrumb">Pendaftaran &gt; Detail Pendaftar</p>
-                        <h1 class="banner-title">Detail Pendaftar: Alexander Wibowo</h1>
+                        <h1 class="banner-title">Detail Pendaftar: <?= htmlspecialchars($data['nama_cs']) ?></h1>
                     </div>
                 </div>
             </section>
@@ -110,42 +119,48 @@
                             <div class="info-grid">
                                 <div class="info-item">
                                     <span class="info-label">Nama Lengkap</span>
-                                    <span class="info-value">Alexander Wibowo</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['nama_cs']) ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Email</span>
-                                    <span class="info-value">alex.bow23@gmail.com</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['email']) ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Nomor Whatsapp</span>
-                                    <span class="info-value">+62 812 3456 7890</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['no_wa']) ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Tanggal Lahir</span>
-                                    <span class="info-value">22 Oktober 2004</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['tanggal_lahir']) ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Asal Sekolah</span>
-                                    <span class="info-value">SMA Pariwisata Jaya</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['asal_sekolah'] ?? '-') ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Posisi-Program Pilihan</span>
-                                    <span class="info-value">Hotel-F&amp;B Service</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['program']) ?></span>
                                 </div>
                                 <div class="info-item full-width">
                                     <span class="info-label">Alamat Lengkap</span>
-                                    <span class="info-value">Jl. Samudra Biru No. 45, Kuta, Bali, Indonesia</span>
+                                    <span class="info-value"><?= htmlspecialchars($data['alamat']) ?></span>
                                 </div>
                                 <div class="info-item full-width mt-2">
                                     <span class="info-label">Status Pendaftaran:</span>
-                                    <span class="badge badge-status-approved">Disetujui Pimpinan</span>
+                                    <?php if ($data['status_approval'] == 1 || $data['status_approval'] === 'disetujui'): ?>
+                                        <span class="badge badge-status-approved" style="background: #D1FAE5; color: #059669;">Disetujui Pimpinan</span>
+                                    <?php elseif ($data['status_approval'] == 'ditolak'): ?>
+                                        <span class="badge badge-status-rejected" style="background: #FEE2E2; color: #DC2626;">Ditolak</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-status-pending" style="background: #DBEAFE; color: #2563EB;">Menunggu Verifikasi</span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                         <div class="photo-content">
-                            <img src="https://ui-avatars.com/api/?name=Alexander+Wibowo&background=0D8ABC&color=fff&size=200" alt="Foto Calon Siswa" class="student-photo">
+                            <img src="../../<?= htmlspecialchars($data['foto_siswa']) ?>" alt="Foto Calon Siswa" class="student-photo" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($data['nama_cs']) ?>&background=0D8ABC&color=fff&size=200'">
                             <p class="photo-title">Foto Calon Siswa</p>
-                            <p class="photo-date">Tanggal Upload: 10/10/2024</p>
+                            <p class="photo-date">Tanggal Upload: <?= isset($data['created_at']) ? date('d/m/Y', strtotime($data['created_at'])) : '-' ?></p>
                         </div>
                     </div>
                 </div>
@@ -157,66 +172,59 @@
                     <div class="doc-grid">
                         <!-- Surat Pernyataan -->
                         <div class="doc-card">
-                            <div class="doc-icon">
-                                <i class="fa-regular fa-file-lines"></i>
-                            </div>
+                            <div class="doc-icon"><i class="fa-regular fa-file-lines"></i></div>
                             <div class="doc-info">
                                 <h3 class="doc-name">Surat Pernyataan</h3>
-                                <p class="doc-filename">surat_pernyataan1234.pdf</p>
+                                <p class="doc-filename"><?= basename($data['surat_pernyataan'] ?? 'file.pdf') ?></p>
                                 <div class="doc-actions">
-                                    <button class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</button>
-                                    <button class="btn-doc btn-download"><i class="fa-solid fa-download"></i> Unduh</button>
+                                    <a href="../../<?= htmlspecialchars($data['surat_pernyataan']) ?>" target="_blank" class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</a>
                                 </div>
                             </div>
                         </div>
                         <!-- KTP -->
                         <div class="doc-card">
-                            <div class="doc-icon">
-                                <i class="fa-regular fa-id-card"></i>
-                            </div>
+                            <div class="doc-icon"><i class="fa-regular fa-id-card"></i></div>
                             <div class="doc-info">
                                 <h3 class="doc-name">KTP</h3>
-                                <p class="doc-filename">ktp_alex.pdf</p>
+                                <p class="doc-filename"><?= basename($data['ktp'] ?? 'file.pdf') ?></p>
                                 <div class="doc-actions">
-                                    <button class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</button>
-                                    <button class="btn-doc btn-download"><i class="fa-solid fa-download"></i> Unduh</button>
+                                    <a href="../../<?= htmlspecialchars($data['ktp']) ?>" target="_blank" class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</a>
                                 </div>
                             </div>
                         </div>
                         <!-- Ijazah -->
                         <div class="doc-card">
-                            <div class="doc-icon">
-                                <i class="fa-solid fa-graduation-cap"></i>
-                            </div>
+                            <div class="doc-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                             <div class="doc-info">
                                 <h3 class="doc-name">Ijazah</h3>
-                                <p class="doc-filename">ijazah_alex.pdf</p>
+                                <p class="doc-filename"><?= basename($data['ijazah'] ?? 'file.pdf') ?></p>
                                 <div class="doc-actions">
-                                    <button class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</button>
-                                    <button class="btn-doc btn-download"><i class="fa-solid fa-download"></i> Unduh</button>
+                                    <a href="../../<?= htmlspecialchars($data['ijazah']) ?>" target="_blank" class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</a>
                                 </div>
                             </div>
                         </div>
                         <!-- Bukti Pembayaran -->
                         <div class="doc-card">
-                            <div class="doc-icon">
-                                <i class="fa-solid fa-file-invoice-dollar"></i>
-                            </div>
+                            <div class="doc-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                             <div class="doc-info">
                                 <h3 class="doc-name">Bukti Pembayaran</h3>
-                                <p class="doc-filename">Pembayaran_Pendaftaran.pdf</p>
+                                <p class="doc-filename"><?= basename($data['bukti_pendaftaran'] ?? 'file.pdf') ?></p>
                                 <div class="doc-actions">
-                                    <button class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</button>
-                                    <button class="btn-doc btn-download"><i class="fa-solid fa-download"></i> Unduh</button>
+                                    <a href="../../<?= htmlspecialchars($data['bukti_pendaftaran']) ?>" target="_blank" class="btn-doc btn-view"><i class="fa-regular fa-eye"></i> Lihat</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Verify Button -->
                 <div class="action-section">
-                    <button class="btn-verify" onclick="openPopupAdminVerif()">Verifikasi</button>
+                    <?php if (($data['status_berkas'] ?? '') === 'valid'): ?>
+                        <button class="btn-verify" disabled style="background: #99A1AF; cursor: not-allowed; opacity: 0.7;">
+                            <i class="fa-solid fa-check-double"></i> Terverifikasi
+                        </button>
+                    <?php else: ?>
+                        <button class="btn-verify" onclick="openPopupAdminVerif()">Verifikasi</button>
+                    <?php endif; ?>
                 </div>
             </section>
 
@@ -247,10 +255,34 @@
 
     <script>
         function openPopupAdminVerif() {
-            document.getElementById('popupAdminVerif').style.display = 'flex';
+            const idPendaftaran = "<?= $data['id_pendaftaran'] ?>";
+            
+            // Kirim data ke backend untuk verifikasi
+            const formData = new FormData();
+            formData.append('action', 'verifikasi_berkas');
+            formData.append('id_pendaftaran', idPendaftaran);
+            formData.append('status_berkas', 'valid');
+
+            fetch('../../backend/pendaftaranAdmin_end.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('popupAdminVerif').style.display = 'flex';
+                } else {
+                    alert('Gagal melakukan verifikasi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan sistem.');
+            });
         }
         function closePopupAdminVerif() {
             document.getElementById('popupAdminVerif').style.display = 'none';
+            window.location.href = 'pendaftaran_admin.php';
         }
 
         const sidebar = document.getElementById('sidebar');

@@ -1,5 +1,8 @@
 <?php
-// PHP logic if needed
+require_once __DIR__ . '/../../config/config.php';
+
+$query = mysqli_query($conn, "SELECT * FROM pendaftaran ORDER BY id_pendaftaran DESC");
+$pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -127,27 +130,31 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php if (empty($pendaftaran)): ?>
                                 <tr>
-                                    <td>REG-2025-0201</td>
-                                    <td>Alexander Wibowo</td>
-                                    <td>Cruise Ship Deck Kadet</td>
-                                    <td><span class="badge badge-status-green">Disetujui Pimpinan</span></td>
-                                    <td><button class="btn-detail" onclick="window.location.href='detail_pendaftar_A.php'">Detail</button></td>
+                                    <td colspan="5" style="text-align: center; padding: 30px; color: #999;">Belum ada data pendaftaran masuk.</td>
                                 </tr>
-                                <tr>
-                                    <td>REG-2025-0200</td>
-                                    <td>Jessica Tan</td>
-                                    <td>Hotel F&B Service</td>
-                                    <td><span class="badge badge-status-blue">Menunggu Wawancara</span></td>
-                                    <td><button class="btn-detail" onclick="window.location.href='detail_pendaftar_A.php'">Detail</button></td>
-                                </tr>
-                                <tr>
-                                    <td>REG-2025-0199</td>
-                                    <td>Maria Gomez</td>
-                                    <td>Cruise Ship Culinary</td>
-                                    <td><span class="badge badge-status-green">Lolos Seleksi</span></td>
-                                    <td><button class="btn-detail" onclick="window.location.href='detail_pendaftar_A.php'">Detail</button></td>
-                                </tr>
+                                <?php else: ?>
+                                    <?php foreach ($pendaftaran as $row): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($row['id_pendaftaran']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_cs']) ?></td>
+                                        <td><?= htmlspecialchars($row['program']) ?></td>
+                                        <td>
+                                            <?php if ($row['status_approval'] == 0 || $row['status_approval'] === 'pending'): ?>
+                                                <span class="badge badge-status-blue">Menunggu Verifikasi</span>
+                                            <?php elseif ($row['status_approval'] == 1 || $row['status_approval'] === 'disetujui'): ?>
+                                                <span class="badge badge-status-green">Disetujui Pimpinan</span>
+                                            <?php else: ?>
+                                                <span class="badge badge-status-blue"><?= htmlspecialchars($row['status_approval']) ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <button class="btn-detail" onclick="window.location.href='detail_pendaftar_A.php?id=<?= $row['id_pendaftaran'] ?>'">Detail</button>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>

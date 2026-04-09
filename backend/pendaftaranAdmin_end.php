@@ -9,9 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     switch ($action) {
         case 'verifikasi_berkas':
             $status_berkas = mysqli_real_escape_string($conn, $_POST['status_berkas']);
-            $query = "UPDATE pendaftaran SET status_berkas = '$status_berkas' WHERE id_pendaftaran = '$id_pendaftaran'";
+            $next_week = date('Y-m-d H:i:s', strtotime('+7 days'));
+            $query = "UPDATE pendaftaran SET 
+                      status_berkas = '$status_berkas', 
+                      status_approval = 'disetujui', 
+                      jadwal_wawancara = '$next_week'
+                      WHERE id_pendaftaran = '$id_pendaftaran'";
             if (mysqli_query($conn, $query)) {
-                echo json_encode(['status' => 'success', 'message' => 'Berkas berhasil diverifikasi.']);
+                echo json_encode(['status' => 'success', 'message' => 'Berkas berhasil diverifikasi dan diteruskan ke tahap wawancara.']);
             } else {
                 echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
             }

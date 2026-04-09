@@ -37,6 +37,8 @@ if ($role_from_post === '2') {
 
     if ($user && $user['token_akses'] === $password) {
         session_regenerate_id(true);
+        $_SESSION['siswa_logged_in'] = true;
+        $_SESSION['siswa_id'] = $user['id_pendaftaran'];
         $_SESSION['user_id'] = $user['id_pendaftaran'];
         $_SESSION['username'] = $user['nama_cs'];
         $_SESSION['role'] = 2;

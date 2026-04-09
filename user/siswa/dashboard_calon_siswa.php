@@ -63,10 +63,10 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
     $status_badge_text = "Ditolak";
 } elseif ($daftar['status_berkas'] === 'valid') {
     $alert_bg = "#fff3cd"; $alert_text = "#856404"; $alert_border = "#ffeeba";
-    $alert_icon = "fa-info-circle"; $alert_title = "Berkas Valid - Menunggu Approval";
-    $alert_desc = "Dokumen Anda telah divalidasi oleh admin dan saat ini sedang menunggu persetujuan dari pimpinan.";
-    $status_verifikasi = "Menunggu Persetujuan";
-    $status_badge_text = "Berkas Valid";
+    $alert_icon = "fa-info-circle"; $alert_title = "Dokumen sudah berhasil terverifikasi!";
+    $alert_desc = "Silakan perhatikan jadwal wawancara di bawah ini untuk melanjutkan proses pendaftaran Program HCTS. Hubungi kontak yang tersedia untuk informasi lebih lanjut.";
+    $status_verifikasi = "Tahap Wawancara";
+    $status_badge_text = "Verifikasi Berhasil";
 } elseif ($daftar['status_berkas'] === 'tidak_valid') {
     $alert_bg = "#f8d7da"; $alert_text = "#721c24"; $alert_border = "#f5c6cb";
     $alert_icon = "fa-times-circle"; $alert_title = "Berkas Tidak Valid";
@@ -79,15 +79,17 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
 $s3 = ""; $s4 = ""; $s5 = ""; $s6 = ""; 
 $progress_width = "20%"; // Step 1 and 2 complete
 
-if ($daftar['status_berkas'] === 'valid' && ($daftar['status_approval'] === 'pending' || empty($daftar['status_approval']))) {
-    $s3 = "active";
-    $progress_width = "38%";
+if ($daftar['status_berkas'] === 'valid') {
+    $s3 = "completed";
+    $s4 = "active";
+    $progress_width = "54%";
 } elseif ($daftar['status_approval'] === 'disetujui') {
     $s3 = "completed";
     $s4 = "active";
     $progress_width = "54%";
 }
 if (!empty($daftar['jadwal_wawancara'])) {
+    $s3 = "completed";
     $s4 = "active";
     $progress_width = "54%";
 }
@@ -166,10 +168,10 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
             </div>
             <div class="timeline-step <?= $s3 ?>">
                 <div class="step-circle"><?= $s3 == 'completed' ? '<i class="fas fa-check"></i>' : '3' ?></div>
-                <div class="step-label">Verifikasi & Approval</div>
+                <div class="step-label">Verifikasi Admin</div>
             </div>
             <div class="timeline-step <?= $s4 ?>">
-                <div class="step-circle"><?= $s4 == 'completed' ? '<i class="fas fa-check"></i>' : '4' ?></div>
+                <div class="step-circle"><?= $s4 == 'completed' ? '<i class="fas fa-check"></i>' : ( ($s4 == 'active') ? '4' : '4' ) ?></div>
                 <div class="step-label">Wawancara</div>
             </div>
             <div class="timeline-step <?= $s5 ?>">
@@ -211,6 +213,23 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                     <a href="../../public/login/logSiswa.php" style="display:inline-block; margin-top:20px; background:#4a9e22; color:white; padding: 12px 25px; border-radius: 8px; text-decoration:none; font-weight:600; box-shadow: 0 4px 6px rgba(74, 158, 34, 0.2);">Login ke Portal Belajar</a>
                 </div>
             </div>
+            <?php elseif ($daftar['status_berkas'] === 'valid'): ?>
+            <div class="content-card">
+                <h3>Status Dokumen</h3>
+                <div class="doc-status" style="text-align: center;">
+                    <div class="icon-folder" style="color: #0d6efd; background: #e7f1ff; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i class="fas fa-check-circle" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h4 style="color: #003B73; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px;">Jadwal Wawancara Program HCTS:</h4>
+                    <div style="text-align: left; font-size: 0.9rem; color: #003B73; display: inline-block; margin-bottom: 20px;">
+                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Hari / Tanggal : <?= date('l, d F Y', strtotime($daftar['jadwal_wawancara'] ?? '+7 days')) ?></p>
+                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Waktu : <?= date('H.i', strtotime($daftar['jadwal_wawancara'] ?? '09:00')) ?> - 11.00 WIB</p>
+                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Metode : Online (Zoom Meeting)</p>
+                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Link Wawancara : Akan dikirim melalui WhatsApp / Email</p>
+                    </div>
+                    <p style="font-size: 0.8rem; font-style: italic; color: #666; border-top: 1px solid #eee; padding-top: 10px;">Keterangan : Peserta diharapkan hadir 10 menit sebelum jadwal dimulai</p>
+                </div>
+            </div>
             <?php else: ?>
             <div class="content-card">
                 <h3>Status Dokumen</h3>
@@ -224,7 +243,6 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                 </div>
             </div>
             <?php endif; ?>
-            
             <div class="content-card">
                 <h3>Ringkasan Data</h3>
                 <table class="data-summary">
@@ -246,7 +264,7 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                     </tr>
                     <tr>
                         <td>Status Akhir</td>
-                        <td class="highlight-text"><?= htmlspecialchars($status_verifikasi) ?></td>
+                        <td class="highlight-text" style="color: #f59e0b; font-weight: 700;"><?= htmlspecialchars($status_verifikasi) ?></td>
                     </tr>
                 </table>
             </div>
