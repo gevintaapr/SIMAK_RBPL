@@ -12,17 +12,17 @@
 
 <body>
 
-    <section class="hero">
+    <section class="hero" id="home">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <span class="badge-outline">Membentuk Pemimpin Perhotelan Global</span>
             <h1>Sekolah Pelatihan Perhotelan &<br>Kapal Pesiar Internasional</h1>
             <p>Raih karier bergengsi di bidang perhotelan mewah dan layanan kapal pesiar. Program terakreditasi internasional kami mempersiapkan Anda untuk meraih keunggulan di hotel, resor, dan jalur pelayaran terbaik dunia.</p>
-            <a href="#" class="btn-primary">Daftar Sekarang &gt;</a>
+            <a href="../user/siswa/pendaftaran.php" class="btn-primary">Daftar Sekarang &gt;</a>
         </div>
     </section>
 
-    <section class="about container">
+    <section class="about container" id="about">
         <div class="about-images">
             <img src="../assets/main_hcts.jpg" alt="Students" class="img-main">
             <div class="experience-badge">
@@ -49,7 +49,7 @@
         </div>
     </section>
 
-    <section class="features">
+    <section class="features" id="program">
         <div class="container text-center">
             <span class="section-subtitle">KEUNGGULAN KAMI</span>
             <h2 class="features-title">Mengapa Memilih HCTS?</h2>

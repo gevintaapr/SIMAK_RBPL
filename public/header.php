@@ -12,13 +12,13 @@
 <body>
         <header class="navbar">
         <div class="container nav-container">
-            <div class="logo">HCTS</div>
+            <a href="../public/MainPage.php" class="logo" style="text-decoration: none; color: inherit;">HCTS</a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Programs</a></li>
-                    <li><a href="#">Admission</a></li>
+                    <li><a href="../public/MainPage.php#home">Home</a></li>
+                    <li><a href="../public/MainPage.php#about">About</a></li>
+                    <li><a href="../public/MainPage.php#program">Programs</a></li>
+                    <li><a href="../user/siswa/pendaftaran.php">Admission</a></li>
                 </ul>
             </nav>
             <a href="../public/MainLogin.php" class="btn-login">Login</a>
