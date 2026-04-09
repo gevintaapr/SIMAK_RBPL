@@ -19,13 +19,20 @@ function generateTokenAkses() {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama = mysqli_real_escape_string($conn, $_POST['nama']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $nama = mysqli_real_escape_string($conn, $_POST['nama'] ?? '');
+    $email = mysqli_real_escape_string($conn, $_POST['email'] ?? '');
+    $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa'] ?? '');
+    $tanggal_lahir = mysqli_real_escape_string($conn, $_POST['tanggal_lahir'] ?? '');
+    $alamat = mysqli_real_escape_string($conn, $_POST['alamat'] ?? '');
+    $program = mysqli_real_escape_string($conn, $_POST['program'] ?? '');
     
     // File upload handlings
     $upload_dir = __DIR__ . '/../public/uploads/';
     $files = ['ktp', 'ijazah', 'foto_siswa', 'bukti_pendaftaran', 'surat_pernyataan'];
     $saved_paths = [];
+
+    $allowed_image_mimes = ['image/jpeg', 'image/png', 'image/jpg'];
+    $allowed_image_exts = ['jpg', 'jpeg', 'png'];
 
     // Validate files first
     foreach ($files as $file_field) {
@@ -37,16 +44,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $file_type = mime_content_type($file_tmp);
         $file_ext = strtolower(pathinfo($_FILES[$file_field]['name'], PATHINFO_EXTENSION));
 
-        // Validation for PDF only
-        if ($file_type !== 'application/pdf' || $file_ext !== 'pdf') {
-            die("Error: Format file $file_field tidak valid. Hanya PDF yang diizinkan.");
+        if ($file_field === 'foto_siswa') {
+            if (!in_array($file_type, $allowed_image_mimes) || !in_array($file_ext, $allowed_image_exts)) {
+                die("Error: Format file pas foto tidak valid. Hanya JPG/PNG yang diizinkan.");
+            }
+        } else {
+            // Validation for PDF only
+            if ($file_type !== 'application/pdf' || $file_ext !== 'pdf') {
+                die("Error: Format file $file_field tidak valid. Hanya PDF yang diizinkan.");
+            }
         }
     }
 
     // Now safely move them
     foreach ($files as $file_field) {
         $file_tmp = $_FILES[$file_field]['tmp_name'];
-        $safe_filename = time() . '_' . rand(1000, 9999) . '_' . $file_field . '.pdf';
+        $file_ext = strtolower(pathinfo($_FILES[$file_field]['name'], PATHINFO_EXTENSION));
+        
+        $safe_filename = time() . '_' . rand(1000, 9999) . '_' . $file_field . '.' . $file_ext;
         $destination = $upload_dir . $safe_filename;
         
         if (move_uploaded_file($file_tmp, $destination)) {
@@ -64,11 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $cek = mysqli_query($conn, "SELECT id_pendaftaran FROM pendaftaran WHERE token_akses='$token'");
     } while(mysqli_num_rows($cek) > 0);
 
-    // Provide dummy values for other unused form inputs temporarily, because table requires them
-    $no_wa = '0000';
-    $tanggal_lahir = '2000-01-01';
-    $alamat = 'N/A';
-    $program = 'N/A';
+    // Variables are already fetched from $_POST above
     
     $ktp_path = mysqli_real_escape_string($conn, $saved_paths['ktp']);
     $ijazah_path = mysqli_real_escape_string($conn, $saved_paths['ijazah']);

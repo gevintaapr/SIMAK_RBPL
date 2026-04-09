@@ -50,22 +50,28 @@
                 
                 <div class="form-group">
                     <label>Nomor Whatsapp <span class="required">*</span></label>
-                    <input type="text" class="form-control" placeholder="+62 812 3456 7890" required>
+                    <input type="text" name="no_wa" class="form-control" placeholder="+62 812 3456 7890" required>
                 </div>
                 
                 <div class="form-group">
                     <label>Tanggal Lahir <span class="required">*</span></label>
-                    <input type="date" class="form-control" required>
+                    <input type="date" name="tanggal_lahir" class="form-control" required>
                 </div>
                 
                 <div class="form-group">
                     <label>Alamat Lengkap <span class="required">*</span></label>
-                    <textarea class="form-control" required></textarea>
+                    <textarea name="alamat" class="form-control" required></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label>Asal Sekolah <span class="required">*</span></label>
-                    <input type="text" class="form-control" required>
+                    <label>Pilihan Program <span class="required">*</span></label>
+                    <select name="program" class="form-control" required>
+                        <option value="">-- Pilih Program --</option>
+                        <option value="Hotel Management">Hotel Management</option>
+                        <option value="Cruise Ship Operations">Cruise Ship Operations</option>
+                        <option value="Culinary Arts">Culinary Arts</option>
+                        <option value="House Keeping">House Keeping</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -86,8 +92,8 @@
                             <input type="file" name="ijazah" accept=".pdf" required style="width: 100%;">
                         </div>
                         <div class="upload-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                            <label><i class="fas fa-file-pdf" style="color:var(--primary-blue);"></i> 3. Pas Foto (PDF)</label>
-                            <input type="file" name="foto_siswa" accept=".pdf" required style="width: 100%;">
+                            <label><i class="fas fa-image" style="color:var(--primary-blue);"></i> 3. Pas Foto (JPG/PNG)</label>
+                            <input type="file" name="foto_siswa" accept=".jpg,.jpeg,.png" required style="width: 100%;">
                         </div>
                         <div class="upload-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
                             <label><i class="fas fa-file-pdf"></i> 4. Bukti Pembayaran</label>
