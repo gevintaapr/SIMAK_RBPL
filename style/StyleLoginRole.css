@@ -400,3 +400,28 @@ button {
 .icon-pimpinan {
     color: #454545;
 }
+
+/* =========================================
+   TOAST NOTIFICATION (ERROR)
+   ========================================= */
+.toast-notification {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(239, 68, 68, 0.95);
+    /* Merah transparan */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    font-family: 'Poppins', sans-serif;
+}

@@ -9,27 +9,49 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $login_input = trim($_POST['login_input'] ?? ''); 
 $password = $_POST['password'] ?? '';
-$role_from_post = $_POST['role'] ?? ''; // Digunakan untuk redirect saat error input kosong
+$role_from_post = $_POST['role'] ?? '';
 
-// --- 1. Validasi Input Kosong & Redirect sesuai Halaman Login Asal ---
+$redirect = match($role_from_post) {
+    '1' => '../public/login/logSiswa.php',
+    '2' => '../public/login/logCalonSiswa.php',
+    '3' => '../public/login/logPengajar.php',
+    '4', '5' => '../public/login/logPimpinan.php',
+    default => '../public/MainLogin.php',
+};
+
+// --- 1. Validasi Input Kosong ---
 if ($login_input === '' || $password === '') {
-    $redirect = match($role_from_post) {
-        '1' => '../public/login/logSiswa.php',
-        '2' => '../public/login/logCalonSiswa.php',
-        '3' => '../public/login/logPengajar.php',
-        '4', '5' => '../public/login/logPimpinan.php',
-        default => '../public/MainLogin.php',
-    };
     header('Location: ' . $redirect . '?error=' . urlencode('Wajib mengisi semua field'));
     exit;
 }
 
-// --- 2. Logika Query: Email (Khusus Role 1) atau Username (Semua Role) ---
+// --- 2. Logika Calon Siswa (Role 2) ---
+if ($role_from_post === '2') {
+    $query = "SELECT * FROM pendaftaran WHERE id_pendaftaran = ? LIMIT 1";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, 's', $login_input);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+
+    if ($user && $user['token_akses'] === $password) {
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $user['id_pendaftaran'];
+        $_SESSION['username'] = $user['nama_cs'];
+        $_SESSION['role'] = 2;
+        header('Location: ../user/dashboards_calon_siswa.php');
+        exit;
+    } else {
+        header('Location: ' . $redirect . '?error=' . urlencode('No. Pendaftaran atau Token Akses salah.'));
+        exit;
+    }
+}
+
+// --- 3. Logika untuk Role Lain (Tabel User) ---
 if (filter_var($login_input, FILTER_VALIDATE_EMAIL)) {
-    // Jika input email, hanya cari yang role_id = 1
     $query = "SELECT id_user, username, email, password, role_id FROM user WHERE email = ? AND role_id = 1 LIMIT 1";
 } else {
-    // Jika input username, cari untuk semua role
     $query = "SELECT id_user, username, email, password, role_id FROM user WHERE username = ? LIMIT 1";
 }
 
@@ -45,25 +67,15 @@ $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 
-// --- 3. Verifikasi Password Menggunakan Password Hash ---
-// Pastikan password di database sudah di-hash menggunakan password_hash()
 if ($user && password_verify($password, $user['password'])) {
-    
-    // Keamanan: Generate ID session baru setelah login berhasil
     session_regenerate_id(true);
-
-    // Simpan data ke session
     $_SESSION['user_id'] = $user['id_user'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['role'] = $user['role_id'];
 
-    // --- 4. Redirect Berdasarkan Role ID dari Database ---
     switch ($user['role_id']) {
         case 1:
             header('Location: ../user/siswa/dashboard_siswa.php');
-            break;
-        case 2:
-            header('Location: ../user/dashboards_calon_siswa.php');
             break;
         case 3:
             header('Location: ../user/pengajar/dashboard_pengajar.php');
@@ -79,10 +91,8 @@ if ($user && password_verify($password, $user['password'])) {
             break;
     }
     exit;
-
 } else {
-    // Error jika user tidak ditemukan atau password salah
-    header('Location: ../public/MainLogin.php?error=' . urlencode('Username/Email atau Password salah.'));
+    header('Location: ' . $redirect . '?error=' . urlencode('Username/Email atau Password salah.'));
     exit;
 }
 ?>

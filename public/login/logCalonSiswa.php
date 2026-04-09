@@ -12,6 +12,21 @@ $role = $_GET['role'] ?? null;
     <link rel="stylesheet" href="../../style/StyleLoginRole.css?v=<?= time() ?>">
 </head>
 <body>
+    <?php if (isset($_GET['error'])): ?>
+    <div id="toast-error" class="toast-notification">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <?= htmlspecialchars($_GET['error']) ?>
+    </div>
+    <script>
+        setTimeout(() => {
+            const toast = document.getElementById('toast-error');
+            if(toast) {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }
+        }, 4000); // Masa aktif kurang lebih 4 detik
+    </script>
+    <?php endif; ?>
 
     <!-- NAVBAR -->
     <header class="navbar">
@@ -42,7 +57,7 @@ $role = $_GET['role'] ?? null;
                 <div class="status-form">
                 <form action="../../app/proses_login.php" method="POST">
                     <div class="form-group">
-                        <input type="hidden" name="role" value="<?= htmlspecialchars($role ?? '') ?>">
+                        <input type="hidden" name="role" value="2">
                         <label for="no-daftar">Nomor Pendaftaran</label>
                         <input type="text" id="no-daftar" 
                         name= "login_input"
