@@ -40,7 +40,7 @@ if ($role_from_post === '2') {
         $_SESSION['user_id'] = $user['id_pendaftaran'];
         $_SESSION['username'] = $user['nama_cs'];
         $_SESSION['role'] = 2;
-        header('Location: ../user/dashboards_calon_siswa.php');
+        header('Location: ../user/siswa/dashboard_calon_siswa.php');
         exit;
     } else {
         header('Location: ' . $redirect . '?error=' . urlencode('No. Pendaftaran atau Token Akses salah.'));
