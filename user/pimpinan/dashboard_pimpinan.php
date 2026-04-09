@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../../style/dashboard_pimpinan.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../../style/popup_logout.css">
+    <link rel="stylesheet" href="../../style/popup_pimpinan.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -19,7 +20,7 @@
             <span class="sidebar-logo">HCTS</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="sidebar-link active">
+            <a href="dashboard_pimpinan.php" class="sidebar-link active">
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
@@ -27,7 +28,7 @@
                 <i class="fa-solid fa-users"></i>
                 <span>Daftar Siswa</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="approval.php" class="sidebar-link">
                 <i class="fa-solid fa-check-double"></i>
                 <span>Approval</span>
             </a>
@@ -168,21 +169,21 @@
                                         <td>Cruise Ship Desk Kadet</td>
                                         <td>Pendaftaran</td>
                                         <td><span class="badge badge-success">Disetujui</span></td>
-                                        <td><a href="#" class="btn-detail">Detail</a></td>
+                                        <td><a href="approval_detail_pendaftaran.php" class="btn-detail">Detail</a></td>
                                     </tr>
                                     <tr>
                                         <td>Jessica Tan</td>
                                         <td>Hotel F&B Service</td>
                                         <td>Magang</td>
                                         <td><span class="badge badge-warning">Menunggu</span></td>
-                                        <td><a href="#" class="btn-detail">Detail</a></td>
+                                        <td><a href="#" class="btn-detail" onclick="openPopupMagang(event)">Detail</a></td>
                                     </tr>
                                     <tr>
                                         <td>Maria Gomez</td>
                                         <td>Cruise Ship Culinary</td>
                                         <td>Evaluasi</td>
                                         <td><span class="badge badge-danger">Ditolak</span></td>
-                                        <td><a href="#" class="btn-detail">Detail</a></td>
+                                        <td><a href="#" class="btn-detail" onclick="openPopupEvaluasi(event)">Detail</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -260,6 +261,135 @@
 
     </div>
 
+    <!-- Popup Detail Evaluasi -->
+    <div id="popupEvaluasi" class="popup-overlay" style="display: none; align-items: center; justify-content: center;">
+        <div class="popup-pimpinan">
+            <div class="popup-header-pimpinan">
+                <h2 class="popup-title-pimpinan">Detail Evaluasi</h2>
+                <button class="btn-close-box" onclick="closePopupEvaluasi()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="popup-section-pimpinan">
+                <h3 class="section-title">Identitas Siswa</h3>
+                <div class="grid-identitas">
+                    <div class="identitas-col">
+                        <div class="identitas-row"><span>ID Siswa</span> <strong>HC123</strong></div>
+                        <div class="identitas-row"><span>Nama Lengkap:</span> <strong>Alexander Wibowo</strong></div>
+                    </div>
+                    <div class="identitas-col">
+                        <div class="identitas-row"><span>Program:</span> <strong>F&amp;B Service</strong></div>
+                        <div class="identitas-row"><span>Periode:</span> <strong>1-2025</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-section-pimpinan">
+                <h3 class="section-title">Hasil Evaluasi <span class="section-badge">Menunggu Persetujuan</span></h3>
+                <table class="table-evaluasi">
+                    <thead>
+                        <tr>
+                            <th>Mata Pelajaran (Subject)</th>
+                            <th style="text-align:center;">Nilai (0-100)</th>
+                            <th style="text-align:center;">Grade</th>
+                            <th>Evaluasi Pengajar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>English Basic</td>
+                            <td align="center"><input type="text" value="88" class="eval-input eval-box-small" readonly></td>
+                            <td align="center"><strong>A</strong></td>
+                            <td><input type="text" value="Memiliki kemampuan dasar bahasa In..." class="eval-input" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Food &amp; Beverage Service</td>
+                            <td align="center"><input type="text" value="89" class="eval-input eval-box-small" readonly></td>
+                            <td align="center"><strong>A</strong></td>
+                            <td><input type="text" value="Menguasai standar pelayanan F&amp;B den..." class="eval-input" readonly></td>
+                        </tr>
+                        <tr>
+                            <td>Housekeeping</td>
+                            <td align="center"><input type="text" value="82" class="eval-input eval-box-small" readonly></td>
+                            <td align="center"><strong>B</strong></td>
+                            <td><input type="text" value="Memahami prosedur dasar housekeepi..." class="eval-input" readonly></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 0.85rem; color: #666; margin-top:0.5rem;">*scroll to see full list</p>
+            </div>
+
+            <button class="btn-setuju-besar" onclick="closePopupEvaluasi()">Setujui Hasil Evaluasi</button>
+        </div>
+    </div>
+
+    <!-- Popup Detail Magang -->
+    <div id="popupMagang" class="popup-overlay" style="display: none; align-items: center; justify-content: center;">
+        <div class="popup-pimpinan">
+            <div class="popup-header-pimpinan">
+                <h2 class="popup-title-pimpinan">Detail Magang</h2>
+                <button class="btn-close-box" onclick="closePopupMagang()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="popup-section-pimpinan">
+                <h3 class="section-title">Identitas Siswa</h3>
+                <div class="grid-identitas">
+                    <div class="identitas-col">
+                        <div class="identitas-row"><span>ID Siswa</span> <strong>HC123</strong></div>
+                        <div class="identitas-row"><span>Nama Lengkap:</span> <strong>Alexander Wibowo</strong></div>
+                    </div>
+                    <div class="identitas-col">
+                        <div class="identitas-row"><span>Program:</span> <strong>F&amp;B Service</strong></div>
+                        <div class="identitas-row"><span>Periode:</span> <strong>1-2025</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="magang-grid">
+                <div class="magang-left">
+                    <div class="popup-section-pimpinan">
+                        <h3 class="section-title">Detail Pengajuan <span class="section-badge">Menunggu Persetujuan</span></h3>
+                        <div class="detail-pengajuan-row"><span>Nama Perusahaan/Hotel:</span> <strong>Msc Cruises</strong></div>
+                        <div class="detail-pengajuan-row"><span>Posisi/Departemen:</span> <strong>Front Office - Kapal Pesiar</strong></div>
+                        <div class="detail-pengajuan-row"><span>Lokasi:</span> <strong>Italy</strong></div>
+                        <div class="detail-pengajuan-row"><span>Periode Pelaksanaan:</span> <strong>Juli 2025 - Desember 2025</strong></div>
+                        
+                        <div class="pengajuan-actions">
+                            <button class="btn-tolak" onclick="closePopupMagang()">Tolak Pengajuan Magang</button>
+                            <button class="btn-setuju" onclick="closePopupMagang()">Setujui Pengajuan Magang</button>
+                        </div>
+                    </div>
+
+                    <div class="popup-section-pimpinan">
+                        <h3 class="section-title">Laporan Kegiatan Harian</h3>
+                        <p style="color: #9CA3AF; font-size: 1.1rem; font-weight: 600; margin: 0;">Belum Di Unggah</p>
+                    </div>
+                </div>
+
+                <div class="magang-right">
+                    <div class="popup-section-pimpinan" style="height: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+                        <h3 class="section-title">Input Nilai Magang</h3>
+                        
+                        <div class="input-group-magang">
+                            <label>Nilai Disiplin &amp; Kehadiran</label>
+                            <input type="text" placeholder="E.g., 90">
+                        </div>
+                        <div class="input-group-magang">
+                            <label>Nilai Kinerja Teknis</label>
+                            <input type="text" placeholder="E.g., 90">
+                        </div>
+                        <div class="input-group-magang">
+                            <label>Nilai Laporan Kegiatan Harian</label>
+                            <input type="text" placeholder="E.g., 90">
+                        </div>
+                        
+                        <button class="btn-disabled">Simpan Nilai Magang</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <script>
         const sidebar = document.getElementById('sidebar');
         const mainWrapper = document.getElementById('mainWrapper');
@@ -276,6 +406,23 @@
         }
         function closeLogoutPopup() {
             document.getElementById('logoutPopup').style.display = 'none';
+        }
+
+        // Popups
+        function openPopupEvaluasi(e) {
+            if (e) e.preventDefault();
+            document.getElementById('popupEvaluasi').style.display = 'flex';
+        }
+        function closePopupEvaluasi() {
+            document.getElementById('popupEvaluasi').style.display = 'none';
+        }
+
+        function openPopupMagang(e) {
+            if (e) e.preventDefault();
+            document.getElementById('popupMagang').style.display = 'flex';
+        }
+        function closePopupMagang() {
+            document.getElementById('popupMagang').style.display = 'none';
         }
     </script>
 

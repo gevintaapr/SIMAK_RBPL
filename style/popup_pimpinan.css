@@ -1,0 +1,262 @@
+.popup-pimpinan {
+    background: white;
+    border-radius: 12px;
+    width: 900px;
+    max-width: 95vw;
+    max-height: 85vh;
+    /* Membatasi tinggi agar tidak memenuhi layar penuh */
+    overflow-y: auto;
+    /* Mengaktifkan scroll internal jika isi terlampau panjang */
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Kustomisasi bilah scroll agar rapi dan modern */
+.popup-pimpinan::-webkit-scrollbar {
+    width: 8px;
+}
+
+.popup-pimpinan::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.popup-pimpinan::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 8px;
+}
+
+.popup-pimpinan::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.popup-header-pimpinan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #E5E7EB;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.popup-title-pimpinan {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: #113A71;
+    font-weight: 700;
+    margin: 0;
+}
+
+.btn-close-box {
+    background: transparent;
+    border: 3px solid #113A71;
+    color: #113A71;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.popup-section-pimpinan {
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    color: #113A71;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-badge {
+    background-color: #D1D5DB;
+    color: #374151;
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.grid-identitas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.identitas-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    border-bottom: 1px dashed #E5E7EB;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.identitas-row span {
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.identitas-row strong {
+    color: #111;
+}
+
+/* Evaluasi Table */
+.table-evaluasi {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-evaluasi th,
+.table-evaluasi td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #E5E7EB;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.table-evaluasi th {
+    background: #F9FAFB;
+    color: #113A71;
+    font-weight: 600;
+}
+
+.eval-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #6B7280;
+}
+
+.eval-box-small {
+    width: 60px;
+    text-align: center;
+}
+
+/* Buttons */
+.btn-setuju-besar {
+    background: #EBC372;
+    color: #113A71;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-setuju-besar:hover {
+    background: #D4AF60;
+}
+
+.btn-setuju {
+    background: #EBC372;
+    color: #113A71;
+    font-weight: 700;
+    padding: 0.8rem 1rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-tolak {
+    background: #FEF2F2;
+    color: #DC2626;
+    font-weight: 700;
+    padding: 0.8rem 1rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-disabled {
+    background: #D1D5DB;
+    color: #4B5563;
+    font-weight: 600;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    border: none;
+    cursor: not-allowed;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Magang Grid */
+.magang-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.magang-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.magang-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-pengajuan-row {
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: baseline;
+}
+
+.detail-pengajuan-row span {
+    color: #6B7280;
+    flex: 0 0 160px;
+    font-weight: 500;
+}
+
+.detail-pengajuan-row strong {
+    color: #111;
+}
+
+.pengajuan-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.input-group-magang {
+    margin-bottom: 1.5rem;
+}
+
+.input-group-magang label {
+    display: block;
+    font-size: 0.9rem;
+    color: #111;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.input-group-magang input {
+    width: 100%;
+    border: 1px solid #D1D5DB;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
