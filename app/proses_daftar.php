@@ -28,6 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // File upload handlings
     $upload_dir = __DIR__ . '/../public/uploads/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+    }
+    
     $files = ['ktp', 'ijazah', 'foto_siswa', 'bukti_pendaftaran', 'surat_pernyataan'];
     $saved_paths = [];
 

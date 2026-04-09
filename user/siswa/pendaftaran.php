@@ -92,7 +92,7 @@
                             <input type="file" name="ijazah" accept=".pdf" required style="width: 100%;">
                         </div>
                         <div class="upload-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                            <label><i class="fas fa-image" style="color:var(--primary-blue);"></i> 3. Pas Foto (JPG/PNG)</label>
+                            <label><i class="fas fa-image"></i> 3. Pas Foto (JPG/PNG)</label>
                             <input type="file" name="foto_siswa" accept=".jpg,.jpeg,.png" required style="width: 100%;">
                         </div>
                         <div class="upload-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
@@ -172,5 +172,31 @@
             </div>
         </div>
     </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInputs = document.querySelectorAll('.upload-item input[type="file"]');
+        
+        fileInputs.forEach(input => {
+            // Find the icon and set initial style
+            const icon = input.closest('.upload-item').querySelector('i.fas');
+            if (icon) {
+                icon.style.color = '#ccc';
+                icon.style.transition = 'color 0.3s ease';
+            }
+
+            // Update color on change
+            input.addEventListener('change', function() {
+                if (icon) {
+                    if (this.files && this.files.length > 0) {
+                        icon.style.color = 'var(--primary-blue, #0056b3)'; // Aktif (Biru)
+                    } else {
+                        icon.style.color = '#ccc'; // Tidak aktif (Abu-abu)
+                    }
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>
