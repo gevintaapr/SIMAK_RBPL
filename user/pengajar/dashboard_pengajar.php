@@ -23,7 +23,7 @@
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="data_siswa.php" class="sidebar-link">
                 <i class="fa-solid fa-users"></i>
                 <span>Data Siswa</span>
             </a>
