@@ -140,13 +140,19 @@ $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                         <td><?= htmlspecialchars($row['id_pendaftaran']) ?></td>
                                         <td><?= htmlspecialchars($row['nama_cs']) ?></td>
                                         <td><?= htmlspecialchars($row['program']) ?></td>
-                                        <td>
-                                            <?php if ($row['status_approval'] == 0 || $row['status_approval'] === 'pending'): ?>
-                                                <span class="badge badge-status-blue">Menunggu Verifikasi</span>
-                                            <?php elseif ($row['status_approval'] == 1 || $row['status_approval'] === 'disetujui'): ?>
-                                                <span class="badge badge-status-green">Disetujui Pimpinan</span>
+                                         <td>
+                                            <?php if ($row['status_approval'] === 'disetujui' || $row['status_approval'] == 1): ?>
+                                                <span class="badge badge-status-green" style="background: #D1FAE5; color: #059669;">Lulus Seleksi</span>
+                                            <?php elseif ($row['status_approval'] === 'ditolak'): ?>
+                                                <span class="badge badge-status-red" style="background: #FEE2E2; color: #DC2626;">Ditolak</span>
+                                            <?php elseif ($row['status_approval'] === 'menunggu_pimpinan'): ?>
+                                                <span class="badge badge-status-orange" style="background: #FEF3C7; color: #D97706;">Menunggu Pimpinan</span>
+                                            <?php elseif ($row['jadwal_wawancara'] !== NULL): ?>
+                                                <span class="badge badge-status-purple" style="background: #EDE9FE; color: #7C3AED;">Wawancara</span>
+                                            <?php elseif ($row['status_berkas'] === 'valid'): ?>
+                                                <span class="badge badge-status-green" style="background: #D1FAE5; color: #059669;">Terverifikasi</span>
                                             <?php else: ?>
-                                                <span class="badge badge-status-blue"><?= htmlspecialchars($row['status_approval']) ?></span>
+                                                <span class="badge badge-status-blue">Menunggu Verifikasi</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>

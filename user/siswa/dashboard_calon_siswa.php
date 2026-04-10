@@ -18,90 +18,75 @@ if (!$daftar) {
     exit();
 }
 
-// Logic for alert boxes
+// Logic for alert boxes and status
 $alert_bg = "#fff3cd"; $alert_text = "#856404"; $alert_border = "#ffeeba";
 $alert_icon = "fa-info-circle";
-$alert_title = "Verifikasi Dokumen Sedang Berlangsung";
-$alert_desc = "Admin kami sedang memeriksa kelengkapan dokumen Anda. Proses ini biasanya memakan waktu 1-2 hari kerja.<br>Harap cek status secara berkala.";
+$alert_title = "Pendaftaran Sedang Berlangsung";
+$alert_desc = "Harap pantau terus dashboard Anda untuk perkembangan status pendaftaran.";
+$status_verifikasi = "Diproses";
+$status_badge_text = "Menunggu";
 
-$status_verifikasi = "Menunggu";
-$status_badge_text = "Lengkap, Menunggu Verifikasi";
+// Timeline Progress
+$s3 = ""; $s4 = ""; $s5 = ""; $s6 = ""; 
+$progress_width = "20%"; // Step 1 and 2 complete (Pendaftaran, Upload)
 
-if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
-    if ($daftar['hasil_akhir'] === 'lulus') {
-        $alert_bg = "#d4edda"; $alert_text = "#155724"; $alert_border = "#c3e6cb";
-        $alert_icon = "fa-check-circle";
-        $alert_title = "Selamat! Anda Lolos Seleksi!";
-        $alert_desc = "Anda telah resmi diterima sebagai siswa. Silakan periksa email untuk instruksi lebih lanjut.";
-        $status_verifikasi = "Lolos Seleksi";
-        $status_badge_text = "Lolos Seleksi";
-    } else {
-        $alert_bg = "#f8d7da"; $alert_text = "#721c24"; $alert_border = "#f5c6cb";
-        $alert_icon = "fa-times-circle";
-        $alert_title = "Mohon Maaf, Anda Tidak Lolos Seleksi";
-        $alert_desc = "Tetap semangat dan jangan menyerah. Terima kasih atas partisipasi Anda.";
-        $status_verifikasi = "Tidak Lulus";
-        $status_badge_text = "Gagal Seleksi";
-    }
-} elseif (!empty($daftar['jadwal_wawancara'])) {
-    $alert_bg = "#d1ecf1"; $alert_text = "#0c5460"; $alert_border = "#bee5eb";
-    $alert_icon = "fa-calendar-alt"; $alert_title = "Jadwal Wawancara Anda Telah Ditetapkan";
-    $alert_desc = "Wawancara akan dilaksanakan pada: <strong>" . date("d M Y H:i", strtotime($daftar['jadwal_wawancara'])) . "</strong>.<br>Hadir tepat waktu dan persiapkan diri Anda.";
-    $status_verifikasi = "Menunggu Wawancara";
-    $status_badge_text = "Jadwal Wawancara";
-} elseif ($daftar['status_approval'] === 'disetujui') {
-    $alert_bg = "#d1ecf1"; $alert_text = "#0c5460"; $alert_border = "#bee5eb";
-    $alert_icon = "fa-clock"; $alert_title = "Selamat! Berkas Disetujui Pimpinan";
-    $alert_desc = "Menunggu admin untuk menetapkan jadwal wawancara Anda. Silakan cek berkala.";
-    $status_verifikasi = "Menunggu Jadwal Wawancara";
-    $status_badge_text = "Disetujui Pimpinan";
+if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] === '1') {
+    $alert_bg = "#d4edda"; $alert_text = "#155724"; $alert_border = "#c3e6cb";
+    $alert_icon = "fa-check-circle";
+    $alert_title = "Selamat! Anda Lolos Seleksi!";
+    $alert_desc = "Anda telah resmi diterima sebagai siswa Program HCTS. Silakan lakukan proses administrasi selanjutnya.";
+    $status_verifikasi = "Lolos Seleksi";
+    $status_badge_text = "Lolos Seleksi";
+    $s3 = "completed"; $s4 = "completed"; $s5 = "completed"; $s6 = "active";
+    $progress_width = "100%";
 } elseif ($daftar['status_approval'] === 'ditolak') {
     $alert_bg = "#f8d7da"; $alert_text = "#721c24"; $alert_border = "#f5c6cb";
-    $alert_icon = "fa-times-circle"; $alert_title = "Pendaftaran Ditolak Pimpinan";
-    $alert_desc = "Mohon maaf, pendaftaran Anda tidak dapat dilanjutkan ke tahap berikutnya.";
-    $status_verifikasi = "Ditolak Pimpinan";
-    $status_badge_text = "Ditolak";
-} elseif ($daftar['status_berkas'] === 'valid') {
-    $alert_bg = "#fff3cd"; $alert_text = "#856404"; $alert_border = "#ffeeba";
-    $alert_icon = "fa-info-circle"; $alert_title = "Dokumen sudah berhasil terverifikasi!";
-    $alert_desc = "Silakan perhatikan jadwal wawancara di bawah ini untuk melanjutkan proses pendaftaran Program HCTS. Hubungi kontak yang tersedia untuk informasi lebih lanjut.";
-    $status_verifikasi = "Tahap Wawancara";
-    $status_badge_text = "Verifikasi Berhasil";
-} elseif ($daftar['status_berkas'] === 'tidak_valid') {
-    $alert_bg = "#f8d7da"; $alert_text = "#721c24"; $alert_border = "#f5c6cb";
-    $alert_icon = "fa-times-circle"; $alert_title = "Berkas Tidak Valid";
-    $alert_desc = "Mohon maaf, berkas Anda dinyatakan tidak valid oleh admin.";
-    $status_verifikasi = "Berkas Ditolak";
-    $status_badge_text = "Berkas Tidak Valid";
-}
-
-// Logic for Timeline steps
-$s3 = ""; $s4 = ""; $s5 = ""; $s6 = ""; 
-$progress_width = "20%"; // Step 1 and 2 complete
-
-if ($daftar['status_berkas'] === 'valid') {
-    $s3 = "completed";
-    $s4 = "active";
-    $progress_width = "54%";
-} elseif ($daftar['status_approval'] === 'disetujui') {
-    $s3 = "completed";
-    $s4 = "active";
-    $progress_width = "54%";
-}
-if (!empty($daftar['jadwal_wawancara'])) {
-    $s3 = "completed";
-    $s4 = "active";
-    $progress_width = "54%";
-}
-if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
-    $s4 = "completed";
-    $s5 = "completed";
+    $alert_icon = "fa-times-circle";
+    $alert_title = "Hasil Seleksi: Tidak Lulus";
+    $alert_desc = "Mohon maaf, Anda belum dapat melanjutkan ke tahap berikutnya. Tetap semangat!";
+    $status_verifikasi = "Tidak Lulus";
+    $status_badge_text = "Gagal Seleksi";
+    $s3 = "completed"; $s4 = "completed"; $s5 = "completed";
     $progress_width = "82%";
-    if ($daftar['hasil_akhir'] === 'lulus') {
-        $s6 = "active";
-        $progress_width = "100%";
-    }
+} elseif ($daftar['status_approval'] === 'menunggu_pimpinan') {
+    $alert_bg = "#e2e3e5"; $alert_text = "#383d41"; $alert_border = "#d6d8db";
+    $alert_icon = "fa-hourglass-half";
+    $alert_title = "Tahap Wawancara Selesai";
+    $alert_desc = "Wawancara telah selesai dilaksanakan. Saat ini sedang menunggu keputusan akhir dari Pimpinan HCTS.";
+    $status_verifikasi = "Menunggu Keputusan";
+    $status_badge_text = "Menunggu Approval";
+    $s3 = "completed"; $s4 = "completed"; $s5 = "active";
+    $progress_width = "82%";
+} elseif (!empty($daftar['jadwal_wawancara'])) {
+    $alert_bg = "#d1ecf1"; $alert_text = "#0c5460"; $alert_border = "#bee5eb";
+    $alert_icon = "fa-calendar-alt";
+    $alert_title = "Jadwal Wawancara Telah Ditetapkan";
+    $alert_desc = "Silakan hadir pada wawancara tanggal: <strong>" . date("d M Y H:i", strtotime($daftar['jadwal_wawancara'])) . " WIB</strong>. Persiapkan dokumen pendukung Anda.";
+    $status_verifikasi = "Menunggu Wawancara";
+    $status_badge_text = "Wawancara Terjadwal";
+    $s3 = "completed"; $s4 = "active";
+    $progress_width = "67%";
+} elseif ($daftar['status_berkas'] === 'valid') {
+    $alert_bg = "#d4edda"; $alert_text = "#155724"; $alert_border = "#c3e6cb";
+    $alert_icon = "fa-user-check";
+    $alert_title = "Berkas Telah Terverifikasi!";
+    $alert_desc = "Dokumen Anda sudah divalidasi oleh Admin. Mohon tunggu penetapan jadwal wawancara dari tim kami.";
+    $status_verifikasi = "Berkas Valid";
+    $status_badge_text = "Terverifikasi";
+    $s3 = "completed"; $s4 = "active";
+    $progress_width = "50%";
+} else {
+    // Default: Waiting verification
+    $alert_bg = "#fff3cd"; $alert_text = "#856404"; $alert_border = "#ffeeba";
+    $alert_icon = "fa-info-circle";
+    $alert_title = "Menunggu Verifikasi Berkas";
+    $alert_desc = "Admin sedang memeriksa kelengkapan dokumen pendaftaran Anda. Mohon tunggu 1-2 hari kerja.";
+    $status_verifikasi = "Pending";
+    $status_badge_text = "Daftar Tunggu";
+    $s3 = "active";
+    $progress_width = "33%";
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -146,7 +131,7 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
             <div class="status-badge">Calon Siswa</div>
         </div>
 
-        <!-- Warning Info -->
+        <!-- Dynamic Alert Box -->
         <div class="alert-warning" style="background-color: <?= $alert_bg ?>; color: <?= $alert_text ?>; border-left: 4px solid <?= $alert_border ?>; padding: 15px 20px; border-radius: 8px; display: flex; align-items: flex-start; gap: 15px; margin-bottom: 30px;">
             <i class="fas <?= $alert_icon ?>" style="font-size: 1.5rem; margin-top: 3px;"></i>
             <div class="alert-content">
@@ -167,26 +152,26 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                 <div class="step-label">Upload Dokumen</div>
             </div>
             <div class="timeline-step <?= $s3 ?>">
-                <div class="step-circle"><?= $s3 == 'completed' ? '<i class="fas fa-check"></i>' : '3' ?></div>
+                <div class="step-circle"><?= ($s3 == 'completed') ? '<i class="fas fa-check"></i>' : '3' ?></div>
                 <div class="step-label">Verifikasi Admin</div>
             </div>
             <div class="timeline-step <?= $s4 ?>">
-                <div class="step-circle"><?= $s4 == 'completed' ? '<i class="fas fa-check"></i>' : ( ($s4 == 'active') ? '4' : '4' ) ?></div>
+                <div class="step-circle"><?= ($s4 == 'completed') ? '<i class="fas fa-check"></i>' : '4' ?></div>
                 <div class="step-label">Wawancara</div>
             </div>
             <div class="timeline-step <?= $s5 ?>">
-                <div class="step-circle"><?= $s5 == 'completed' ? '<i class="fas fa-check"></i>' : '5' ?></div>
+                <div class="step-circle"><?= ($s5 == 'completed') ? '<i class="fas fa-check"></i>' : '5' ?></div>
                 <div class="step-label">Pengumuman</div>
             </div>
             <div class="timeline-step <?= $s6 ?>">
-                <div class="step-circle">6</div>
+                <div class="step-circle"><?= ($s6 == 'completed') ? '<i class="fas fa-check"></i>' : '6' ?></div>
                 <div class="step-label">Mulai Belajar</div>
             </div>
         </div>
 
         <!-- Grid Cards -->
         <div class="dashboard-grid">
-            <?php if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] === 'lulus'): ?>
+            <?php if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] === '1'): ?>
             <div class="content-card" style="border-color: #c2e2af; background: #fdfdfd;">
                 <h3>Informasi Akademik</h3>
                 <div class="doc-status" style="background:#f0faeb; border: 1px solid #c2e2af; border-radius: 12px; padding: 2.5rem 1rem;">
@@ -198,38 +183,37 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                     <div style="background:white; padding: 20px; border-radius: 8px; margin: 0 15px; text-align: left; border: 1px solid #d4ebc6;">
                         <strong style="color: #333; font-size:0.9rem;">Email Belajar:</strong><br>
                         <?php
-                            $parts = explode('-', $daftar['id_pendaftaran']); 
-                            $tahun = substr($parts[1] ?? '2026', -2); 
-                            $nodaftar = $parts[2] ?? '0000'; 
-                            $nama_parts = !empty($daftar['nama_cs']) ? explode(' ', strtolower(trim($daftar['nama_cs']))) : ['siswa'];
+                            $nodaftar = $daftar['id_pendaftaran'];
+                            $nama_parts = explode(' ', strtolower(trim($daftar['nama_cs'])));
                             $nama_awal = preg_replace('/[^a-z]/', '', $nama_parts[0]);
-                            $dummy_email = $nama_awal . $nodaftar . '.' . $tahun . '@hcts.ac.id';
+                            $dummy_email = $nama_awal . substr($nodaftar, -4) . '.26@hcts.ac.id';
                         ?>
                         <span style="color:#0369a1; font-weight:700; font-size: 1.2rem;"><?= htmlspecialchars($daftar['email_belajar'] ?? $dummy_email) ?></span>
                         <br><br>
                         <strong style="color: #333; font-size:0.9rem;">Password Awal:</strong><br>
-                        <span style="color:#555; font-family: monospace; font-size: 1.1rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">HCTS<?= date('Y', strtotime($daftar['created_at'] ?? 'now')) ?></span>
+                        <span style="color:#555; font-family: monospace; font-size: 1.1rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">HCTS2026</span>
                     </div>
-                    <a href="../../public/login/logSiswa.php" style="display:inline-block; margin-top:20px; background:#4a9e22; color:white; padding: 12px 25px; border-radius: 8px; text-decoration:none; font-weight:600; box-shadow: 0 4px 6px rgba(74, 158, 34, 0.2);">Login ke Portal Belajar</a>
+                    <a href="../../public/login/logSiswa.php" style="display:inline-block; margin-top:20px; background:#4a9e22; color:white; padding: 12px 25px; border-radius: 8px; text-decoration:none; font-weight:600;">Login ke Portal Belajar</a>
                 </div>
             </div>
-            <?php elseif ($daftar['status_berkas'] === 'valid'): ?>
+            
+            <?php elseif (!empty($daftar['jadwal_wawancara'])): ?>
             <div class="content-card">
-                <h3>Status Dokumen</h3>
+                <h3>Informasi Wawancara</h3>
                 <div class="doc-status" style="text-align: center;">
                     <div class="icon-folder" style="color: #0d6efd; background: #e7f1ff; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                        <i class="fas fa-check-circle" style="font-size: 2.5rem;"></i>
+                        <i class="fas fa-calendar-check" style="font-size: 2.5rem;"></i>
                     </div>
-                    <h4 style="color: #003B73; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px;">Jadwal Wawancara Program HCTS:</h4>
-                    <div style="text-align: left; font-size: 0.9rem; color: #003B73; display: inline-block; margin-bottom: 20px;">
-                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Hari / Tanggal : <?= date('l, d F Y', strtotime($daftar['jadwal_wawancara'] ?? '+7 days')) ?></p>
-                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Waktu : <?= date('H.i', strtotime($daftar['jadwal_wawancara'] ?? '09:00')) ?> - 11.00 WIB</p>
-                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Metode : Online (Zoom Meeting)</p>
-                        <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 10px;"></i> Link Wawancara : Akan dikirim melalui WhatsApp / Email</p>
+                    <h4 style="color: #003B73; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px;">Jadwal Wawancara Anda:</h4>
+                    <div style="text-align: left; font-size: 0.9rem; color: #003B73; display: inline-block; margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                        <p style="margin-bottom: 8px;"><i class="fas fa-clock" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Waktu:</strong> <?= date('l, d F Y, H:i', strtotime($daftar['jadwal_wawancara'])) ?> WIB</p>
+                        <p style="margin-bottom: 8px;"><i class="fas fa-video" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Metode:</strong> Online via Zoom Meeting</p>
+                        <p style="margin-bottom: 0;"><i class="fas fa-link" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Link:</strong> Akan dikirim via WhatsApp</p>
                     </div>
-                    <p style="font-size: 0.8rem; font-style: italic; color: #666; border-top: 1px solid #eee; padding-top: 10px;">Keterangan : Peserta diharapkan hadir 10 menit sebelum jadwal dimulai</p>
+                    <p style="font-size: 0.8rem; font-style: italic; color: #666;">Harap persiapkan koneksi internet yang stabil.</p>
                 </div>
             </div>
+
             <?php else: ?>
             <div class="content-card">
                 <h3>Status Dokumen</h3>
@@ -238,17 +222,18 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                         <i class="fas fa-folder"></i>
                     </div>
                     <h4><?= $status_badge_text ?></h4>
-                    <p>Mencakup: KTP, Ijazah, Pas Foto, Bukti Pendaftaran, dan Surat Pernyataan</p>
-                    <div class="status-pill"><?= $status_verifikasi ?></div>
+                    <p>Status pendaftaran saat ini: <?= $status_verifikasi ?></p>
+                    <div class="status-pill" style="background: <?= $alert_bg ?>; color: <?= $alert_text ?>;"><?= $status_verifikasi ?></div>
                 </div>
             </div>
             <?php endif; ?>
+
             <div class="content-card">
                 <h3>Ringkasan Data</h3>
                 <table class="data-summary">
                     <tr>
                         <td>Nama Lengkap</td>
-                        <td><?= htmlspecialchars($daftar['nama_cs']) ?></td>
+                        <td><?= htmlspecialchars($data['nama_cs'] ?? $daftar['nama_cs']) ?></td>
                     </tr>
                     <tr>
                         <td>Program Pilihan</td>
@@ -259,12 +244,8 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                         <td><?= htmlspecialchars($daftar['no_wa'] ?? '-') ?></td>
                     </tr>
                     <tr>
-                        <td>Tanggal Daftar</td>
-                        <td><?= isset($daftar['tanggal']) ? date("d M Y", strtotime($daftar['tanggal'])) : (isset($daftar['created_at']) ? date("d M Y", strtotime($daftar['created_at'])) : '-') ?></td>
-                    </tr>
-                    <tr>
-                        <td>Status Akhir</td>
-                        <td class="highlight-text" style="color: #f59e0b; font-weight: 700;"><?= htmlspecialchars($status_verifikasi) ?></td>
+                        <td>Status Alur</td>
+                        <td class="highlight-text" style="color: <?= $status_color ?? '#f59e0b' ?>; font-weight: 700;"><?= $status_verifikasi ?></td>
                     </tr>
                 </table>
             </div>
@@ -277,22 +258,6 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
             <div class="footer-col brand-col">
                 <h3 class="footer-logo">HCTS</h3>
                 <p>Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
-                <div class="social-icons" style="margin-top: 1rem;">
-                    <a href="#" style="color: #ccc; margin-right: 15px;"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" style="color: #ccc; margin-right: 15px;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="color: #ccc; margin-right: 15px;"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" style="color: #ccc;"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4>Aksi Cepat</h4>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Our Programs</a></li>
-                    <li><a href="#">Admission Process</a></li>
-                    <li><a href="#">Career Opportunities</a></li>
-                    <li><a href="#">Student Stories</a></li>
-                </ul>
             </div>
             <div class="footer-col">
                 <h4>Program Kami</h4>
@@ -300,26 +265,18 @@ if (!empty($daftar['hasil_akhir']) && $daftar['hasil_akhir'] !== 'pending') {
                     <li><a href="#">Hotel Management</a></li>
                     <li><a href="#">Cruise Ship Operations</a></li>
                     <li><a href="#">Culinary Arts</a></li>
-                    <li><a href="#">Hospitality Services</a></li>
-                    <li><a href="#">Tourism Management</a></li>
                 </ul>
             </div>
             <div class="footer-col contact-col">
                 <h4>Kontak Kami</h4>
                 <ul>
-                    <li><a href="#"><i class="fas fa-map-marker-alt" style="margin-right: 10px;"></i> 123 Maritime Avenue,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Harbor District, HD 12345</a></li>
-                    <li><a href="#"><i class="fas fa-phone-alt" style="margin-right: 10px;"></i> +1 (555) 123-4567</a></li>
-                    <li><a href="#"><i class="fas fa-envelope" style="margin-right: 10px;"></i> info@hcts.edu</a></li>
+                    <li><i class="fas fa-envelope" style="margin-right: 10px;"></i> info@hcts.edu</li>
+                    <li><i class="fas fa-phone-alt" style="margin-right: 10px;"></i> +1 (555) 123-4567</li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <div class="footer-copy">&copy; 2025 HCTS International. All rights reserved.</div>
-            <div class="footer-legal">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Cookie Policy</a>
-            </div>
+            <div class="footer-copy">&copy; 2026 HCTS International. All rights reserved.</div>
         </div>
     </footer>
 </body>

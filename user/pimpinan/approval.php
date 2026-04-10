@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 // Check session
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'pimpinan') {
@@ -12,10 +12,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'pimpinan') {
 $db = new Database();
 $conn = $db->getConnection();
 
-// Fetch pending magang applications
-$stmt = $conn->query("SELECT m.*, u.name, u.email FROM magang m LEFT JOIN `user` u ON m.user_id = u.id_user WHERE m.status_pengajuan = 'pending' ORDER BY m.created_at DESC");
-$magang_pending = $stmt->fetchAll();
+// Fetch pending pendaftaran (waiting for pimpinan)
+$stmt_p = $conn->query("SELECT * FROM pendaftaran WHERE status_approval = 'menunggu_pimpinan' ORDER BY id_pendaftaran DESC");
+$pendaftaran_pending = $stmt_p->fetchAll();
+$count_pendaftaran = count($pendaftaran_pending);
 
+// Fetch pending magang applications
+$stmt_m = $conn->query("SELECT m.*, s.nama_lengkap as name, u.email FROM magang m LEFT JOIN `user` u ON m.user_id = u.id_user LEFT JOIN `siswa` s ON u.id_user = s.id_user WHERE m.status_pengajuan = 'pending' ORDER BY m.created_at DESC");
+$magang_pending = $stmt_m->fetchAll();
 $count_magang = count($magang_pending);
 ?>
 <!DOCTYPE html>
@@ -101,7 +105,7 @@ $count_magang = count($magang_pending);
                     </div>
                     
                     <div class="custom-tabs">
-                        <button class="tab-btn active" onclick="openTab('pendaftaran')">Pendaftaran (12)</button>
+                        <button class="tab-btn active" onclick="openTab('pendaftaran')">Pendaftaran (<?= $count_pendaftaran ?>)</button>
                         <button class="tab-btn" onclick="openTab('evaluasi')">Evaluasi (3)</button>
                         <button class="tab-btn" onclick="openTab('magang')">Magang (<?= $count_magang ?>)</button>
                     </div>
@@ -110,48 +114,27 @@ $count_magang = count($magang_pending);
                     <!-- Pendaftaran -->
                     <div id="pendaftaran" class="tab-pane active">
                         <div class="approval-list">
-                            <!-- Card 1 -->
-                            <div class="approval-card">
-                                <div class="ac-left">
-                                    <h3 class="ac-name">Alexander Wibowo</h3>
-                                    <p class="ac-dept">F&B Services</p>
+                            <?php if (empty($pendaftaran_pending)): ?>
+                                <div class="empty-state" style="text-align:center; padding: 40px;">
+                                    <p>Tidak ada pendaftaran yang menunggu approval pimpinan.</p>
                                 </div>
-                                <div class="ac-center">
-                                    <span class="ac-badge">Menunggu Approval</span>
-                                    <span class="ac-date">| Tanggal Pengajuan: 24 Oktober 2025</span>
-                                </div>
-                                <div class="ac-right">
-                                    <a href="approval_detail_pendaftaran.php" class="btn-primary-dark">Detail</a>
-                                </div>
-                            </div>
-                            <!-- Card 2 -->
-                            <div class="approval-card">
-                                <div class="ac-left">
-                                    <h3 class="ac-name">Alexander Wibowo</h3>
-                                    <p class="ac-dept">F&B Services</p>
-                                </div>
-                                <div class="ac-center">
-                                    <span class="ac-badge">Menunggu Approval</span>
-                                    <span class="ac-date">| Tanggal Pengajuan: 24 Oktober 2025</span>
-                                </div>
-                                <div class="ac-right">
-                                    <a href="approval_detail_pendaftaran.php" class="btn-primary-dark">Detail</a>
-                                </div>
-                            </div>
-                            <!-- Card 3 -->
-                            <div class="approval-card">
-                                <div class="ac-left">
-                                    <h3 class="ac-name">Alexander Wibowo</h3>
-                                    <p class="ac-dept">F&B Services</p>
-                                </div>
-                                <div class="ac-center">
-                                    <span class="ac-badge">Menunggu Approval</span>
-                                    <span class="ac-date">| Tanggal Pengajuan: 24 Oktober 2025</span>
-                                </div>
-                                <div class="ac-right">
-                                    <a href="approval_detail_pendaftaran.php" class="btn-primary-dark">Detail</a>
-                                </div>
-                            </div>
+                            <?php else: ?>
+                                <?php foreach ($pendaftaran_pending as $p): ?>
+                                    <div class="approval-card">
+                                        <div class="ac-left">
+                                            <h3 class="ac-name"><?= htmlspecialchars($p['nama_cs']) ?></h3>
+                                            <p class="ac-dept"><?= htmlspecialchars($p['program']) ?></p>
+                                        </div>
+                                        <div class="ac-center">
+                                            <span class="ac-badge">Menunggu Approval</span>
+                                            <span class="ac-date">| Wawancara Selesai Pada: <?= date('d M Y', strtotime($p['jadwal_wawancara'])) ?></span>
+                                        </div>
+                                        <div class="ac-right">
+                                            <a href="approval_detail_pendaftaran.php?id=<?= $p['id_pendaftaran'] ?>" class="btn-primary-dark">Detail</a>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -202,7 +185,7 @@ $count_magang = count($magang_pending);
                     </div>
 
                 </div>
-            </div>
+            </section>
             
         </main>
 
@@ -320,7 +303,6 @@ $count_magang = count($magang_pending);
                         </tr>
                     </tbody>
                 </table>
-                <p style="font-size:12px; margin-top:12px; color:#64748b; font-style:italic;">*scroll to see full list</p>
             </div>
 
             <div class="modal-footer">
@@ -345,7 +327,6 @@ $count_magang = count($magang_pending);
             </div>
 
             <div class="magang-grid">
-                <!-- Left Col -->
                 <div class="magang-col" style="width: 100%;">
                     <div class="section-box" style="margin-bottom:0;">
                         <div class="section-header">
@@ -362,8 +343,8 @@ $count_magang = count($magang_pending);
                             <textarea id="pimpinanCatatan" style="width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 10px; margin-bottom: 16px; min-height: 80px;"></textarea>
                             
                             <div class="magang-actions" style="display: flex; gap: 15px; justify-content: flex-end;">
-                                <button class="btn-magang-reject" onclick="prosesApprove('ditolak_pimpinan')" style="background: #ef4444; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer;">Tolak</button>
-                                <button class="btn-magang-approve" onclick="prosesApprove('disetujui_pimpinan')" style="background: #1e293b; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer;">Setujui</button>
+                                <button class="btn-magang-reject" onclick="prosesApproveMagang('ditolak_pimpinan')" style="background: #ef4444; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer;">Tolak</button>
+                                <button class="btn-magang-approve" onclick="prosesApproveMagang('disetujui_pimpinan')" style="background: #1e293b; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer;">Setujui</button>
                             </div>
                         </div>
                     </div>
@@ -387,12 +368,9 @@ $count_magang = count($magang_pending);
 
         // Tabs Logic
         function openTab(tabId) {
-            // Remove active from all buttons
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            // Remove active from all panes
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             
-            // Add active to clicked button and target pane
             event.target.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
@@ -414,7 +392,7 @@ $count_magang = count($magang_pending);
             openModal('magangModal');
         }
 
-        function prosesApprove(status) {
+        function prosesApproveMagang(status) {
             const catatan = document.getElementById('pimpinanCatatan').value;
             if (status === 'ditolak_pimpinan' && !catatan) {
                 alert('Catatan wajib diisi jika menolak.');
@@ -427,7 +405,7 @@ $count_magang = count($magang_pending);
             formData.append('status', status);
             formData.append('catatan', catatan);
 
-            fetch('../backend/approvalMagang.php', {
+            fetch('../../backend/approvalMagang.php', {
                 method: 'POST',
                 body: formData
             })

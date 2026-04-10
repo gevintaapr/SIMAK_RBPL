@@ -22,6 +22,90 @@ if (!$data) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../../style/detail_pendaftar_A.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../../style/popup_admin.css?v=<?= time() ?>">
+    <style>
+        .workflow-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #edf2f7;
+        }
+        .wf-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: #003B73;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .wf-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .input-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4A5568;
+        }
+        .input-group input {
+            padding: 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .btn-action {
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        .btn-blue {
+            background: #003B73;
+            color: #fff;
+        }
+        .btn-gold {
+            background: #EBC372;
+            color: #003B73;
+        }
+        .btn-green {
+            background: #10B981;
+            color: #fff;
+        }
+        .btn-action:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .status-info {
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 10px;
+            border-left: 4px solid #003B73;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .status-info p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .status-info strong {
+            color: #003B73;
+        }
+    </style>
 </head>
 <body>
 
@@ -146,14 +230,37 @@ if (!$data) {
                                     <span class="info-value"><?= htmlspecialchars($data['alamat']) ?></span>
                                 </div>
                                 <div class="info-item full-width mt-2">
-                                    <span class="info-label">Status Pendaftaran:</span>
-                                    <?php if ($data['status_approval'] == 1 || $data['status_approval'] === 'disetujui'): ?>
-                                        <span class="badge badge-status-approved" style="background: #D1FAE5; color: #059669;">Disetujui Pimpinan</span>
-                                    <?php elseif ($data['status_approval'] == 'ditolak'): ?>
-                                        <span class="badge badge-status-rejected" style="background: #FEE2E2; color: #DC2626;">Ditolak</span>
-                                    <?php else: ?>
-                                        <span class="badge badge-status-pending" style="background: #DBEAFE; color: #2563EB;">Menunggu Verifikasi</span>
-                                    <?php endif; ?>
+                                    <span class="info-label">Status Alur Pendaftaran:</span>
+                                    <?php 
+                                    $status_label = "Menunggu Verifikasi";
+                                    $status_color = "#2563EB";
+                                    $status_bg = "#DBEAFE";
+                                    
+                                    if ($data['status_approval'] === 'disetujui' || $data['status_approval'] === '1') {
+                                        $status_label = "Lulus Seleksi";
+                                        $status_color = "#059669";
+                                        $status_bg = "#D1FAE5";
+                                    } elseif ($data['status_approval'] === 'ditolak') {
+                                        $status_label = "Tidak Lulus";
+                                        $status_color = "#DC2626";
+                                        $status_bg = "#FEE2E2";
+                                    } elseif ($data['status_approval'] === 'menunggu_pimpinan') {
+                                        $status_label = "Menunggu Approval Pimpinan";
+                                        $status_color = "#D97706";
+                                        $status_bg = "#FEF3C7";
+                                    } elseif ($data['jadwal_wawancara'] !== NULL) {
+                                        $status_label = "Jadwal Wawancara Ditetapkan";
+                                        $status_color = "#7C3AED";
+                                        $status_bg = "#EDE9FE";
+                                    } elseif ($data['status_berkas'] === 'valid') {
+                                        $status_label = "Berkas Terverifikasi";
+                                        $status_color = "#059669";
+                                        $status_bg = "#D1FAE5";
+                                    }
+                                    ?>
+                                    <span class="badge" style="background: <?= $status_bg ?>; color: <?= $status_color ?>; display: inline-block; padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: 600;">
+                                        <?= $status_label ?>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -165,12 +272,68 @@ if (!$data) {
                     </div>
                 </div>
 
+                <!-- Workflow Action Card -->
+                <div class="workflow-card">
+                    <h3 class="wf-title"><i class="fa-solid fa-list-check"></i> Kontrol Tahapan Pendaftaran</h3>
+                    
+                    <?php if ($data['status_berkas'] !== 'valid'): ?>
+                        <!-- TAHAP 1: Verifikasi -->
+                        <div class="wf-form">
+                            <p>Tinjau dokumen calon siswa di bawah ini. Jika sudah benar, lakukan verifikasi berkas.</p>
+                            <button class="btn-action btn-gold" onclick="prosesWorkflow('verifikasi_berkas')">
+                                <i class="fa-solid fa-check-double"></i> Verifikasi Berkas Sekarang
+                            </button>
+                        </div>
+
+                    <?php elseif ($data['jadwal_wawancara'] === NULL): ?>
+                        <!-- TAHAP 2: Set Jadwal -->
+                        <div class="wf-form">
+                            <div class="status-info">
+                                <p><i class="fa-solid fa-circle-check"></i> <strong>Berkas Telah Terverifikasi.</strong> Tahap selanjutnya adalah menetapkan jadwal wawancara.</p>
+                            </div>
+                            <div class="input-group">
+                                <label for="jadwalInput">Pilih Jadwal Wawancara:</label>
+                                <input type="datetime-local" id="jadwalInput" min="<?= date('Y-m-d\TH:i') ?>">
+                            </div>
+                            <button class="btn-action btn-blue" onclick="prosesWorkflow('set_jadwal')">
+                                <i class="fa-solid fa-calendar-plus"></i> Tetapkan Jadwal Wawancara
+                            </button>
+                        </div>
+
+                    <?php elseif ($data['status_approval'] === 'pending' || $data['status_approval'] === '0'): ?>
+                        <!-- TAHAP 3: Selesai Wawancara -->
+                        <div class="wf-form">
+                            <div class="status-info">
+                                <p><i class="fa-solid fa-calendar-check"></i> <strong>Jadwal Wawancara Ditetapkan:</strong></p>
+                                <p><strong><?= date('d F Y, H:i', strtotime($data['jadwal_wawancara'])) ?> WIB</strong></p>
+                            </div>
+                            <p>Jika wawancara telah dilaksanakan, silakan klik tombol di bawah untuk meneruskan ke Pimpinan.</p>
+                            <button class="btn-action btn-green" onclick="prosesWorkflow('selesai_wawancara')">
+                                <i class="fa-solid fa-flag-checkered"></i> Wawancara Selesai & Kirim Approval
+                            </button>
+                        </div>
+
+                    <?php elseif ($data['status_approval'] === 'menunggu_pimpinan'): ?>
+                        <!-- TAHAP 4: Menunggu Pimpinan -->
+                        <div class="status-info" style="border-left-color: #D97706;">
+                            <p><i class="fa-solid fa-hourglass-half"></i> <strong>Sedang Menunggu Approval Pimpinan.</strong></p>
+                            <p>Data pendaftaran ini telah muncul di dashboard pimpinan untuk diputuskan (Lulus/Tidak Lulus).</p>
+                        </div>
+
+                    <?php else: ?>
+                        <!-- FINISHED -->
+                        <div class="status-info" style="border-left-color: <?= $data['status_approval'] === 'disetujui' ? '#10B981' : '#DC2626' ?>;">
+                            <p><i class="fa-solid fa-circle-info"></i> <strong>Proses Seleksi Selesai.</strong></p>
+                            <p>Hasil Akhir: <strong><?= $data['status_approval'] === 'disetujui' ? 'LULUS SELEKSI' : 'TIDAK LULUS' ?></strong></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
                 <!-- Card 2: Dokumen Pendaftaran -->
                 <div class="detail-card">
                     <h2 class="card-title">Dokumen Pendaftaran</h2>
                     <hr class="card-divider">
                     <div class="doc-grid">
-                        <!-- Surat Pernyataan -->
                         <div class="doc-card">
                             <div class="doc-icon"><i class="fa-regular fa-file-lines"></i></div>
                             <div class="doc-info">
@@ -181,7 +344,6 @@ if (!$data) {
                                 </div>
                             </div>
                         </div>
-                        <!-- KTP -->
                         <div class="doc-card">
                             <div class="doc-icon"><i class="fa-regular fa-id-card"></i></div>
                             <div class="doc-info">
@@ -192,7 +354,6 @@ if (!$data) {
                                 </div>
                             </div>
                         </div>
-                        <!-- Ijazah -->
                         <div class="doc-card">
                             <div class="doc-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                             <div class="doc-info">
@@ -203,7 +364,6 @@ if (!$data) {
                                 </div>
                             </div>
                         </div>
-                        <!-- Bukti Pembayaran -->
                         <div class="doc-card">
                             <div class="doc-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                             <div class="doc-info">
@@ -216,73 +376,65 @@ if (!$data) {
                         </div>
                     </div>
                 </div>
-
-                <div class="action-section">
-                    <?php if (($data['status_berkas'] ?? '') === 'valid'): ?>
-                        <button class="btn-verify" disabled style="background: #99A1AF; cursor: not-allowed; opacity: 0.7;">
-                            <i class="fa-solid fa-check-double"></i> Terverifikasi
-                        </button>
-                    <?php else: ?>
-                        <button class="btn-verify" onclick="openPopupAdminVerif()">Verifikasi</button>
-                    <?php endif; ?>
-                </div>
             </section>
-
-        </main>.
-
-
-
+        </main>
     </div>
 
-    <!-- Popup Verifikasi -->
-    <div id="popupAdminVerif" class="popup-overlay" style="display: none;">
+    <!-- Popup Status -->
+    <div id="popupWorkflow" class="popup-overlay" style="display: none;">
         <div class="popup-admin-box">
-            <button class="popup-admin-close" onclick="closePopupAdminVerif()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="popup-admin-title">Verifikasi Berhasil!</h2>
+            <button class="popup-admin-close" onclick="closePopup()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="popup-admin-title" id="popupTitle">Berhasil!</h2>
             <hr class="popup-admin-divider">
             <div class="verif-list">
                 <div class="verif-item">
                     <div class="verif-icon"><i class="fa-solid fa-check"></i></div>
-                    <span>Status Pendaftaran Berhasil Diperbarui</span>
-                </div>
-                <div class="verif-item">
-                    <div class="verif-icon"><i class="fa-solid fa-check"></i></div>
-                    <span>Data Siswa Berhasil diKirim ke Pengajar</span>
+                    <span id="popupMessage">Tahapan pendaftaran telah diperbarui.</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function openPopupAdminVerif() {
-            const idPendaftaran = "<?= $data['id_pendaftaran'] ?>";
-            
-            // Kirim data ke backend untuk verifikasi
+        function prosesWorkflow(action) {
             const formData = new FormData();
-            formData.append('action', 'verifikasi_berkas');
-            formData.append('id_pendaftaran', idPendaftaran);
-            formData.append('status_berkas', 'valid');
+            formData.append('action', action);
+            formData.append('id_pendaftaran', "<?= $data['id_pendaftaran'] ?>");
+            
+            if (action === 'set_jadwal') {
+                const jadwal = document.getElementById('jadwalInput').value;
+                if (!jadwal) {
+                    alert('Harap pilih jadwal wawancara terlebih dahulu.');
+                    return;
+                }
+                formData.append('jadwal_wawancara', jadwal);
+            }
 
             fetch('../../backend/pendaftaranAdmin_end.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if(data.status === 'success') {
-                    document.getElementById('popupAdminVerif').style.display = 'flex';
+                if (data.status === 'success') {
+                    document.getElementById('popupTitle').innerText = "Berhasil!";
+                    document.getElementById('popupMessage').innerText = data.message;
+                    document.getElementById('popupWorkflow').style.display = 'flex';
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
                 } else {
-                    alert('Gagal melakukan verifikasi: ' + data.message);
+                    alert('Error: ' + data.message);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan sistem.');
+            .catch(err => {
+                console.error(err);
+                alert('Gagal menghubungkan ke server.');
             });
         }
-        function closePopupAdminVerif() {
-            document.getElementById('popupAdminVerif').style.display = 'none';
-            window.location.href = 'pendaftaran_admin.php';
+
+        function closePopup() {
+            location.reload();
         }
 
         const sidebar = document.getElementById('sidebar');

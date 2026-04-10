@@ -7,21 +7,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $id_pendaftaran = mysqli_real_escape_string($conn, $_POST['id_pendaftaran']);
 
     switch ($action) {
-        case 'approve':
-            $status_approval = mysqli_real_escape_string($conn, $_POST['status_approval']);
+        case 'approve_pendaftaran':
+            $status = mysqli_real_escape_string($conn, $_POST['status']); // 'disetujui' or 'ditolak'
             
-            $check = mysqli_query($conn, "SELECT status_berkas FROM pendaftaran WHERE id_pendaftaran = '$id_pendaftaran'");
-            $data = mysqli_fetch_assoc($check);
+            $query = "UPDATE pendaftaran SET status_approval = '$status' WHERE id_pendaftaran = '$id_pendaftaran'";
             
-            if ($data && $data['status_berkas'] === 'valid') {
-                $query = "UPDATE pendaftaran SET status_approval = '$status_approval' WHERE id_pendaftaran = '$id_pendaftaran'";
-                if (mysqli_query($conn, $query)) {
-                    echo json_encode(['status' => 'success', 'message' => "Pendaftaran $status_approval."]);
-                } else {
-                    echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
-                }
+            if (mysqli_query($conn, $query)) {
+                $msg = ($status === 'disetujui') ? "Pendaftaran berhasil disetujui." : "Pendaftaran telah ditolak.";
+                echo json_encode(['status' => 'success', 'message' => $msg]);
             } else {
-                echo json_encode(['status' => 'error', 'message' => 'Berkas belum divalidasi oleh Admin.']);
+                echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
             }
             break;
 

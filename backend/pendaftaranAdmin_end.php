@@ -8,40 +8,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
 
     switch ($action) {
         case 'verifikasi_berkas':
-            $status_berkas = mysqli_real_escape_string($conn, $_POST['status_berkas']);
-            $next_week = date('Y-m-d H:i:s', strtotime('+7 days'));
+            $status_berkas = 'valid';
             $query = "UPDATE pendaftaran SET 
                       status_berkas = '$status_berkas', 
-                      status_approval = 'disetujui', 
-                      jadwal_wawancara = '$next_week'
+                      status_approval = 'pending', 
+                      jadwal_wawancara = NULL
                       WHERE id_pendaftaran = '$id_pendaftaran'";
             if (mysqli_query($conn, $query)) {
-                echo json_encode(['status' => 'success', 'message' => 'Berkas berhasil diverifikasi dan diteruskan ke tahap wawancara.']);
+                echo json_encode(['status' => 'success', 'message' => 'Berkas berhasil diverifikasi. Silakan tentukan jadwal wawancara.']);
             } else {
                 echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
             }
             break;
 
-        case 'jadwal':
-            $check = mysqli_query($conn, "SELECT status_approval FROM pendaftaran WHERE id_pendaftaran = '$id_pendaftaran'");
-            $data = mysqli_fetch_assoc($check);
-            if ($data && $data['status_approval'] === 'disetujui') {
-                $jadwal_wawancara = mysqli_real_escape_string($conn, $_POST['jadwal_wawancara']);
-                $query = "UPDATE pendaftaran SET jadwal_wawancara = '$jadwal_wawancara' WHERE id_pendaftaran = '$id_pendaftaran'";
-                if (mysqli_query($conn, $query)) {
-                    echo json_encode(['status' => 'success', 'message' => 'Jadwal wawancara berhasil ditetapkan.']);
-                } else {
-                    echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
-                }
+        case 'set_jadwal':
+            $jadwal_wawancara = mysqli_real_escape_string($conn, $_POST['jadwal_wawancara']);
+            $query = "UPDATE pendaftaran SET jadwal_wawancara = '$jadwal_wawancara' WHERE id_pendaftaran = '$id_pendaftaran'";
+            if (mysqli_query($conn, $query)) {
+                echo json_encode(['status' => 'success', 'message' => 'Jadwal wawancara berhasil ditetapkan.']);
             } else {
-                echo json_encode(['status' => 'error', 'message' => 'Pendaftaran belum disetujui pimpinan.']);
+                echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
+            }
+            break;
+
+        case 'selesai_wawancara':
+            $query = "UPDATE pendaftaran SET status_approval = 'menunggu_pimpinan' WHERE id_pendaftaran = '$id_pendaftaran'";
+            if (mysqli_query($conn, $query)) {
+                echo json_encode(['status' => 'success', 'message' => 'Proses wawancara selesai. Menunggu approval pimpinan.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
             }
             break;
 
         case 'hasil':
             $hasil_akhir = mysqli_real_escape_string($conn, $_POST['hasil_akhir']);
             $query = "UPDATE pendaftaran SET hasil_akhir = '$hasil_akhir' WHERE id_pendaftaran = '$id_pendaftaran'";
-            
             if (mysqli_query($conn, $query)) {
                 echo json_encode(['status' => 'success', 'message' => 'Hasil akhir berhasil disimpan.']);
             } else {
