@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $login_input = trim($_POST['login_input'] ?? ''); 
 $password = $_POST['password'] ?? '';
-$role_from_post = $_POST['role'] ?? '';
+$role_from_post = $_POST['role'] ?? ''; // Role yang dipilih di halaman login
 
 $redirect = match($role_from_post) {
     '1' => '../public/login/logSiswa.php',
@@ -50,16 +50,17 @@ if ($role_from_post === '2') {
     }
 }
 
-// --- 3. Logika untuk Role Lain (Tabel User) ---
+// --- 3. Logika untuk Role Lain (Tabel User: Siswa, Pengajar, Pimpinan, Admin) ---
+// Note: Role 1 = Siswa (Sudah Lulus Seleksi)
 if (filter_var($login_input, FILTER_VALIDATE_EMAIL)) {
-    $query = "SELECT id_user, username, email, password, role_id FROM user WHERE email = ? AND role_id = 1 LIMIT 1";
+    $query = "SELECT id_user, username, email, password, role_id FROM user WHERE email = ? LIMIT 1";
 } else {
     $query = "SELECT id_user, username, email, password, role_id FROM user WHERE username = ? LIMIT 1";
 }
 
 $stmt = mysqli_prepare($conn, $query);
 if (!$stmt) {
-    header('Location: ../public/MainLogin.php?error=' . urlencode('Server error database.'));
+    header('Location: ' . $redirect . '?error=' . urlencode('Server error database.'));
     exit;
 }
 
@@ -70,6 +71,14 @@ $user = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 
 if ($user && password_verify($password, $user['password'])) {
+    
+    // --- SECURITY CHECK: Role Must Match ---
+    // Pastikan user tidak login ke halaman yang salah (misal Admin login di halaman Siswa)
+    if ((int)$user['role_id'] !== (int)$role_from_post && !(($user['role_id'] == 4 || $user['role_id'] == 5) && ($role_from_post == 4 || $role_from_post == 5))) {
+        header('Location: ' . $redirect . '?error=' . urlencode('Anda tidak memiliki akses ke halaman ini.'));
+        exit;
+    }
+
     session_regenerate_id(true);
     $_SESSION['user_id'] = $user['id_user'];
     $_SESSION['username'] = $user['username'];
@@ -89,7 +98,7 @@ if ($user && password_verify($password, $user['password'])) {
             header('Location: ../user/admin/dashboard_admin.php');
             break;
         default: 
-            header('Location: ../public/MainLogin.php?error=' . urlencode('Role tidak terdaftar.'));
+            header('Location: ' . $redirect . '?error=' . urlencode('Role tidak terdaftar.'));
             break;
     }
     exit;

@@ -1,13 +1,10 @@
 <?php
 session_start();
-require_once '../../config/database.php';
-
-// Check session
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'pimpinan') {
-    // For demonstration
-    $_SESSION['user_id'] = 2; 
-    $_SESSION['role'] = 'pimpinan';
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
+    header("Location: ../../public/login/logPimpinan.php?role=4&error=" . urlencode("Akses ditolak."));
+    exit;
 }
+require_once '../../config/database.php';
 
 $db = new Database();
 $conn = $db->getConnection();

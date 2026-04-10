@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
+    header("Location: ../../public/login/logPimpinan.php?role=5&error=" . urlencode("Akses ditolak. Silakan login sebagai Admin."));
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>

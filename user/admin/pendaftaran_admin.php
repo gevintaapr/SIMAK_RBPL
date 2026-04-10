@@ -1,5 +1,11 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../config/config.php';
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
+    header("Location: ../../public/login/logPimpinan.php?role=5&error=" . urlencode("Akses ditolak."));
+    exit;
+}
 
 $query = mysqli_query($conn, "SELECT * FROM pendaftaran ORDER BY id_pendaftaran DESC");
 $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);

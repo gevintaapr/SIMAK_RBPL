@@ -3,8 +3,8 @@ session_start();
 require_once __DIR__ . '/../../config/config.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['siswa_logged_in']) || $_SESSION['siswa_logged_in'] !== true) {
-    header("Location: ../../public/login/logCalonSiswa.php");
+if (!isset($_SESSION['siswa_logged_in']) || $_SESSION['siswa_logged_in'] !== true || $_SESSION['role'] != 2) {
+    header("Location: ../../public/login/logCalonSiswa.php?error=" . urlencode("Sesi berakhir atau akses ditolak."));
     exit();
 }
 
@@ -197,6 +197,22 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
                 </div>
             </div>
             
+            <?php elseif ($daftar['status_approval'] === 'menunggu_pimpinan'): ?>
+            <div class="content-card">
+                <h3>Informasi Wawancara</h3>
+                <div class="doc-status" style="text-align: center; padding: 3rem 1rem;">
+                    <div class="icon-folder" style="color: #059669; background: #D1FAE5; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i class="fas fa-check-double" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h4 style="color: #003B73; font-weight: 700; font-size: 1.3rem; margin-bottom: 15px;">Wawancara Telah Selesai!</h4>
+                    <p style="color: #4A5568; font-size: 1rem; line-height: 1.6;">
+                        Selamat! Anda telah menyelesaikan seluruh rangkaian tahap wawancara.<br>
+                        Hasil seleksi akan segera diumumkan setelah mendapatkan persetujuan dari Pimpinan.<br>
+                        <strong>Pantau terus dashboard Anda secara berkala.</strong>
+                    </p>
+                </div>
+            </div>
+
             <?php elseif (!empty($daftar['jadwal_wawancara'])): ?>
             <div class="content-card">
                 <h3>Informasi Wawancara</h3>
@@ -211,6 +227,18 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
                         <p style="margin-bottom: 0;"><i class="fas fa-link" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Link:</strong> Akan dikirim via WhatsApp</p>
                     </div>
                     <p style="font-size: 0.8rem; font-style: italic; color: #666;">Harap persiapkan koneksi internet yang stabil.</p>
+                </div>
+            </div>
+
+            <?php elseif ($daftar['status_berkas'] === 'valid'): ?>
+            <div class="content-card">
+                <h3>Status Dokumen</h3>
+                <div class="doc-status" style="text-align: center; padding: 2rem 1rem;">
+                    <div class="icon-folder" style="color: #059669; background: #D1FAE5; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i class="fas fa-file-circle-check" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h4 style="color: #003B73; font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;">Berkas Terverifikasi</h4>
+                    <p style="color: #4A5568; font-size: 0.95rem;">Dokumen Anda telah divalidasi oleh Admin. Mohon tunggu penetapan jadwal wawancara.</p>
                 </div>
             </div>
 
