@@ -11,12 +11,13 @@ $admin_id = $_SESSION['user_id'];
 $db = new Database();
 $conn = $db->getConnection();
 
-// Fetch all payments with user info
-//$stmt = $conn->query("SELECT p.*, u.name as nama_siswa, u.email
-//FROM pembayaran p
-//LEFT JOIN `user` u ON p.id_siswa = u.id_user
-//ORDER BY p.tanggal_pembayaran DESC");
-//$payments = $stmt->fetchAll();
+// Fetch all payments with student info
+$stmt = $conn->query("SELECT p.*, s.nama_lengkap as nama_siswa, s.email_belajar as email
+    FROM pembayaran p
+    LEFT JOIN `siswa` s ON p.id_siswa = s.id_siswa
+    ORDER BY p.tanggal_pembayaran DESC");
+$payments = $stmt->fetchAll();
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -287,13 +288,14 @@ $conn = $db->getConnection();
                 </div>
             </div>
 
-            <div class="modal-footer" style="display:flex; justify-content: flex-end; gap: 1rem;">
+            <div class="modal-footer" style="display:flex; justify-content: center; gap: 1rem; padding: 1.5rem 2rem; background: #f8fafc; border-top: 1px solid #e2e8f0;">
                 <input type="hidden" id="modalPaymentId" value="">
-                <button class="btn-primary-yellow" id="btnTolak" onclick="submitVerif('ditolak')"
-                    style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca;">
-                    <i class="fas fa-times"></i> Tolak
+                <button class="btn-tolak" id="btnTolak" onclick="submitVerif('ditolak')"
+                    style="flex: 1; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; background:#fee2e2; color:#991b1b; border:1px solid #fecaca; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fas fa-times"></i> Tolak Pembayaran
                 </button>
-                <button class="btn-primary-yellow" id="btnTerima" onclick="submitVerif('diterima')">
+                <button class="btn-terima" id="btnTerima" onclick="submitVerif('diterima')"
+                    style="flex: 1; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; background:#10b981; color:white; border:none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                     <i class="fas fa-check"></i> Terima Pembayaran
                 </button>
             </div>
