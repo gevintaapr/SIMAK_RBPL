@@ -95,7 +95,7 @@ $siswa = mysqli_fetch_assoc($query);
                 </div>
                 <div class="card-body">
                     <div class="quick-access-grid">
-                        <a href="#" class="qa-item">
+                        <a href="pembayaranSiswa.php" class="qa-item">
                             <div class="qa-icon"><i class="fas fa-money-bill-wave"></i></div>
                             <span>Pembayaran</span>
                         </a>

@@ -107,7 +107,7 @@ $siswa_list = mysqli_fetch_all($query, MYSQLI_ASSOC);
             <!-- Nav Pills -->
             <div class="akademik-nav-group">
                 <button class="akademik-nav-btn active"><i class="fa-solid fa-users"></i> Daftar Siswa</button>
-                <button class="akademik-nav-btn"><i class="fa-solid fa-wallet"></i> Verifikasi Pembayaran</button>
+                <button class="akademik-nav-btn" onclick="window.location.href='verifPembayaran_akademik.php'"><i class="fa-solid fa-wallet"></i> Verifikasi Pembayaran</button>
                 <button class="akademik-nav-btn"><i class="fa-solid fa-calendar-check"></i> Atur Jadwal</button>
                 <button class="akademik-nav-btn"><i class="fa-solid fa-paste"></i> Verifikasi Evaluasi</button>
             </div>
