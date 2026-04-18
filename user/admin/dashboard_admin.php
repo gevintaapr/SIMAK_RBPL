@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../config/config.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
     header("Location: ../../public/login/logAdmin.php?role=5&error=" . urlencode("Akses ditolak. Silakan login sebagai Admin."));
     exit;
@@ -46,7 +46,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
                 <i class="fa-solid fa-globe"></i>
                 <span>Program Taiwan</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="manage_user.php" class="sidebar-link">
                 <i class="fa-solid fa-users-gear"></i>
                 <span>Manajemen Pengguna</span>
             </a>
