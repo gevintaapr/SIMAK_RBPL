@@ -124,5 +124,33 @@
             </div>
         </div>
     </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyIcons = document.querySelectorAll('.data-value i.fa-copy');
+        
+        copyIcons.forEach(icon => {
+            icon.style.cursor = 'pointer';
+            icon.addEventListener('click', function() {
+                const textToCopy = this.previousElementSibling.innerText;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Beri feedback visual
+                    const originalColor = this.style.color;
+                    this.style.color = '#0056b3';
+                    
+                    const tooltip = document.createElement('span');
+                    tooltip.innerText = 'Tersalin!';
+                    tooltip.style.cssText = 'position:absolute; background:#333; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px; margin-left:10px;';
+                    this.parentElement.appendChild(tooltip);
+                    
+                    setTimeout(() => {
+                        this.style.color = originalColor;
+                        tooltip.remove();
+                    }, 1500);
+                });
+            });
+        });
+    });
+    </script>
 </body>
 </html>

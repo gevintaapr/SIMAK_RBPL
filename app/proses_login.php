@@ -8,14 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $login_input = trim($_POST['login_input'] ?? ''); 
-$password = $_POST['password'] ?? '';
+$password = trim($_POST['password'] ?? '');
 $role_from_post = $_POST['role'] ?? ''; // Role yang dipilih di halaman login
 
 $redirect = match($role_from_post) {
     '1' => '../public/login/logSiswa.php',
     '2' => '../public/login/logCalonSiswa.php',
     '3' => '../public/login/logPengajar.php',
-    '4', '5' => '../public/login/logPimpinan.php',
+    '4' => '../public/login/logPimpinan.php',
+    '5' => '../public/login/logAdmin.php',
     default => '../public/MainLogin.php',
 };
 
@@ -27,7 +28,7 @@ if ($login_input === '' || $password === '') {
 
 // --- 2. Logika Calon Siswa (Role 2) ---
 if ($role_from_post === '2') {
-    $query = "SELECT * FROM pendaftaran WHERE id_pendaftaran = ? LIMIT 1";
+    $query = "SELECT * FROM pendaftaran WHERE token_masuk = ? LIMIT 1";
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, 's', $login_input);
     mysqli_stmt_execute($stmt);
@@ -39,7 +40,7 @@ if ($role_from_post === '2') {
         session_regenerate_id(true);
         $_SESSION['siswa_logged_in'] = true;
         $_SESSION['siswa_id'] = $user['id_pendaftaran'];
-        $_SESSION['user_id'] = $user['id_pendaftaran'];
+        $_SESSION['user_id'] = $user['id_user'];
         $_SESSION['username'] = $user['nama_cs'];
         $_SESSION['role'] = 2;
         header('Location: ../user/siswa/dashboard_calon_siswa.php');

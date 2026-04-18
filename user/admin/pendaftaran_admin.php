@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
-    header("Location: ../../public/login/logPimpinan.php?role=5&error=" . urlencode("Akses ditolak."));
+    header("Location: ../../public/login/logAdmin.php?role=5&error=" . urlencode("Akses ditolak."));
     exit;
 }
 
@@ -143,7 +143,7 @@ $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                 <?php else: ?>
                                     <?php foreach ($pendaftaran as $row): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($row['id_pendaftaran']) ?></td>
+                                        <td><?= htmlspecialchars($row['token_masuk']) ?></td>
                                         <td><?= htmlspecialchars($row['nama_cs']) ?></td>
                                         <td><?= htmlspecialchars($row['program']) ?></td>
                                          <td>

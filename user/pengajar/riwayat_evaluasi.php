@@ -18,7 +18,7 @@ if ($query_detail) {
 
 // Fetch batch evaluations grouped
 $query_batch = mysqli_query($conn, "
-    SELECT e.id_siswa, s.nama_lengkap, s.program_pembelajaran, e.periode_semester, 
+    SELECT e.id_siswa, s.nama_lengkap, s.program_pembelajaran, s.nim_siswa, e.periode_semester, 
            DATE_FORMAT(MIN(e.tanggal_input), '%d %b %Y') as tgl_input, 
            AVG(e.nilai_angka) as rata_rata 
     FROM evaluasi e 
@@ -164,7 +164,7 @@ $query_batch = mysqli_query($conn, "
                                         <td><?= $rata ?> (<?= $rt_grade ?>)</td>
                                         <td style="text-align: center;">
                                             <button class="btn-detail" 
-                                                onclick="openDetailModal('<?= htmlspecialchars($r['id_siswa']) ?>', 
+                                                onclick="openDetailModal('<?= htmlspecialchars($r['nim_siswa']) ?>', 
                                                                         '<?= htmlspecialchars($r['nama_lengkap'], ENT_QUOTES, 'UTF-8') ?>', 
                                                                         '<?= htmlspecialchars($r['program_pembelajaran'], ENT_QUOTES, 'UTF-8') ?>', 
                                                                         '<?= htmlspecialchars($r['periode_semester'], ENT_QUOTES, 'UTF-8') ?>', 
@@ -218,7 +218,7 @@ $query_batch = mysqli_query($conn, "
                     <h3 class="info-box-title">Identitas Siswa</h3>
                     <div class="info-grid">
                         <div class="info-row">
-                            <span class="info-label">ID Siswa</span>
+                            <span class="info-label">NIM Siswa</span>
                             <span class="info-value" id="modalIdSiswa"></span>
                         </div>
                         <div class="info-row">

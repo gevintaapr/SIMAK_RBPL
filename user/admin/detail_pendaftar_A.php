@@ -1,8 +1,17 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../config/config.php';
 
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
+    header("Location: ../../public/login/logAdmin.php?role=5&error=" . urlencode("Sesi berakhir atau akses ditolak."));
+    exit;
+}
+
 $id = $_GET['id'] ?? '';
-$query = mysqli_query($conn, "SELECT * FROM pendaftaran WHERE id_pendaftaran = '$id'");
+$query = mysqli_query($conn, "SELECT p.*, u.create_at 
+                             FROM pendaftaran p 
+                             LEFT JOIN user u ON p.id_user = u.id_user 
+                             WHERE p.id_pendaftaran = '$id'");
 $data = mysqli_fetch_assoc($query);
 
 if (!$data) {
@@ -217,10 +226,7 @@ if (!$data) {
                                     <span class="info-label">Tanggal Lahir</span>
                                     <span class="info-value"><?= htmlspecialchars($data['tanggal_lahir']) ?></span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="info-label">Asal Sekolah</span>
-                                    <span class="info-value"><?= htmlspecialchars($data['asal_sekolah'] ?? '-') ?></span>
-                                </div>
+
                                 <div class="info-item">
                                     <span class="info-label">Posisi-Program Pilihan</span>
                                     <span class="info-value"><?= htmlspecialchars($data['program']) ?></span>
@@ -267,7 +273,7 @@ if (!$data) {
                         <div class="photo-content">
                             <img src="../../<?= htmlspecialchars($data['foto_siswa']) ?>" alt="Foto Calon Siswa" class="student-photo" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($data['nama_cs']) ?>&background=0D8ABC&color=fff&size=200'">
                             <p class="photo-title">Foto Calon Siswa</p>
-                            <p class="photo-date">Tanggal Upload: <?= isset($data['created_at']) ? date('d/m/Y', strtotime($data['created_at'])) : '-' ?></p>
+                            <p class="photo-date">Tanggal Upload: <?= isset($data['create_at']) ? date('d/m/Y', strtotime($data['create_at'])) : '-' ?></p>
                         </div>
                     </div>
                 </div>

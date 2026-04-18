@@ -35,7 +35,7 @@
             
             <form action="../../app/proses_login.php" method="POST">
                 <div class="input-group">
-                    <input type="hidden" name="role" value="<?= htmlspecialchars($role ?? '') ?>">
+                    <input type="hidden" name="role" value="1">
                     <label for="email">Email Belajar</label>
                     <input type="email" id="email" name="login_input" class="form-input" placeholder="contoh@hcts.ac.id" required>
                 </div>

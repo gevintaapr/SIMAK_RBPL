@@ -1,5 +1,14 @@
 <?php
-// PHP logic if needed
+session_start();
+require_once __DIR__ . '/../../config/config.php';
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
+    header("Location: ../../public/login/logAdmin.php?role=5&error=" . urlencode("Akses ditolak. Silakan login sebagai Admin."));
+    exit;
+}
+
+$query = mysqli_query($conn, "SELECT * FROM siswa ORDER BY id_siswa DESC");
+$siswa_list = mysqli_fetch_all($query, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -156,7 +165,7 @@
                     <table class="ak-table">
                         <thead>
                             <tr>
-                                <th>ID SISWA</th>
+                                <th>NIM SISWA</th>
                                 <th>NAMA</th>
                                 <th>PROGRAM</th>
                                 <th>STATUS</th>
@@ -164,27 +173,21 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <?php if (empty($siswa_list)): ?>
                             <tr>
-                                <td>HC-123</td>
-                                <td>Alexander Wibowo</td>
-                                <td>Cruise Ship Deck Kadet</td>
-                                <td><span class="badge-ak-magang">Magang</span></td>
-                                <td><button class="btn-ak-detail">Detail</button></td>
+                                <td colspan="5" style="text-align: center; padding: 20px; color: #666;">Belum ada data siswa.</td>
                             </tr>
-                            <tr>
-                                <td>HC-124</td>
-                                <td>Jessica Tan</td>
-                                <td>Hotel F&amp;B Service</td>
-                                <td><span class="badge-ak-reguler">Reguler</span></td>
-                                <td><button class="btn-ak-detail">Detail</button></td>
-                            </tr>
-                            <tr>
-                                <td>HC-125</td>
-                                <td>Maria Gomez</td>
-                                <td>Cruise Ship Culinary</td>
-                                <td><span class="badge-ak-magang">Magang</span></td>
-                                <td><button class="btn-ak-detail">Detail</button></td>
-                            </tr>
+                            <?php else: ?>
+                                <?php foreach ($siswa_list as $s): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($s['nim_siswa']) ?></td>
+                                    <td><?= htmlspecialchars($s['nama_lengkap']) ?></td>
+                                    <td><?= htmlspecialchars($s['program_pembelajaran']) ?></td>
+                                    <td><span class="badge-ak-reguler">Reguler</span></td>
+                                    <td><button class="btn-ak-detail">Detail</button></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

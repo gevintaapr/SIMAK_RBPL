@@ -166,7 +166,7 @@ if ($query_siswa) {
                         <select class="select-student" id="studentSelect">
                             <option value="">-- Cari Nama Siswa --</option>
                             <?php foreach($siswaDropdown as $s): ?>
-                                <option value="<?= htmlspecialchars($s['id_siswa']) ?>|<?= htmlspecialchars($s['program_pembelajaran']) ?>">
+                                <option value="<?= htmlspecialchars($s['id_siswa']) ?>|<?= htmlspecialchars($s['program_pembelajaran']) ?>|<?= htmlspecialchars($s['nim_siswa']) ?>">
                                     <?= htmlspecialchars($s['nama_lengkap']) ?> (<?= htmlspecialchars($s['program_pembelajaran']) ?>)
                                 </option>
                             <?php endforeach; ?>
@@ -182,7 +182,7 @@ if ($query_siswa) {
                             </div>
                             <div class="student-info">
                                 <h3 id="studentNameDisplay"></h3>
-                                <p>ID Siswa: <span id="studentIdDisplay"></span> | Program: <span id="studentProgramDisplay"></span></p>
+                                <p>NIM Siswa: <span id="studentIdDisplay"></span> | Program: <span id="studentProgramDisplay"></span></p>
                             </div>
                             <div class="period-badge">Periode 1 - 2025</div>
                         </div>
@@ -379,12 +379,12 @@ if ($query_siswa) {
                 // Parse select value
                 const rawText = this.options[this.selectedIndex].text;
                 const namePart = rawText.split(' (')[0];
-                const [id, program] = this.value.split('|');
-
+                const [id, program, nim] = this.value.split('|');
+                
                 studentNameDisplay.textContent = namePart;
-                studentIdDisplay.textContent = id;
+                studentIdDisplay.textContent = nim;
                 studentProgramDisplay.textContent = program;
-                formIdSiswa.value = this.value;
+                formIdSiswa.value = id;
 
                 studentCard.style.display = 'flex';
                 evalTableContainer.style.display = 'block';

@@ -23,32 +23,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
 
                     if (!$p) throw new Exception("Data pendaftaran tidak ditemukan.");
 
-                    // 3. Buat Akun User Baru (Role 1 = Siswa)
+                    // 3. Update Akun User (Dari Role 2 ke Role 1)
                     $nama_parts = explode(' ', strtolower(trim($p['nama_cs'])));
                     $nama_awal = preg_replace('/[^a-z]/', '', $nama_parts[0]);
                     $random_suffix = substr($id_pendaftaran, -4);
+                    
+                    // Generate NIM dan Email Belajar
+                    $nim_siswa = "HC-" . str_replace('REG-', '', $p['token_masuk']);
                     $email_belajar = $nama_awal . $random_suffix . ".26@hcts.ac.id";
+                    
                     $password_plain = "HCTS2026";
                     $password_hashed = password_hash($password_plain, PASSWORD_DEFAULT);
+                    $existing_user_id = $p['id_user'];
 
-                    // Insert ke tabel user
-                    $user_query = "INSERT INTO user (username, email, password, role_id, is_active, create_at) 
-                                   VALUES (?, ?, ?, 1, 1, NOW())";
+                    // Update ke tabel user (Username diubah jadi NIM)
+                    $user_query = "UPDATE user SET username = ?, email = ?, password = ?, role_id = 1, create_at = NOW() WHERE id_user = ?";
                     $stmt_user = mysqli_prepare($conn, $user_query);
-                    mysqli_stmt_bind_param($stmt_user, 'sss', $p['nama_cs'], $email_belajar, $password_hashed);
+                    mysqli_stmt_bind_param($stmt_user, 'sssi', $nim_siswa, $email_belajar, $password_hashed, $existing_user_id);
                     mysqli_stmt_execute($stmt_user);
-                    $new_user_id = mysqli_insert_id($conn);
+                    $new_user_id = $existing_user_id;
 
                     // 4. Input ke tabel siswa
-                    $id_siswa = "HC-" . str_replace('REG-', '', $id_pendaftaran);
-                    $siswa_query = "INSERT INTO siswa (id_siswa, id_user, nama_lengkap, program_pembelajaran, id_pendaftaran, email_belajar, password) 
+                    $siswa_query = "INSERT INTO siswa (id_user, nim_siswa, nama_lengkap, program_pembelajaran, id_pendaftaran, email_belajar, password) 
                                     VALUES (?, ?, ?, ?, ?, ?, ?)";
                     $stmt_siswa = mysqli_prepare($conn, $siswa_query);
-                    mysqli_stmt_bind_param($stmt_siswa, 'sisssss', $id_siswa, $new_user_id, $p['nama_cs'], $p['program'], $id_pendaftaran, $email_belajar, $password_plain);
+                    mysqli_stmt_bind_param($stmt_siswa, 'issssss', $new_user_id, $nim_siswa, $p['nama_cs'], $p['program'], $id_pendaftaran, $email_belajar, $password_plain);
                     mysqli_stmt_execute($stmt_siswa);
 
-                    // 5. Update email_belajar di tabel pendaftaran
-                    mysqli_query($conn, "UPDATE pendaftaran SET email_belajar = '$email_belajar', id_user = $new_user_id WHERE id_pendaftaran = '$id_pendaftaran'");
+                    // 5. Update email_belajar dan token_expired di tabel pendaftaran
+                    // Token expired diset 2 hari dari sekarang
+                    $token_expired = date('Y-m-d H:i:s', strtotime('+2 days'));
+                    mysqli_query($conn, "UPDATE pendaftaran SET email_belajar = '$email_belajar', id_user = $new_user_id, token_expired = '$token_expired' WHERE id_pendaftaran = '$id_pendaftaran'");
                 }
 
                 mysqli_commit($conn);

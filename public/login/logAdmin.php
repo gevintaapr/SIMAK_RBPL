@@ -42,7 +42,7 @@
                 <div class="status-form">
                     <form action="../../app/proses_login.php" method="POST">
                         <div class="form-group">
-                            <input type="hidden" name="role" value="<?= htmlspecialchars($role ?? '') ?>">
+                            <input type="hidden" name="role" value="5">
                             <label for="username">Username</label>
                             <input type="text" id="username" name="login_input" class="form-input" placeholder="Masukkan username">
                         </div>

@@ -1,9 +1,15 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config/config.php';
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
     header("Location: ../../public/login/logSiswa.php?role=1&error=" . urlencode("Akses ditolak. Silakan login menggunakan akun Siswa Anda."));
     exit;
 }
+
+$id_user = $_SESSION['user_id'];
+$query = mysqli_query($conn, "SELECT * FROM siswa WHERE id_user = $id_user");
+$siswa = mysqli_fetch_assoc($query);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -38,7 +44,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
         
         <div class="hero-content">
             <div class="breadcrumb">Beranda &gt; Dashboard</div>
-            <h1>Selamat datang, Alexander!</h1>
+            <h1>Selamat datang, <?= htmlspecialchars(explode(' ', $siswa['nama_lengkap'])[0]) ?>!</h1>
         </div>
     </header>
 
@@ -48,7 +54,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
         <section class="card status-card">
             <div class="status-left">
                 <h2 class="status-title">Status: <span class="badge-success">Siswa Aktif</span></h2>
-                <p class="status-desc">Program Hotel & Cruise Ship - Batch 2025</p>
+                <p class="status-desc">Program <?= htmlspecialchars($siswa['program_pembelajaran'] ?? 'Hotel & Cruise Ship') ?> | NIM: <?= htmlspecialchars($siswa['nim_siswa'] ?? '-') ?></p>
             </div>
             <div class="status-right">
                 <span class="status-label">Kelengkapan Berkas</span>

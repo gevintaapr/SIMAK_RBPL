@@ -35,7 +35,7 @@
             
             <form action="../../app/proses_login.php" method="POST">
                 <div class="input-group">
-                     <input type="hidden" name="role" value="<?= htmlspecialchars($role ?? '') ?>"> 
+                     <input type="hidden" name="role" value="4"> 
                     <label for="id_pimpinan">ID Pimpinan</label>
                     <input type="text" id="id_pimpinan" name="login_input" required>
                 </div>

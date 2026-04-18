@@ -41,7 +41,7 @@
                 
                 <form action="../../app/proses_login.php" method="POST" class="status-form">
                     <div class="form-group">
-                        <input type="hidden" name="role" value="<?= htmlspecialchars($role ?? '') ?>">                        
+                        <input type="hidden" name="role" value="3">                        
                         <label for="username">NIDN / Username</label>
                         <input type="text" id="username" name="login_input" class="form-input" placeholder="Masukkan NIDN atau username">
                     </div>

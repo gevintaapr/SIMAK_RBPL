@@ -18,6 +18,20 @@ if (!$daftar) {
     exit();
 }
 
+// Pengecekan Masa Berlaku Dashboard (2 Hari setelah Approve)
+if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] === '1') {
+    if (!empty($daftar['token_expired'])) {
+        $now = new DateTime();
+        $expired = new DateTime($daftar['token_expired']);
+        
+        if ($now > $expired) {
+            session_destroy();
+            header("Location: ../../public/login/logSiswa.php?error=" . urlencode("Masa berlaku dashboard calon siswa telah habis. Silakan gunakan akun Siswa resmi Anda."));
+            exit();
+        }
+    }
+}
+
 // Logic for alert boxes and status
 $alert_bg = "#fff3cd"; $alert_text = "#856404"; $alert_border = "#ffeeba";
 $alert_icon = "fa-info-circle";
@@ -126,7 +140,7 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
         <div class="dashboard-header">
             <div class="welcome-text">
                 <h2>Selamat Datang, <?= htmlspecialchars(explode(" ", $daftar['nama_cs'])[0]) ?></h2>
-                <p>No. Reg: <?= htmlspecialchars($daftar['id_pendaftaran']) ?></p>
+                <p>No. Reg: <?= htmlspecialchars($daftar['token_masuk']) ?></p>
             </div>
             <div class="status-badge">Calon Siswa</div>
         </div>

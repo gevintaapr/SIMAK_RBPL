@@ -4,8 +4,8 @@ require_once __DIR__ . '/../config/config.php';
 
 function generateNoPendaftaran($conn) {
     $tahun = date("Y");
-    // Find the max ID for this year
-    $query = mysqli_query($conn, "SELECT MAX(CAST(SUBSTRING(id_pendaftaran, 10) AS UNSIGNED)) as max_id FROM pendaftaran WHERE id_pendaftaran LIKE 'REG-$tahun-%'");
+    // Mencari ID terbesar dari tabel pendaftaran
+    $query = mysqli_query($conn, "SELECT MAX(id_pendaftaran) as max_id FROM pendaftaran");
     $data = mysqli_fetch_assoc($query);
     $next_id = ($data['max_id'] ?? 0) + 1;
     return "REG-$tahun-" . str_pad($next_id, 4, "0", STR_PAD_LEFT);
@@ -22,6 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama = mysqli_real_escape_string($conn, $_POST['nama'] ?? '');
     $email = mysqli_real_escape_string($conn, $_POST['email'] ?? '');
     $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa'] ?? '');
+    // Membersihkan nomor WA dari spasi, strip, atau karakter lain kecuali angka dan +
+    $no_wa = preg_replace('/[^0-9+]/', '', $no_wa);
     $tanggal_lahir = mysqli_real_escape_string($conn, $_POST['tanggal_lahir'] ?? '');
     $alamat = mysqli_real_escape_string($conn, $_POST['alamat'] ?? '');
     $program = mysqli_real_escape_string($conn, $_POST['program'] ?? '');
@@ -75,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $id_pendaftaran = generateNoPendaftaran($conn);
+    $no_reg = generateNoPendaftaran($conn);
     
     // Generate unique token
     do {
@@ -91,20 +93,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $bukti_path = mysqli_real_escape_string($conn, $saved_paths['bukti_pendaftaran']);
     $surat_path = mysqli_real_escape_string($conn, $saved_paths['surat_pernyataan']);
 
+    // 1. Buat akun di tabel user terlebih dahulu (Role 2 = Calon Siswa)
+    // Mencari ID user berikutnya secara manual untuk menghindari duplicate entry
+    $res_id = mysqli_query($conn, "SELECT MAX(id_user) as max_id FROM user");
+    $data_id = mysqli_fetch_assoc($res_id);
+    $new_user_id = ($data_id['max_id'] ?? 0) + 1;
+
+    $user_pass = $token; 
+    $user_query = "INSERT INTO user (id_user, username, email, password, role_id, is_active, create_at) 
+                   VALUES ($new_user_id, '$no_reg', '$email', '$user_pass', 2, 1, NOW())";
+    
+    if (!mysqli_query($conn, $user_query)) {
+        die("Error: Gagal membuat akun pengguna. " . mysqli_error($conn));
+    }
+    
+    $new_user_id = mysqli_insert_id($conn);
+
+    // 2. Masukkan ke tabel pendaftaran
     $query = "INSERT INTO pendaftaran (
-        id_pendaftaran, id_user, nama_cs, email, no_wa, tanggal_lahir, alamat,
+        id_user, nama_cs, email, no_wa, tanggal_lahir, alamat,
         ktp, ijazah, foto_siswa, bukti_pendaftaran, surat_pernyataan, program,
-        token_akses, status_approval
+        token_masuk, token_akses, status_approval
     ) VALUES (
-        '$id_pendaftaran', 0, '$nama', '$email', '$no_wa', '$tanggal_lahir', '$alamat',
+        $new_user_id, '$nama', '$email', '$no_wa', '$tanggal_lahir', '$alamat',
         '$ktp_path', '$ijazah_path', '$foto_path', '$bukti_path', '$surat_path', '$program',
-        '$token', 0
+        '$no_reg', '$token', 0
     )";
 
     if (mysqli_query($conn, $query)) {
+        $id_baru = mysqli_insert_id($conn);
+        
         $_SESSION['pendaftaran_sukses'] = true;
-        $_SESSION['kode_akses'] = $id_pendaftaran;
+        $_SESSION['kode_akses'] = $no_reg;
         $_SESSION['token'] = $token;
+        $_SESSION['siswa_id'] = $id_baru;
+        $_SESSION['user_id'] = $new_user_id;
         
         header("Location: ../user/siswa/pendaftaran_berhasil.php");
         exit();
