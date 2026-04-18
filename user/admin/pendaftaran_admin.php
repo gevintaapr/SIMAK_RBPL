@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once __DIR__ . '/../../config/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
@@ -50,7 +49,7 @@ $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
                 <i class="fa-solid fa-globe"></i>
                 <span>Program Taiwan</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="manage_user.php" class="sidebar-link">
                 <i class="fa-solid fa-users-gear"></i>
                 <span>Manajemen Pengguna</span>
             </a>
