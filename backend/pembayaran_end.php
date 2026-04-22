@@ -1,7 +1,6 @@
+<?php
 require_once '../config/config.php';
-
 header('Content-Type: application/json');
-
 $action = $_POST['action'] ?? ($_GET['action'] ?? '');
 
 if ($action === 'upload') {

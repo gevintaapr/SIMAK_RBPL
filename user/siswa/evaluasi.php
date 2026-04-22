@@ -137,7 +137,6 @@ if ($must_remedial) {
                             <th>Nilai</th>
                             <th>Grade</th>
                             <th>Status</th>
-                            <th>Catatan Pengajar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -152,13 +151,18 @@ if ($must_remedial) {
                             <td class="mapel-score"><?= $val ?></td>
                             <td><?= $g ?></td>
                             <td><span class="badge <?= $sc ?>"><?= $s ?></span></td>
-                            <td style="font-style: italic; color: #64748B; font-size: 13px;">
-                                <?= $eval['catatan_pengajar'] ?? '-' ?>
-                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Box Catatan Baru (Sesuai Gambar) -->
+            <div style="padding: 0 30px 30px;">
+                <h4 style="color: var(--primary); margin-bottom: 15px; font-weight: 700;">Catatan Umum Pengajar:</h4>
+                <div style="width: 100%; min-height: 100px; padding: 20px; border: 1px solid #E2E8F0; border-radius: 12px; background-color: #FFFFFF; color: var(--text-muted); font-size: 14px; line-height: 1.6; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                    <?= !empty($eval['catatan_pengajar']) ? nl2br(htmlspecialchars($eval['catatan_pengajar'])) : "Belum ada catatan evaluasi menyeluruh untuk periode ini." ?>
+                </div>
             </div>
         </div>
 
