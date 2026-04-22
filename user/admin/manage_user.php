@@ -33,7 +33,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
                 <i class="fa-solid fa-file-signature"></i>
                 <span>Pendaftaran</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="magang_admin.php" class="sidebar-link">
                 <i class="fa-solid fa-briefcase"></i>
                 <span>Magang (OJT)</span>
             </a>

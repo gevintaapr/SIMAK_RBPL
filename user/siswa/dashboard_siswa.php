@@ -103,7 +103,7 @@ $siswa = mysqli_fetch_assoc($query);
                             <div class="qa-icon"><i class="fas fa-clipboard-list"></i></div>
                             <span>Nilai</span>
                         </a>
-                        <a href="#" class="qa-item">
+                        <a href="magang_siswa.php" class="qa-item">
                             <div class="qa-icon"><i class="fas fa-user-tie"></i></div>
                             <span>Magang</span>
                         </a>
