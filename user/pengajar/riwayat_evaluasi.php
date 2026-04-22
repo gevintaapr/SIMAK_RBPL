@@ -68,6 +68,7 @@ if ($query_batch && mysqli_num_rows($query_batch) > 0) {
                 <div class="dropdown-menu show" id="evaluasiMenu">
                     <a href="input_penilaian.php" class="dropdown-link">Input Penilaian</a>
                     <a href="riwayat_evaluasi.php" class="dropdown-link active">Riwayat Evaluasi</a>
+                    <a href="remedial_siswa.php" class="dropdown-link">Kelola Remedial</a>
                 </div>
             </div>
         </nav>

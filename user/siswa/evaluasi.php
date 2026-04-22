@@ -74,6 +74,11 @@ if ($must_remedial) {
     $status_label = "Lulus Evaluasi";
     $status_class = "badge-lulus";
 }
+
+// Cek apakah sedang dalam proses remedial
+$check_remedial = mysqli_query($conn, "SELECT COUNT(*) as aktif FROM pengajuan_remedial WHERE id_siswa = $id_siswa AND status_remedial != 'selesai'");
+$data_remedial = mysqli_fetch_assoc($check_remedial);
+$is_waiting_remedial = ($data_remedial['aktif'] > 0);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -169,18 +174,26 @@ if ($must_remedial) {
         <!-- Action Area -->
         <div class="card action-card <?= ($must_remedial) ? 'remedial' : 'lulus' ?>">
             <?php if ($must_remedial): ?>
-                <div class="action-icon" style="color: #B91C1C;"><i class="fas fa-times-circle"></i></div>
-                <h2 class="action-title" style="color: #B91C1C;">Maaf! Anda Belum Lulus Evaluasi</h2>
+                <div class="action-icon" style="color: <?= $is_waiting_remedial ? '#F59E0B' : '#B91C1C' ?>;">
+                    <i class="fas <?= $is_waiting_remedial ? 'fa-spinner fa-spin' : 'fa-times-circle' ?>"></i>
+                </div>
+                <h2 class="action-title" style="color: <?= $is_waiting_remedial ? '#F59E0B' : '#B91C1C' ?>;">
+                    <?= $is_waiting_remedial ? 'Remedial Sedang Diproses' : 'Maaf! Anda Belum Lulus Evaluasi' ?>
+                </h2>
                 <p class="action-desc">
-                    <?php if ($remedial_count >= 2): ?>
+                    <?php if ($is_waiting_remedial): ?>
+                        Permohonan remedial Anda sudah diterima dan sedang dalam proses penilaian oleh Pengajar. Mohon tunggu hingga semua mata pelajaran selesai diperbarui untuk melihat status kelulusan akhir Anda.
+                    <?php elseif ($remedial_count >= 2): ?>
                         Anda memiliki <strong><?= $remedial_count ?> mata pelajaran</strong> dengan status Remedial. Sesuai aturan, Anda wajib mengikuti remedial untuk semua mapel tersebut sebelum bisa mengajukan magang.
                     <?php else: ?>
                         Rata-rata nilai Anda (<?= number_format($avg, 1) ?>) masih di bawah standar minimal 80. Silakan ajukan remedial untuk memperbaiki nilai Anda.
                     <?php endif; ?>
                 </p>
-                <a href="#" class="btn-action btn-remedial">
-                   <i class="fas fa-calendar-check"></i> Ajukan Jadwal Remedial
-                </a>
+                <?php if (!$is_waiting_remedial): ?>
+                    <a href="javascript:void(0)" class="btn-action btn-remedial" onclick="openRemedialModal()">
+                       <i class="fas fa-calendar-check"></i> Ajukan Jadwal Remedial
+                    </a>
+                <?php endif; ?>
             <?php elseif ($has_option): ?>
                 <div class="action-icon" style="color: #F59E0B;"><i class="fas fa-exclamation-circle"></i></div>
                 <h2 class="action-title">Lulus dengan Catatan</h2>
@@ -189,7 +202,7 @@ if ($must_remedial) {
                     <a href="#" class="btn-action btn-magang">
                         Lanjut ke Pengajuan Magang <i class="fas fa-arrow-right"></i>
                     </a>
-                    <a href="#" class="btn-action btn-remedial" style="background: #E2E8F0; color: #475569;">
+                    <a href="javascript:void(0)" class="btn-action btn-remedial" style="background: #E2E8F0; color: #475569;" onclick="openRemedialModal()">
                         Ambil Remedial Terlebih Dahulu
                     </a>
                 </div>
@@ -211,7 +224,115 @@ if ($must_remedial) {
         <?php endif; ?>
     </div>
 
+    </div>
+
+    <!-- Modal Pengajuan Remedial -->
+    <div id="remedialModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: white; padding: 35px; border-radius: 20px; width: 500px; max-width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="background: #FEF3C7; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-edit" style="font-size: 24px; color: #D97706;"></i>
+                </div>
+                <h3 style="color: #003B73; font-size: 22px;">Pengajuan Remedial</h3>
+                <p style="color: #64748B; font-size: 14px;">Silakan pilih mata pelajaran yang ingin diperbaiki.</p>
+            </div>
+
+            <form id="remedialForm">
+                <input type="hidden" name="action" value="ajukan_remedial">
+                <input type="hidden" name="id_siswa" value="<?= $id_siswa ?>">
+                <input type="hidden" name="id_evaluasi" value="<?= $eval['id_evaluasi'] ?>">
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: 600; color: #1E293B;">Pilih Mata Pelajaran:</label>
+                        <label style="font-size: 13px; color: var(--primary); cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="selectAllMapel" onclick="toggleSelectAll(this)"> Pilih Semua
+                        </label>
+                    </div>
+                    
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 5px; max-height: 200px; overflow-y: auto;" class="scroll-container">
+                        <?php 
+                        $any_rem = false;
+                        foreach($mapel_names as $code => $name): 
+                            $score = $eval[$code] ?? 0;
+                            if ($score < 80): 
+                                $any_rem = true;
+                        ?>
+                            <label style="display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; border-bottom: 1px solid #F1F5F9; transition: background 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='transparent'">
+                                <input type="checkbox" name="mapel_kode[]" class="mapel-checkbox" value="<?= $code ?>|<?= $score ?>">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: #0F172A; font-size: 14px;"><?= $name ?></div>
+                                    <div style="font-size: 12px; color: #B91C1C;">Nilai saat ini: <?= $score ?></div>
+                                </div>
+                            </label>
+                        <?php 
+                            endif;
+                        endforeach; 
+                        ?>
+                    </div>
+                    <style>
+                        .scroll-container::-webkit-scrollbar { width: 6px; }
+                        .scroll-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+                        .scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                        .scroll-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+                    </style>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #1E293B;">Alasan Pengajuan:</label>
+                    <textarea name="alasan" style="width: 100%; height: 80px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 10px; font-family: inherit; resize: none;" placeholder="Contoh: Kurang fokus saat ujian, ingin memperbaiki pemahaman materi..." required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn-action btn-remedial" style="flex: 1; justify-content: center;">Kirim Pengajuan</button>
+                    <button type="button" onclick="closeRemedialModal()" style="flex: 1; background: #F1F5F9; color: #64748B; border: none; border-radius: 30px; font-weight: 600; cursor: pointer;">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Footer Space -->
     <div style="height: 100px;"></div>
+
+    <script>
+        function openRemedialModal() {
+            document.getElementById('remedialModal').style.display = 'flex';
+        }
+
+        function closeRemedialModal() {
+            document.getElementById('remedialModal').style.display = 'none';
+        }
+
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('.mapel-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = source.checked;
+            });
+        }
+
+        document.getElementById('remedialForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('../../backend/remedial_end.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('Berhasil! ' + data.message);
+                    closeRemedialModal();
+                    location.reload();
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan koneksi.');
+            });
+        });
+    </script>
 </body>
 </html>

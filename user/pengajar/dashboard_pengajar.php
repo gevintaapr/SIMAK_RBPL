@@ -36,6 +36,7 @@
                 <div class="dropdown-menu" id="evaluasiMenu">
                     <a href="input_penilaian.php" class="dropdown-link">Input Penilaian</a>
                     <a href="riwayat_evaluasi.php" class="dropdown-link">Riwayat Evaluasi</a>
+                    <a href="remedial_siswa.php" class="dropdown-link">Kelola Remedial</a>
                 </div>
             </div>
         </nav>
