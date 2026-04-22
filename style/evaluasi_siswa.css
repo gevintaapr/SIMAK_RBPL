@@ -1,0 +1,219 @@
+:root {
+    --primary: #003B73;
+    --primary-dark: #002D5A;
+    --accent: #EBC372;
+    --success: #1B7B23;
+    --success-bg: #DBF8DE;
+    --warning: #92400E;
+    --warning-bg: #FEF3C7;
+    --danger: #B91C1C;
+    --danger-bg: #FEE2E2;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --bg-light: #F8FAFC;
+    --white: #FFFFFF;
+}
+
+.eval-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.eval-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #E2E8F0;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.eval-header {
+    padding: 30px;
+    border-left: 8px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.eval-header-info h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary);
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.eval-meta {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.eval-meta strong {
+    color: var(--text-main);
+}
+
+.status-grid {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.score-display {
+    text-align: right;
+}
+
+.score-large {
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.score-grade {
+    font-size: 18px;
+    color: var(--text-muted);
+}
+
+/* Badges */
+.badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge-lulus {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.badge-remedial {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+/* Table Style */
+.eval-table-container {
+    padding: 0 30px 30px;
+}
+
+.eval-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.eval-table th {
+    text-align: left;
+    padding: 15px;
+    color: var(--primary);
+    font-size: 14px;
+    border-bottom: 2px solid var(--bg-light);
+}
+
+.eval-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 14px;
+}
+
+.row-remedial {
+    background-color: #FFFBEB;
+}
+
+.mapel-name {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.mapel-score {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Action Area */
+.action-card {
+    text-align: center;
+    padding: 50px 30px;
+    border: 2px dashed #CBD5E1;
+}
+
+.action-card.lulus {
+    border-color: #22C55E;
+    background: #F0FDF4;
+}
+
+.action-card.remedial {
+    border-color: #F59E0B;
+    background: #FFFBEB;
+}
+
+.action-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.action-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+
+.action-desc {
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 30px;
+    line-height: 1.6;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 36px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-magang {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.btn-magang:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 59, 115, 0.4);
+}
+
+.btn-remedial {
+    background: var(--accent);
+    color: var(--primary);
+}
+
+.btn-remedial:hover {
+    background: #F0D49E;
+    transform: translateY(-2px);
+}
+
+.deadline-text {
+    display: block;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #94A3B8;
+}

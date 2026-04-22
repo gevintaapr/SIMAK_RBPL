@@ -262,7 +262,7 @@ $siswa = mysqli_fetch_assoc($query);
                             <div class="qa-icon"><i class="fas fa-money-bill-wave"></i></div>
                             <span>Pembayaran</span>
                         </a>
-                        <a href="#" class="qa-item">
+                        <a href="evaluasi.php" class="qa-item">
                             <div class="qa-icon"><i class="fas fa-clipboard-list"></i></div>
                             <span>Nilai</span>
                         </a>
