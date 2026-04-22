@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $no_wa = preg_replace('/[^0-9+]/', '', $no_wa);
     $tanggal_lahir = mysqli_real_escape_string($conn, $_POST['tanggal_lahir'] ?? '');
     $alamat = mysqli_real_escape_string($conn, $_POST['alamat'] ?? '');
-    $program = mysqli_real_escape_string($conn, $_POST['program'] ?? '');
+    $id_program = intval($_POST['id_program'] ?? 0);
     
     // File upload handlings
     $upload_dir = __DIR__ . '/../public/uploads/';
@@ -112,11 +112,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 2. Masukkan ke tabel pendaftaran
     $query = "INSERT INTO pendaftaran (
         id_user, nama_cs, email, no_wa, tanggal_lahir, alamat,
-        ktp, ijazah, foto_siswa, bukti_pendaftaran, surat_pernyataan, program,
+        ktp, ijazah, foto_siswa, bukti_pendaftaran, surat_pernyataan, id_program,
         token_masuk, token_akses, status_approval
     ) VALUES (
         $new_user_id, '$nama', '$email', '$no_wa', '$tanggal_lahir', '$alamat',
-        '$ktp_path', '$ijazah_path', '$foto_path', '$bukti_path', '$surat_path', '$program',
+        '$ktp_path', '$ijazah_path', '$foto_path', '$bukti_path', '$surat_path', $id_program,
         '$no_reg', '$token', 0
     )";
 

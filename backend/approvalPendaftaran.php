@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
                     $new_user_id = $existing_user_id;
 
                     // 4. Input ke tabel siswa
-                    $siswa_query = "INSERT INTO siswa (id_user, nim_siswa, nama_lengkap, program_pembelajaran, id_pendaftaran, email_belajar, password) 
+                    $siswa_query = "INSERT INTO siswa (id_user, nim_siswa, nama_lengkap, id_program, id_pendaftaran, email_belajar, password) 
                                     VALUES (?, ?, ?, ?, ?, ?, ?)";
                     $stmt_siswa = mysqli_prepare($conn, $siswa_query);
-                    mysqli_stmt_bind_param($stmt_siswa, 'issssss', $new_user_id, $nim_siswa, $p['nama_cs'], $p['program'], $id_pendaftaran, $email_belajar, $password_plain);
+                    mysqli_stmt_bind_param($stmt_siswa, 'ississs', $new_user_id, $nim_siswa, $p['nama_cs'], $p['id_program'], $id_pendaftaran, $email_belajar, $password_plain);
                     mysqli_stmt_execute($stmt_siswa);
 
                     // 5. Update email_belajar dan token_expired di tabel pendaftaran

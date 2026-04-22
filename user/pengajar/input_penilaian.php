@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluasi'])) {
 
 // Ambil data siswa untuk dropdown
 $siswaDropdown = [];
-$query_siswa = mysqli_query($conn, "SELECT * FROM siswa");
+$query_siswa = mysqli_query($conn, "SELECT s.*, p.nama_program as program_pembelajaran FROM siswa s JOIN program p ON s.id_program = p.id_program");
 if ($query_siswa) {
     while($row = mysqli_fetch_assoc($query_siswa)) {
         $siswaDropdown[] = $row;
@@ -92,7 +92,7 @@ if ($query_siswa) {
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="data_siswa.php" class="sidebar-link">
                 <i class="fa-solid fa-users"></i>
                 <span>Data Siswa</span>
             </a>

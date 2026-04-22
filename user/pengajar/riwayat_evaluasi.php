@@ -18,11 +18,12 @@ if ($query_detail) {
 
 // Fetch batch evaluations grouped
 $query_batch = mysqli_query($conn, "
-    SELECT e.id_siswa, s.nama_lengkap, s.program_pembelajaran, s.nim_siswa, e.periode_semester, 
+    SELECT e.id_siswa, s.nama_lengkap, p.nama_program as program_pembelajaran, s.nim_siswa, e.periode_semester, 
            DATE_FORMAT(MIN(e.tanggal_input), '%d %b %Y') as tgl_input, 
            AVG(e.nilai_angka) as rata_rata 
     FROM evaluasi e 
     JOIN siswa s ON e.id_siswa = s.id_siswa 
+    JOIN program p ON s.id_program = p.id_program
     GROUP BY e.id_siswa, e.periode_semester
     ORDER BY MIN(e.tanggal_input) DESC
 ");
@@ -56,7 +57,7 @@ $query_batch = mysqli_query($conn, "
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="data_siswa.php" class="sidebar-link">
                 <i class="fa-solid fa-users"></i>
                 <span>Data Siswa</span>
             </a>
