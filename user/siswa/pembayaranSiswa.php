@@ -1,39 +1,36 @@
 <?php
-session_start();
-require_once '../../config/database.php';
+require_once '../../config/config.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../public/MainLogin.php?error=" . urlencode("Sesi berakhir. Silakan login kembali."));
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
+    header("Location: ../../public/login/logSiswa.php?error=" . urlencode("Sesi berakhir. Silakan login kembali."));
     exit;
 }
 $user_id = $_SESSION['user_id'];
 
-// Database Connection
-$db = new Database();
-$conn = $db->getConnection();
-
-// Fetch Student Data (including id_siswa)
-$stmt_siswa = $conn->prepare("SELECT * FROM siswa WHERE id_user = ? LIMIT 1");
-$stmt_siswa->execute([$user_id]);
-$siswa_data = $stmt_siswa->fetch();
+// Fetch Student Data (including id_siswa) using mysqli from config.php
+$stmt_siswa = mysqli_prepare($conn, "SELECT * FROM siswa WHERE id_user = ? LIMIT 1");
+mysqli_stmt_bind_param($stmt_siswa, "i", $user_id);
+mysqli_stmt_execute($stmt_siswa);
+$result_siswa = mysqli_stmt_get_result($stmt_siswa);
+$siswa_data = mysqli_fetch_assoc($result_siswa);
 
 if (!$siswa_data) {
-    echo "Data siswa tidak ditemukan.";
+    echo "Data profil siswa tidak ditemukan di database. Sesi ID: " . htmlspecialchars($user_id);
     exit;
 }
 
 $id_siswa = $siswa_data['id_siswa'];
 $nama_siswa = $siswa_data['nama_lengkap'];
 
-// Fetch payment history from DB using id_siswa
-$stmt = $conn->prepare("SELECT * FROM pembayaran WHERE id_siswa = ? ORDER BY tanggal_pembayaran DESC");
-$stmt->execute([$id_siswa]);
-$riwayat = $stmt->fetchAll();
+// Fetch payment history
+$stmt_pay = mysqli_prepare($conn, "SELECT * FROM pembayaran WHERE id_siswa = ? ORDER BY tanggal_pembayaran DESC");
+mysqli_stmt_bind_param($stmt_pay, "i", $id_siswa);
+mysqli_stmt_execute($stmt_pay);
+$riwayat = mysqli_fetch_all(mysqli_stmt_get_result($stmt_pay), MYSQLI_ASSOC);
 
-// Fetch available educational fees (biaya_pendidikan)
-$stmt_bp = $conn->prepare("SELECT * FROM biaya_pendidikan ORDER BY id_bp ASC");
-$stmt_bp->execute();
-$biaya_list = $stmt_bp->fetchAll();
+// Fetch educational fees
+$res_bp = mysqli_query($conn, "SELECT * FROM biaya_pendidikan ORDER BY id_bp ASC");
+$biaya_list = mysqli_fetch_all($res_bp, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -271,6 +268,23 @@ $biaya_list = $stmt_bp->fetchAll();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // Logic for deep linking from dashboard announcement
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('view') === 'upload') {
+                showKonfirmasi(0);
+                // Pre-select DP if possible
+                const selectBP = document.getElementById('id_bp');
+                for (let i = 0; i < selectBP.options.length; i++) {
+                    if (selectBP.options[i].value == "1") {
+                        selectBP.selectedIndex = i;
+                        updateNominal(selectBP);
+                        break;
+                    }
+                }
+            }
+        });
+
         function updateNominal(select) {
             const option = select.options[select.selectedIndex];
             const nominal = parseInt(option.getAttribute('data-nominal')) || 0;
@@ -309,6 +323,8 @@ $biaya_list = $stmt_bp->fetchAll();
             navigator.clipboard.writeText(text).then(() => {
                 alert('Nomor rekening ' + text + ' telah disalin!');
             });
+        }
+
         // Auto-hide alert after 3 seconds
         window.addEventListener('load', function() {
             const alert = document.getElementById('successAlert');

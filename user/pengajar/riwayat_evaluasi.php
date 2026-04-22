@@ -1,33 +1,32 @@
 <?php
-session_start();
 require_once '../../config/config.php';
 
-// Prepare evaluations detail array mapping per student per periode
-$evaluations = [];
-$query_detail = mysqli_query($conn, "SELECT 
-    e.id_siswa, e.periode_semester, e.mata_pelajaran, e.nilai_angka, e.grade, e.catatan_pengajar 
-    FROM evaluasi e 
-    ORDER BY e.mata_pelajaran ASC");
-
-if ($query_detail) {
-    while($row = mysqli_fetch_assoc($query_detail)){
-        $key = $row['id_siswa'] . '_' . $row['periode_semester'];
-        $evaluations[$key][] = $row;
-    }
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
+   // Pengajar usually role 3 or similar, check config
 }
 
-// Fetch batch evaluations grouped
+// Fetch batch evaluations in pivoted format
 $query_batch = mysqli_query($conn, "
-    SELECT e.id_siswa, s.nama_lengkap, s.program_pembelajaran, s.nim_siswa, e.periode_semester, 
-           DATE_FORMAT(MIN(e.tanggal_input), '%d %b %Y') as tgl_input, 
-           AVG(e.nilai_angka) as rata_rata 
+    SELECT e.*, s.nama_lengkap, p.nama_program as program_pembelajaran, s.nim_siswa,
+           DATE_FORMAT(e.tanggal_input, '%d %b %Y') as tgl_input
     FROM evaluasi e 
     JOIN siswa s ON e.id_siswa = s.id_siswa 
-    GROUP BY e.id_siswa, e.periode_semester
-    ORDER BY MIN(e.tanggal_input) DESC
+    JOIN program p ON s.id_program = p.id_program
+    ORDER BY e.tanggal_input DESC
 ");
+
+// Pre-process evaluations for the detail modal (pivoted format)
+$evaluations_raw = [];
+if ($query_batch && mysqli_num_rows($query_batch) > 0) {
+    mysqli_data_seek($query_batch, 0); // Reset pointer
+    while($row = mysqli_fetch_assoc($query_batch)) {
+        $key = $row['id_siswa'] . '_' . $row['periode_semester'];
+        $evaluations_raw[$key][] = $row;
+    }
+    mysqli_data_seek($query_batch, 0); // Reset pointer for the HTML loop
+}
 ?>
-<!DOCTYPE html>
+
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -56,7 +55,7 @@ $query_batch = mysqli_query($conn, "
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="data_siswa.php" class="sidebar-link">
                 <i class="fa-solid fa-users"></i>
                 <span>Data Siswa</span>
             </a>
@@ -150,11 +149,10 @@ $query_batch = mysqli_query($conn, "
                                         elseif($rata >= 50) $rt_grade = 'D';
 
                                         $lulus = ($rata >= 60);
-                                        $status = $lulus ? 'Lulus' : 'Tidak Lulus';
-                                        $statusClass = $lulus ? 'badge-lulus' : 'badge-gagal';
+                                        $statusClass = ($r['status_kelulusan'] === 'Lulus') ? 'badge-lulus' : 'badge-gagal';
                                         
                                         $key = $r['id_siswa'] . '_' . $r['periode_semester'];
-                                        $siswa_grades = isset($evaluations[$key]) ? $evaluations[$key] : [];
+                                        $siswa_grades = isset($evaluations_raw[$key]) ? $evaluations_raw[$key] : [];
                                         $json_data = htmlspecialchars(json_encode($siswa_grades), ENT_QUOTES, 'UTF-8');
                                     ?>
                                     <tr>
@@ -164,16 +162,16 @@ $query_batch = mysqli_query($conn, "
                                         <td><?= $rata ?> (<?= $rt_grade ?>)</td>
                                         <td style="text-align: center;">
                                             <button class="btn-detail" 
-                                                onclick="openDetailModal('<?= htmlspecialchars($r['nim_siswa']) ?>', 
-                                                                        '<?= htmlspecialchars($r['nama_lengkap'], ENT_QUOTES, 'UTF-8') ?>', 
-                                                                        '<?= htmlspecialchars($r['program_pembelajaran'], ENT_QUOTES, 'UTF-8') ?>', 
-                                                                        '<?= htmlspecialchars($r['periode_semester'], ENT_QUOTES, 'UTF-8') ?>', 
-                                                                        '<?= $status ?>', 
-                                                                        this, 
-                                                                        '<?= $statusClass ?>')" 
-                                                data-details="<?= $json_data ?>">
-                                                Detail
-                                            </button>
+                                                 onclick="openDetailModal('<?= htmlspecialchars($r['nim_siswa']) ?>', 
+                                                                         '<?= htmlspecialchars($r['nama_lengkap'], ENT_QUOTES, 'UTF-8') ?>', 
+                                                                         '<?= htmlspecialchars($r['program_pembelajaran'], ENT_QUOTES, 'UTF-8') ?>', 
+                                                                         '<?= htmlspecialchars($r['periode_semester'], ENT_QUOTES, 'UTF-8') ?>', 
+                                                                         '<?= $r['status_kelulusan'] ?>', 
+                                                                         this, 
+                                                                         '<?= $statusClass ?>')" 
+                                                 data-details="<?= $json_data ?>">
+                                                 Detail
+                                             </button>
                                         </td>
                                     </tr>
                                     <?php endwhile; ?>
@@ -250,12 +248,14 @@ $query_batch = mysqli_query($conn, "
                                 <th>Mata Pelajaran (Subject)</th>
                                 <th class="text-center">Nilai (0-100)</th>
                                 <th class="text-center">Grade</th>
-                                <th>Evaluasi Pengajar</th>
                             </tr>
                         </thead>
                         <tbody id="modalTableBody">
                             <!-- Populated via JS -->
                         </tbody>
+                        <tfoot id="modalTableFooter">
+                            <!-- Populated via JS -->
+                        </tfoot>
                     </table>
                 </div>
 
@@ -334,20 +334,60 @@ $query_batch = mysqli_query($conn, "
             // Build Table String
             let htmlStr = '';
             if(data.length === 0) {
-                htmlStr = '<tr><td colspan="4" class="text-center">Data rinci tidak ditemukan</td></tr>';
+                htmlStr = '<tr><td colspan="3" class="text-center">Data rinci tidak ditemukan</td></tr>';
             } else {
-                data.forEach(item => {
+                const item = data[0];
+                const mapelMap = {
+                    'DUI1': 'English for Hospitality',
+                    'DUI2': 'Hotel & Cruise Ship Overview',
+                    'DUI3': 'Food & Beverage Service Foundation',
+                    'DUI4': 'Kitchen & Food Production Basics',
+                    'DUI5': 'Housekeeping & Laundry Fundamentals',
+                    'DUI6': 'Front Office & Guest Interaction',
+                    'DUI7': 'Basic Safety Training (BST) & STCW',
+                    'DUI8': 'Grooming & Professional Conduct'
+                };
+
+                function getG(s) {
+                    if (s >= 90) return 'A';
+                    if (s >= 85) return 'A-';
+                    if (s >= 80) return 'B+';
+                    if (s >= 75) return 'B';
+                    if (s >= 70) return 'C';
+                    return 'D';
+                }
+
+                Object.keys(mapelMap).forEach(code => {
+                    const score = item[code] || 0;
                     htmlStr += `
-                        <tr>
-                            <td class="fw-bold">${item.mata_pelajaran}</td>
-                            <td class="text-center"><input type="text" class="disabled-input disabled-score" value="${item.nilai_angka}" readonly></td>
-                            <td class="text-center fw-bold">${item.grade}</td>
-                            <td><input type="text" class="disabled-input" value="${item.catatan_pengajar}" readonly></td>
+                        <tr ${score < 80 ? 'style="background:#FFFBEB"' : ''}>
+                            <td class="fw-bold">${mapelMap[code]}</td>
+                            <td class="text-center"><span class="mapel-score">${score}</span></td>
+                            <td class="text-center fw-bold">${getG(score)}</td>
                         </tr>
                     `;
                 });
             }
             modalTableBody.innerHTML = htmlStr;
+
+            // Build Footer Note (Outside Table - Matching Request)
+            let footerNoteHtml = `
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #E2E8F0;">
+                    <h4 style="color: #003B73; margin-bottom: 12px; font-weight: 700; font-size: 15px;">Catatan Umum Pengajar:</h4>
+                    <div style="width: 100%; min-height: 80px; padding: 15px; border: 1px solid #E2E8F0; border-radius: 10px; background-color: #F8FAFC; color: #64748B; font-size: 13px; line-height: 1.5;">
+                        ${(data.length > 0 && data[0].catatan_pengajar) ? data[0].catatan_pengajar : 'Tidak ada catatan evaluasi.'}
+                    </div>
+                </div>
+            `;
+            
+            // Check if footer container exists, if not create it or append to body
+            let footerContainer = document.getElementById('modalNoteContainer');
+            if (!footerContainer) {
+                footerContainer = document.createElement('div');
+                footerContainer.id = 'modalNoteContainer';
+                modalTableBody.parentElement.parentElement.appendChild(footerContainer);
+            }
+            footerContainer.innerHTML = footerNoteHtml;
 
             detailModal.style.display = 'flex';
         }

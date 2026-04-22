@@ -7,9 +7,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
 }
 
 $id = $_GET['id'] ?? '';
-$query = mysqli_query($conn, "SELECT p.*, u.create_at 
+$query = mysqli_query($conn, "SELECT p.*, u.create_at, pr.nama_program 
                              FROM pendaftaran p 
                              LEFT JOIN user u ON p.id_user = u.id_user 
+                             LEFT JOIN program pr ON p.id_program = pr.id_program
                              WHERE p.id_pendaftaran = '$id'");
 $data = mysqli_fetch_assoc($query);
 
@@ -228,7 +229,7 @@ if (!$data) {
 
                                 <div class="info-item">
                                     <span class="info-label">Posisi-Program Pilihan</span>
-                                    <span class="info-value"><?= htmlspecialchars($data['program']) ?></span>
+                                    <span class="info-value"><?= htmlspecialchars($data['nama_program'] ?? '-') ?></span>
                                 </div>
                                 <div class="info-item full-width">
                                     <span class="info-label">Alamat Lengkap</span>

@@ -1,9 +1,8 @@
 <?php
-// Pengaturan Durasi Sesi (1 Jam = 3600 detik)
-ini_set('session.gc_maxlifetime', 3600);
-session_set_cookie_params(3600);
-
 if (session_status() === PHP_SESSION_NONE) {
+    // Pengaturan Durasi Sesi (1 Jam = 3600 detik)
+    ini_set('session.gc_maxlifetime', 3600);
+    session_set_cookie_params(3600);
     session_start();
 }
 

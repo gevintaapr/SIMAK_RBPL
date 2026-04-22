@@ -64,7 +64,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `username`, `email`, `password`, `role_id`, `is_active`, `create_at`) VALUES
-(102, '124240114', 'gevintap@gmail.com', 'inicoba', 3, 1, '2026-02-26');
+(102, '124240114', 'gevintap@gmail.com', '$2y$10$biQneMzzR6TXeXwknRJCMedoUclmPhQiSfHnbbIB6Dy2hUFmPXsBW', 3, 1, '2026-02-26');
 
 --
 -- Indexes for dumped tables

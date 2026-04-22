@@ -7,50 +7,52 @@ $error_msg = "";
 
 // Cek submit form evaluasi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluasi'])) {
-    $id_siswa_raw = $_POST['id_siswa'] ?? ''; 
-    $parts = explode('|', $id_siswa_raw);
-    $id_siswa = $parts[0] ?? '';
-    
-    // Dummy pengajar ID, menyesuaikan dengan yang ada di db dump
-    $id_pengajar = 102; 
+    $id_siswa = $_POST['id_siswa'] ?? '';
+    $id_pengajar = $_SESSION['user_id'] ?? 102; 
     $periode = "Semester Ganjil 2025";
     
-    $mapel_arr = $_POST['mapel'] ?? [];
-    $nilai_arr = $_POST['nilai'] ?? [];
-    $grade_arr = $_POST['grade'] ?? [];
-    $catatan_arr = $_POST['catatan'] ?? [];
+    // Ambil nilai masing-masing mapel
+    $dui1 = (int)($_POST['dui1'] ?? 0);
+    $dui2 = (int)($_POST['dui2'] ?? 0);
+    $dui3 = (int)($_POST['dui3'] ?? 0);
+    $dui4 = (int)($_POST['dui4'] ?? 0);
+    $dui5 = (int)($_POST['dui5'] ?? 0);
+    $dui6 = (int)($_POST['dui6'] ?? 0);
+    $dui7 = (int)($_POST['dui7'] ?? 0);
+    $dui8 = (int)($_POST['dui8'] ?? 0);
+    $catatan = mysqli_real_escape_string($conn, $_POST['catatan_umum'] ?? '');
 
-    if (!empty($id_siswa) && count($mapel_arr) > 0) {
-        mysqli_begin_transaction($conn);
-        try {
-            $inserted = 0;
-            for ($i = 0; $i < count($mapel_arr); $i++) {
-                $m = mysqli_real_escape_string($conn, $mapel_arr[$i]);
-                $n = $nilai_arr[$i];
-                $g = mysqli_real_escape_string($conn, $grade_arr[$i]);
-                $c = mysqli_real_escape_string($conn, $catatan_arr[$i]);
-                
-                // Cek nilai kosong, lewati jika pengajar tidak menginput mapel ini
-                if ($n === '') continue; 
-                
-                $n_int = (int)$n;
-                
-                $sql = "INSERT INTO evaluasi (id_siswa, id_pengajar, mata_pelajaran, nilai_angka, grade, catatan_pengajar, periode_semester) 
-                        VALUES ('$id_siswa', $id_pengajar, '$m', $n_int, '$g', '$c', '$periode')";
-                mysqli_query($conn, $sql);
-                $inserted++;
-            }
-            
-            if ($inserted > 0) {
-                mysqli_commit($conn);
-                $success_msg = "Laporan evaluasi ($inserted mapel) berhasil disimpan ke database!";
-            } else {
-                mysqli_rollback($conn);
-                $error_msg = "Tidak ada nilai yang diinputkan.";
-            }
-        } catch (Exception $e) {
-            mysqli_rollback($conn);
-            $error_msg = "Gagal menyimpan: " . $e->getMessage();
+    // Hitung Rata-rata & Jumlah Remedial
+    $total = $dui1 + $dui2 + $dui3 + $dui4 + $dui5 + $dui6 + $dui7 + $dui8;
+    $avg = $total / 8;
+    
+    $remedial_count = 0;
+    foreach([$dui1, $dui2, $dui3, $dui4, $dui5, $dui6, $dui7, $dui8] as $n) {
+        if ($n < 80) $remedial_count++;
+    }
+
+    // Aturan Baru: Max 1 Remedial & Avg >= 80
+    $status = ($avg >= 80 && $remedial_count <= 1) ? 'Lulus' : 'Tidak Lulus';
+
+    if (!empty($id_siswa)) {
+        // Cek apakah sudah ada data evaluasi untuk siswa ini di periode ini
+        $check = mysqli_query($conn, "SELECT id_evaluasi FROM evaluasi WHERE id_siswa = $id_siswa AND periode_semester = '$periode'");
+        
+        if (mysqli_num_rows($check) > 0) {
+            $sql = "UPDATE evaluasi SET 
+                    DUI1 = $dui1, DUI2 = $dui2, DUI3 = $dui3, DUI4 = $dui4, 
+                    DUI5 = $dui5, DUI6 = $dui6, DUI7 = $dui7, DUI8 = $dui8, 
+                    rata_rata = $avg, status_kelulusan = '$status', catatan_pengajar = '$catatan'
+                    WHERE id_siswa = $id_siswa AND periode_semester = '$periode'";
+        } else {
+            $sql = "INSERT INTO evaluasi (id_siswa, id_pengajar, DUI1, DUI2, DUI3, DUI4, DUI5, DUI6, DUI7, DUI8, rata_rata, status_kelulusan, periode_semester, catatan_pengajar) 
+                    VALUES ('$id_siswa', $id_pengajar, $dui1, $dui2, $dui3, $dui4, $dui5, $dui6, $dui7, $dui8, $avg, '$status', '$periode', '$catatan')";
+        }
+
+        if (mysqli_query($conn, $sql)) {
+            $success_msg = "Laporan evaluasi untuk siswa berhasil disimpan! Rata-rata: " . number_format($avg, 1) . " ($status)";
+        } else {
+            $error_msg = "Gagal menyimpan: " . mysqli_error($conn);
         }
     } else {
         $error_msg = "Pilih siswa terlebih dahulu.";
@@ -59,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluasi'])) {
 
 // Ambil data siswa untuk dropdown
 $siswaDropdown = [];
-$query_siswa = mysqli_query($conn, "SELECT * FROM siswa");
+$query_siswa = mysqli_query($conn, "SELECT s.*, p.nama_program as program_pembelajaran FROM siswa s JOIN program p ON s.id_program = p.id_program");
 if ($query_siswa) {
     while($row = mysqli_fetch_assoc($query_siswa)) {
         $siswaDropdown[] = $row;
@@ -92,7 +94,7 @@ if ($query_siswa) {
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="data_siswa.php" class="sidebar-link">
                 <i class="fa-solid fa-users"></i>
                 <span>Data Siswa</span>
             </a>
@@ -199,30 +201,48 @@ if ($query_siswa) {
                                 </thead>
                                 <tbody>
                                     <?php 
-                                    $mapels = [
-                                        "English Basic", "Food & Beverage Service", "Housekeeping", 
-                                        "English Profession", "General Hotel Operation", "General Hotel Knowledge", 
-                                        "Psychology of Service", "Hygiene and Sanitation"
+                                    $mapels_list = [
+                                        "dui1" => "English for Hospitality",
+                                        "dui2" => "Hotel & Cruise Ship Overview",
+                                        "dui3" => "Food & Beverage Service Foundation",
+                                        "dui4" => "Kitchen & Food Production Basics",
+                                        "dui5" => "Housekeeping & Laundry Fundamentals",
+                                        "dui6" => "Front Office & Guest Interaction",
+                                        "dui7" => "Basic Safety Training (BST) & STCW",
+                                        "dui8" => "Grooming & Professional Conduct"
                                     ];
-                                    foreach($mapels as $mapel):
+                                    foreach($mapels_list as $code => $label):
                                     ?>
                                     <tr>
                                         <td>
-                                            <?= $mapel ?>
-                                            <input type="hidden" name="mapel[]" value="<?= $mapel ?>">
+                                            <?= $label ?>
                                         </td>
                                         <td style="text-align: center;">
-                                            <input type="number" name="nilai[]" class="input-score" min="0" max="100" placeholder="0">
+                                            <input type="number" name="<?= $code ?>" class="input-score" min="0" max="100" placeholder="0" required>
                                         </td>
                                         <td style="text-align: center;">
-                                            <input type="hidden" name="grade[]" class="input-grade-hidden" value="-">
                                             <span class="grade-display">-</span>
                                         </td>
                                         <td>
-                                            <input type="text" name="catatan[]" class="input-note" placeholder="Berikan catatan singkat...">
+                                            <span style="color: #94A3B8; font-size: 12px; font-style: italic;">Status: </span>
+                                            <span class="status-mini-badge">-</span>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
+                                    <tr style="background: #f8fafc; font-weight: bold;">
+                                        <td style="text-align: right;">RATA-RATA EVALUASI:</td>
+                                        <td style="text-align: center;" id="avgDisplay">-</td>
+                                        <td style="text-align: center;" id="gradeDisplay">-</td>
+                                        <td id="statusDisplay">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div style="margin-top: 10px;">
+                                                <label style="display: block; font-size: 14px; margin-bottom: 5px; color: var(--primary);">Catatan Umum Pengajar:</label>
+                                                <textarea name="catatan_umum" class="input-note" style="width: 100%; height: 80px; padding: 10px;" placeholder="Tuliskan evaluasi menyeluruh untuk siswa ini..."></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -428,9 +448,49 @@ if ($query_siswa) {
                 const tr = this.closest('tr');
                 const newGrade = getGrade(this.value);
                 tr.querySelector('.grade-display').textContent = newGrade;
-                tr.querySelector('.input-grade-hidden').value = newGrade;
+                
+                const statusBadge = tr.querySelector('.status-mini-badge');
+                if (this.value >= 80) {
+                    statusBadge.textContent = 'Lulus';
+                    statusBadge.style.color = 'var(--success)';
+                } else {
+                    statusBadge.textContent = 'Remedial';
+                    statusBadge.style.color = 'var(--danger)';
+                }
+
+                calculateTotal();
             });
         });
+
+        function calculateTotal() {
+            let total = 0;
+            let count = 0;
+            let remedialCount = 0;
+            scoreInputs.forEach(input => {
+                const val = input.value !== '' ? parseFloat(input.value) : 0;
+                total += val;
+                if (val < 80) remedialCount++;
+                count++;
+            });
+
+            const avg = total / count;
+            const avgDisplay = document.getElementById('avgDisplay');
+            const gradeDisplay = document.getElementById('gradeDisplay');
+            const statusDisplay = document.getElementById('statusDisplay');
+
+            avgDisplay.textContent = avg.toFixed(1);
+            gradeDisplay.textContent = getGrade(avg);
+            
+            if (avg >= 80 && remedialCount <= 1) {
+                if (remedialCount === 1) {
+                    statusDisplay.innerHTML = '<span class="badge badge-remedial">Lulus (Opsi Remedial)</span>';
+                } else {
+                    statusDisplay.innerHTML = '<span class="badge badge-lulus">Lulus Sempurna</span>';
+                }
+            } else {
+                statusDisplay.innerHTML = '<span class="badge badge-remedial" style="background:#FEE2E2; color:#B91C1C;">Wajib Remedial</span>';
+            }
+        }
 
         function validateForm() {
             let isValid = true;

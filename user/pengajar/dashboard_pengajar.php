@@ -19,7 +19,7 @@
             <span class="sidebar-logo">HCTS</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="sidebar-link active">
+            <a href="dashboard_pengajar.php" class="sidebar-link active">
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
@@ -34,8 +34,8 @@
                     <i class="fa-solid fa-chevron-down chevron-icon"></i>
                 </a>
                 <div class="dropdown-menu" id="evaluasiMenu">
-                    <a href="#" class="dropdown-link">Input Penilaian</a>
-                    <a href="#" class="dropdown-link">Riwayat Evaluasi</a>
+                    <a href="input_penilaian.php" class="dropdown-link">Input Penilaian</a>
+                    <a href="riwayat_evaluasi.php" class="dropdown-link">Riwayat Evaluasi</a>
                 </div>
             </div>
         </nav>

@@ -27,6 +27,12 @@ body {
     line-height: 1.6;
 }
 
+.nav-disabled {
+    pointer-events: none !important;
+    filter: grayscale(1) opacity(0.7);
+    cursor: not-allowed;
+}
+
 a {
     text-decoration: none;
     color: inherit;

@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
     exit;
 }
 
-$query = mysqli_query($conn, "SELECT * FROM pendaftaran ORDER BY id_pendaftaran DESC");
+$query = mysqli_query($conn, "SELECT p.*, pr.nama_program FROM pendaftaran p LEFT JOIN program pr ON p.id_program = pr.id_program ORDER BY p.id_pendaftaran DESC");
 $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -144,7 +144,7 @@ $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                     <tr>
                                         <td><?= htmlspecialchars($row['token_masuk']) ?></td>
                                         <td><?= htmlspecialchars($row['nama_cs']) ?></td>
-                                        <td><?= htmlspecialchars($row['program']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_program'] ?? '-') ?></td>
                                          <td>
                                             <?php if ($row['status_approval'] === 'disetujui' || $row['status_approval'] == 1): ?>
                                                 <span class="badge badge-status-green" style="background: #D1FAE5; color: #059669;">Lulus Seleksi</span>

@@ -1,3 +1,7 @@
+<?php
+require_once '../../config/config.php';
+$query_program = mysqli_query($conn, "SELECT * FROM program ORDER BY nama_program ASC");
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -65,12 +69,11 @@
                 
                 <div class="form-group">
                     <label>Pilihan Program <span class="required">*</span></label>
-                    <select name="program" class="form-control" required>
+                    <select name="id_program" class="form-control" required>
                         <option value="">-- Pilih Program --</option>
-                        <option value="Hotel Management">Hotel Management</option>
-                        <option value="Cruise Ship Operations">Cruise Ship Operations</option>
-                        <option value="Culinary Arts">Culinary Arts</option>
-                        <option value="House Keeping">House Keeping</option>
+                        <?php while($p = mysqli_fetch_assoc($query_program)): ?>
+                            <option value="<?= $p['id_program'] ?>"><?= htmlspecialchars($p['nama_program']) ?></option>
+                        <?php endwhile; ?>
                     </select>
                 </div>
                 

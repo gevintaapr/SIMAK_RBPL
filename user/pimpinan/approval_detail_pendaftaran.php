@@ -3,7 +3,7 @@ session_start();
 require_once '../../config/config.php';
 
 $id = $_GET['id'] ?? '';
-$query = mysqli_query($conn, "SELECT * FROM pendaftaran WHERE id_pendaftaran = '$id'");
+$query = mysqli_query($conn, "SELECT p.*, pr.nama_program FROM pendaftaran p LEFT JOIN program pr ON p.id_program = pr.id_program WHERE p.id_pendaftaran = '$id'");
 $data = mysqli_fetch_assoc($query);
 
 if (!$data) {
@@ -148,7 +148,7 @@ if (!$data) {
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Posisi-Program Pilihan</span>
-                                    <span class="info-value"><?= htmlspecialchars($data['program']) ?></span>
+                                    <span class="info-value"><?= htmlspecialchars($data['nama_program'] ?? '-') ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="info-label">Tanggal Wawancara</span>
