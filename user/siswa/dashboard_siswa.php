@@ -19,12 +19,165 @@ $siswa = mysqli_fetch_assoc($query);
     <title>Dashboard Siswa</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../style/dashboard_siswa.css">
+    <link rel="stylesheet" href="../../style/dashboard_siswa.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../../style/popup_logout.css">
+    <style>
+        /* Lock Overlay Styles */
+        .dashboard-lock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lock-card {
+            background: #fff;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            padding: 0;
+            text-align: left;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.5s ease-out;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .lock-header {
+            background: #003B73;
+            color: #EBC372;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 4px solid #EBC372;
+        }
+
+        .lock-body {
+            padding: 30px;
+        }
+
+        .lock-title {
+            font-size: 22px;
+            color: #0F172A;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .lock-desc {
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        .lock-info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .lock-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .lock-info-item:last-child { margin-bottom: 0; }
+
+        .lock-info-label { color: #64748B; }
+        .lock-info-value { color: #003B73; font-weight: 700; }
+
+        .btn-pay-now {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #003B73;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-pay-now:hover {
+            background: #002D5A;
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .nav-disabled {
+            pointer-events: none !important;
+            filter: blur(2px) grayscale(0.5);
+        }
+    </style>
 </head>
 <body>
+    <!-- ===== DASHBOARD LOCK OVERLAY ===== -->
+    <?php if ($siswa['status_pembayaran'] !== 'lunas_dp'): ?>
+    <div class="dashboard-lock-overlay">
+        <div class="lock-card">
+            <div class="lock-header">
+                <i class="fas fa-bullhorn"></i>
+                PENGUMUMAN PENTING
+            </div>
+            <div class="lock-body">
+                <?php if ($siswa['status_pembayaran'] === 'pending'): ?>
+                    <h2 class="lock-title">Verifikasi Pembayaran Sedang Diproses</h2>
+                    <p class="lock-desc">Halo <?= htmlspecialchars(explode(' ', $siswa['nama_lengkap'])[0]) ?>, Bukti pembayaran DP Anda telah kami terima. Saat ini tim keuangan HCTS sedang melakukan validasi. Dashboard akan aktif sepenuhnya segera setelah verifikasi selesai.</p>
+                    <div class="lock-info-box">
+                        <div class="lock-info-item">
+                            <span class="lock-info-label">Status Saat Ini:</span>
+                            <span class="lock-info-value" style="color: #D97706;">Siswa Menunggu Konfirmasi</span>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <h2 class="lock-title">Selesaikan Administrasi Anda</h2>
+                    <p class="lock-desc">Selamat atas bergabungnya Anda di HCTS (Hotel & Cruise Ship Selection)! Untuk mulai mengakses materi, jadwal, dan fitur akademik, silakan lakukan pembayaran DP terlebih dahulu sesuai ketentuan Lembaga.</p>
+                    <div class="lock-info-box">
+                        <div class="lock-info-item">
+                            <span class="lock-info-label">Jenis Tagihan:</span>
+                            <span class="lock-info-value">Down Payment (DP) Pertama</span>
+                        </div>
+                        <div class="lock-info-item">
+                            <span class="lock-info-label">Nominal:</span>
+                            <span class="lock-info-value">Rp 5.000.000</span>
+                        </div>
+                    </div>
+                    <a href="pembayaranSiswa.php?view=upload" class="btn-pay-now">
+                        <i class="fas fa-wallet"></i> Lakukan Pembayaran DP Sekarang
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Navbar -->
-    <nav class="navbar">
+    <nav class="navbar <?= ($siswa['status_pembayaran'] !== 'lunas_dp') ? 'nav-disabled' : '' ?>">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
             <li><a href="#" class="active">Home</a></li>
@@ -49,7 +202,17 @@ $siswa = mysqli_fetch_assoc($query);
     </header>
 
     <!-- Main Content -->
-    <main class="dashboard-container">
+    <main class="dashboard-container <?= ($siswa['status_pembayaran'] !== 'lunas_dp') ? 'nav-disabled' : '' ?>">
+        <!-- Success Notification -->
+        <?php if ($siswa['status_pembayaran'] === 'lunas_dp'): ?>
+            <div style="background: #d4edda; color: #155724; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border: 1px solid #c3e6cb;">
+                <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+                <div>
+                    <strong>Pembayaran DP Berhasil!</strong> Dashboard Anda kini telah aktif sepenuhnya. Selamat belajar!
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Status Card -->
         <section class="card status-card">
             <div class="status-left">

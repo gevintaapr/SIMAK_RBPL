@@ -1,9 +1,4 @@
-<?php
-session_start();
-require_once '../config/database.php';
-
-$db = new Database();
-$conn = $db->getConnection();
+require_once '../config/config.php';
 
 header('Content-Type: application/json');
 
@@ -17,13 +12,15 @@ if ($action === 'upload') {
         exit;
     }
 
-    // Get id_siswa from user_id
-    $stmt_get_siswa = $conn->prepare("SELECT id_siswa FROM siswa WHERE id_user = ? LIMIT 1");
-    $stmt_get_siswa->execute([$user_id]);
-    $siswa = $stmt_get_siswa->fetch();
+    // Get id_siswa from user_id using mysqli
+    $stmt_get_siswa = mysqli_prepare($conn, "SELECT id_siswa FROM siswa WHERE id_user = ? LIMIT 1");
+    mysqli_stmt_bind_param($stmt_get_siswa, "i", $user_id);
+    mysqli_stmt_execute($stmt_get_siswa);
+    $res_siswa = mysqli_stmt_get_result($stmt_get_siswa);
+    $siswa = mysqli_fetch_assoc($res_siswa);
     
     if (!$siswa) {
-        header("Location: ../user/siswa/pembayaranSiswa.php?error=Data siswa tidak ditemukan.");
+        header("Location: ../user/siswa/pembayaranSiswa.php?error=Data profil siswa tidak ditemukan.");
         exit;
     }
     $id_siswa = $siswa['id_siswa'];
@@ -49,10 +46,18 @@ if ($action === 'upload') {
 
     if (move_uploaded_file($_FILES["bukti_file"]["tmp_name"], $target_file)) {
         try {
-            $stmt = $conn->prepare("INSERT INTO pembayaran (id_siswa, id_biaya_pendidikan, nominal, bukti_file, deskripsi, tanggal_pembayaran, status_pembayaran) 
+            $stmt = mysqli_prepare($conn, "INSERT INTO pembayaran (id_siswa, id_biaya_pendidikan, nominal, bukti_file, deskripsi, tanggal_pembayaran, status_pembayaran) 
                                     VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id_siswa, $id_bp, $nominal, $db_file_path, $deskripsi, $tanggal, $status]);
+            mysqli_stmt_bind_param($stmt, "iiissss", $id_siswa, $id_bp, $nominal, $db_file_path, $deskripsi, $tanggal, $status);
+            mysqli_stmt_execute($stmt);
             
+            // Link ke Logika Dashboard: Jika yang dibayar adalah DP (id_bp = 1), update status_pembayaran di tabel siswa jadi 'pending'
+            if ($id_bp == 1) {
+                $upd_siswa = mysqli_prepare($conn, "UPDATE siswa SET status_pembayaran = 'pending' WHERE id_siswa = ?");
+                mysqli_stmt_bind_param($upd_siswa, "i", $id_siswa);
+                mysqli_stmt_execute($upd_siswa);
+            }
+
             header("Location: ../user/siswa/pembayaranSiswa.php?success=1");
             exit;
         } catch (Exception $e) {
@@ -76,9 +81,24 @@ if ($action === 'upload') {
     }
 
     try {
-        $stmt = $conn->prepare("UPDATE pembayaran SET status_pembayaran = ?, keterangan = ? WHERE id_pembayaran = ?");
-        $stmt->execute([$status_verif, $keterangan, $id_pembayaran]);
+        // Ambil data pembayaran sebelum update untuk cek id_bp dan id_siswa
+        $stmt_check = mysqli_prepare($conn, "SELECT id_siswa, id_biaya_pendidikan FROM pembayaran WHERE id_pembayaran = ?");
+        mysqli_stmt_bind_param($stmt_check, "i", $id_pembayaran);
+        mysqli_stmt_execute($stmt_check);
+        $pay_data = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_check));
+
+        $stmt = mysqli_prepare($conn, "UPDATE pembayaran SET status_pembayaran = ?, keterangan = ? WHERE id_pembayaran = ?");
+        mysqli_stmt_bind_param($stmt, "ssi", $status_verif, $keterangan, $id_pembayaran);
+        mysqli_stmt_execute($stmt);
         
+        // Link ke Logika Dashboard: Jika verifikasi sukses dan jenisnya DP (id_bp = 1)
+        if ($pay_data && $pay_data['id_biaya_pendidikan'] == 1) {
+            $new_siswa_status = ($status_verif === 'diterima') ? 'lunas_dp' : 'belum_bayar';
+            $upd_siswa = mysqli_prepare($conn, "UPDATE siswa SET status_pembayaran = ? WHERE id_siswa = ?");
+            mysqli_stmt_bind_param($upd_siswa, "si", $new_siswa_status, $pay_data['id_siswa']);
+            mysqli_stmt_execute($upd_siswa);
+        }
+
         echo json_encode(['status' => 'success', 'message' => 'Status pembayaran berhasil diperbarui.']);
     } catch (Exception $e) {
         echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui status: ' . $e->getMessage()]);
