@@ -34,10 +34,10 @@ if ($action === 'verifikasi') {
     }
 
     // Jika diterima → set status_magang ke 'berlangsung'
-    $status_magang = ($status === 'diterima') ? 'berlangsung' : 'belum_mulai';
+    $status_magang = ($status === 'diterima') ? 'berlangsung' : 'ditolak';
     $status_esc = mysqli_real_escape_string($conn, $status);
 
-    $sql = "UPDATE magang SET status_verifikasi = '$status_esc', catatan_admin = '$catatan', status_magang = '$status_magang' WHERE id = $magang_id";
+    $sql = "UPDATE magang SET status_admin = '$status_esc', catatan_admin = '$catatan', status_magang = '$status_magang' WHERE id_magang = $magang_id";
     if (mysqli_query($conn, $sql)) {
         echo json_encode(['status' => 'success', 'message' => 'Verifikasi berhasil disimpan.']);
     } else {
@@ -45,7 +45,7 @@ if ($action === 'verifikasi') {
     }
 
 } elseif ($action === 'selesai') {
-    $sql = "UPDATE magang SET status_magang = 'selesai' WHERE id = $magang_id AND status_magang = 'berlangsung'";
+    $sql = "UPDATE magang SET status_magang = 'selesai' WHERE id_magang = $magang_id AND status_magang = 'berlangsung'";
     if (mysqli_query($conn, $sql) && mysqli_affected_rows($conn) > 0) {
         echo json_encode(['status' => 'success', 'message' => 'Program magang berhasil diselesaikan.']);
     } else {

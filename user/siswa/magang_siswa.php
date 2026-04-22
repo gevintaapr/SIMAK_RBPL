@@ -1,37 +1,33 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
 
-// Auth: hanya siswa (role_id = 1)
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
-    header("Location: ../../public/login/logSiswa.php?role=1&error=" . urlencode("Akses ditolak. Silakan login menggunakan akun Siswa Anda."));
+    header("Location: ../../public/login/logSiswa.php");
     exit;
 }
 
 $id_user = $_SESSION['user_id'];
 
-// Ambil data siswa
-$query_siswa = mysqli_query($conn, "SELECT * FROM siswa WHERE id_user = $id_user");
+// Ambil data siswa & status pembayaran
+$query_siswa = mysqli_query($conn, "SELECT id_siswa, nama_lengkap, status_pembayaran FROM siswa WHERE id_user = $id_user");
 $siswa = mysqli_fetch_assoc($query_siswa);
-$nama_siswa = $siswa['nama_lengkap'] ?? 'Siswa';
+$id_siswa = $siswa['id_siswa'];
 
-// Fetch latest internship data
-$query_magang = mysqli_query($conn, "SELECT * FROM magang WHERE user_id = $id_user ORDER BY created_at DESC LIMIT 1");
-$magang = mysqli_fetch_assoc($query_magang);
+// Cek Kelulusan Evaluasi
+$query_eval = mysqli_query($conn, "SELECT status_kelulusan, rata_rata FROM evaluasi WHERE id_siswa = $id_siswa LIMIT 1");
+$eval = mysqli_fetch_assoc($query_eval);
 
-$current_step = 1;
-if ($magang) {
-    if ($magang['status_pengajuan'] === 'pending') {
-        $current_step = 2; // Menunggu persetujuan pimpinan
-    } elseif ($magang['status_pengajuan'] === 'disetujui_pimpinan' && $magang['status_verifikasi'] === 'pending') {
-        $current_step = 2; // Menunggu verifikasi admin
-    } elseif ($magang['status_verifikasi'] === 'diterima' && $magang['status_magang'] === 'berlangsung') {
-        $current_step = 3; // Magang aktif
-    } elseif ($magang['status_magang'] === 'selesai') {
-        $current_step = 6; // Selesai
-    } elseif ($magang['status_pengajuan'] === 'ditolak_pimpinan' || $magang['status_verifikasi'] === 'ditolak') {
-        $current_step = 1; // Bisa ajukan ulang
-    }
-}
+// Logika Syarat Magang (Sesuai kolom status_pembayaran)
+$is_lunas = ($siswa['status_pembayaran'] === 'lunas_dp');
+$is_lulus = ($eval && ($eval['status_kelulusan'] == 'Lulus' || $eval['status_kelulusan'] == 'Lulus (Opsi Remedial Tersedia)'));
+$can_apply = ($is_lunas && $is_lulus);
+
+// Ambil Riwayat Pengajuan
+$query_riwayat = mysqli_query($conn, "SELECT * FROM magang WHERE id_siswa = $id_siswa ORDER BY tanggal_pengajuan DESC");
+
+// Cek apakah ada pengajuan yang sedang diproses (pending)
+$check_pending = mysqli_query($conn, "SELECT COUNT(*) as jml FROM magang WHERE id_siswa = $id_siswa AND status_magang = 'pending'");
+$is_pending_magang = (mysqli_fetch_assoc($check_pending)['jml'] > 0);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -41,8 +37,40 @@ if ($magang) {
     <title>Proses Magang - HCTS</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../style/magang_siswa.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../../style/popup_logout.css">
+    <link rel="stylesheet" href="../../style/dashboard_siswa.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../../style/evaluasi_siswa.css?v=<?= time() ?>">
+    <style>
+        :root { --primary: #003B73; --gold: #D4AF37; --bg-light: #F8FAFC; }
+        body { background-color: var(--bg-light); font-family: 'Poppins', sans-serif; }
+        .page-title { font-family: 'Playfair Display', serif; color: var(--primary); margin: 40px auto 30px; width: 90%; max-width: 1100px; font-size: 32px; }
+        .magang-card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px; padding: 35px; border: 1px solid #edf2f7; }
+        .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 25px; color: var(--primary); font-family: 'Playfair Display', serif; font-size: 22px; }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px; }
+        .info-box { background: #F1F5F9; padding: 20px; border-radius: 12px; }
+        .info-box h4 { margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .check-item { display: flex; align-items: center; gap: 10px; font-size: 14px; margin-bottom: 8px; color: #475569; }
+        .check-item i { color: #10B981; } .check-item.failed i { color: #EF4444; }
+        
+        .eligibility-banner { background: #ECFDF5; border: 1px solid #10B981; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .eligibility-banner i { font-size: 28px; color: #059669; }
+        .eligibility-banner.failed { background: #FEF2F2; border-color: #EF4444; }
+        .eligibility-banner.failed i { color: #DC2626; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--primary); font-size: 14px; }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #E2E8F0; border-radius: 10px; font-family: inherit; font-size: 14px; }
+        .form-control:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
+        .btn-group { display: flex; gap: 15px; justify-content: flex-end; margin-top: 20px; }
+        .btn-draft { border: 2px solid var(--primary); background: transparent; color: var(--primary); padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-submit { background: #E9C46A; color: var(--primary); border: none; padding: 12px 40px; border-radius: 30px; font-weight: 700; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(233, 196, 106, 0.3); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(233, 196, 106, 0.4); }
+
+        .archive-empty { text-align: center; padding: 50px; color: #94A3B8; }
+        .archive-empty i { font-size: 64px; margin-bottom: 15px; }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -50,265 +78,141 @@ if ($magang) {
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
             <li><a href="dashboard_siswa.php">Home</a></li>
-            <li><a href="pembayaranSiswa.php">Pembayaran</a></li>
-            <li><a href="magang_siswa.php" class="active">Magang</a></li>
-            <li><a href="#">Program Taiwan</a></li>
+            <li><a href="evaluasi.php">Evaluasi</a></li>
+            <li><a href="pembayaranSiswa.php">Keuangan</a></li>
+            <li><a href="#" class="active">Magang</a></li>
         </ul>
         <div class="nav-action">
-            <a href="#" class="nav-bell"><i class="far fa-bell"></i></a>
-            <a href="#" onclick="showLogoutPopup(event)" class="btn-logout">Logout</a>
+            <a href="../../app/logout.php" class="btn-logout">Logout</a>
         </div>
     </nav>
 
-    <main class="container">
-        <h1 class="page-title">Proses Magang</h1>
+    <div class="eval-container">
+        <h1 style="font-family: 'Playfair Display', serif; color: #003B73; margin: 40px 0 30px;">Proses Magang</h1>
 
-        <!-- Progress Stepper -->
-        <section class="stepper-section card">
-            <div class="stepper">
-                <div class="step <?= $current_step >= 1 ? 'active' : '' ?> <?= $current_step > 1 ? 'completed' : '' ?>">
-                    <div class="step-icon"><?= $current_step > 1 ? '<i class="fas fa-check"></i>' : '1' ?></div>
-                    <span class="step-label">Pengajuan Terkirim</span>
+
+        <!-- Syarat & Alur -->
+        <div class="magang-card">
+            <div class="section-header">Pengajuan Magang (On-the-Job Training)</div>
+            <div class="info-grid">
+                <div class="info-box">
+                    <h4><i class="fas fa-clipboard-check"></i> Syarat Pengajuan</h4>
+                    <div class="check-item <?= !$is_lunas ? 'failed' : '' ?>">
+                        <i class="fas <?= $is_lunas ? 'fa-check' : 'fa-times' ?>"></i> Status siswa aktif & administrasi lunas.
+                    </div>
+                    <div class="check-item <?= !$is_lulus ? 'failed' : '' ?>">
+                        <i class="fas <?= $is_lulus ? 'fa-check' : 'fa-times' ?>"></i> Lulus Evaluasi Akademik (Min. Nilai B).
+                    </div>
+                    <div class="check-item"><i class="fas fa-check"></i> Sehat jasmani (MCU jika diperlukan).</div>
                 </div>
-                <div class="step-line"></div>
-                <div class="step <?= $current_step >= 2 ? 'active' : '' ?> <?= $current_step > 2 ? 'completed' : '' ?>">
-                    <div class="step-icon"><?= $current_step > 2 ? '<i class="fas fa-check"></i>' : '2' ?></div>
-                    <span class="step-label">Verifikasi Akademik</span>
-                </div>
-                <div class="step-line"></div>
-                <div class="step <?= $current_step >= 3 ? 'active' : '' ?> <?= $current_step > 4 ? 'completed' : '' ?>">
-                    <div class="step-icon"><?= $current_step > 4 ? '<i class="fas fa-check"></i>' : '3' ?></div>
-                    <span class="step-label">Hasil & Proses</span>
-                </div>
-                <div class="step-line"></div>
-                <div class="step <?= $current_step >= 6 ? 'active completed' : '' ?>">
-                    <div class="step-icon"><?= $current_step >= 6 ? '<i class="fas fa-check"></i>' : '4' ?></div>
-                    <span class="step-label">Selesai Magang</span>
+                <div class="info-box">
+                    <h4><i class="fas fa-route"></i> Alur Pelaksanaan</h4>
+                    <div class="check-item"><strong>1.</strong> &nbsp; Pengajuan Data Industri</div>
+                    <div class="check-item"><strong>2.</strong> &nbsp; Verifikasi Akademik & Interview</div>
+                    <div class="check-item"><strong>3.</strong> &nbsp; Penerbitan Surat Pengantar</div>
                 </div>
             </div>
-        </section>
 
-        <!-- Dynamic Content Based on Step -->
-        <?php if ($current_step == 1): ?>
-            <!-- STATE 1: PENGAJUAN -->
-            <section class="card content-card">
-                <div class="card-header-main">
-                    <h2>Pengajuan Magang (On-the-Job Training)</h2>
-                </div>
-                
-                <div class="requirements-grid">
-                    <div class="info-box">
-                        <h3><i class="fas fa-id-card"></i> Syarat Pengajuan</h3>
-                        <ul>
-                            <li><i class="fas fa-check"></i> Status siswa aktif & administrasi lunas.</li>
-                            <li><i class="fas fa-check"></i> Lulus Evaluasi Akademik (Min. Nilai B).</li>
-                            <li><i class="fas fa-check"></i> Sehat jasmani (MCU jika diperlukan).</li>
-                        </ul>
-                    </div>
-                    <div class="info-box">
-                        <h3><i class="fas fa-book-reader"></i> Alur Pelaksanaan</h3>
-                        <ol>
-                            <li><span>1</span> Pengajuan Data Industri</li>
-                            <li><span>2</span> Verifikasi Akademik & Interview</li>
-                            <li><span>3</span> Penerbitan Surat Pengantar</li>
-                        </ol>
+            <?php if ($can_apply): ?>
+                <div class="eligibility-banner">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong style="display: block; color: #065F46;">Anda Memenuhi Syarat Magang</strong>
+                        <span style="font-size: 14px; color: #065F46;">Status Evaluasi Akademik Anda dinyatakan LULUS. Silakan lengkapi formulir di bawah ini.</span>
                     </div>
                 </div>
+            <?php else: ?>
+                <div class="eligibility-banner failed">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong style="display: block; color: #991B1B;">Belum Memenuhi Syarat</strong>
+                        <span style="font-size: 14px; color: #991B1B;">Mohon selesaikan administrasi atau perbaikan nilai akademik untuk membuka formulir pengajuan.</span>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
 
-                <div class="alert alert-success">
-                    <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
-                    <div class="alert-text">
-                        <strong>Anda Memenuhi Syarat Magang</strong>
-                        <p>Status Evaluasi Akademik Anda dinyatakan LULUS. Silakan lengkapi formulir di bawah ini.</p>
+        <?php if ($can_apply): ?>
+            <?php if ($is_pending_magang): ?>
+                <div class="magang-card" style="text-align: center; border-left: 5px solid #F59E0B;">
+                    <i class="fas fa-history" style="font-size: 48px; color: #F59E0B; margin-bottom: 20px;"></i>
+                    <h2 style="color: #003B73;">Pengajuan Sedang Diverifikasi</h2>
+                    <p style="color: #64748B; max-width: 600px; margin: 0 auto;">Anda telah mengirimkan rencana magang. Saat ini Pimpinan sedang meninjau data industri yang Anda ajukan. Tunggu hingga status disetujui untuk melanjutkan ke tahap berikutnya.</p>
+                </div>
+            <?php else: ?>
+                <!-- Formulir Rencana Magang -->
+                <div class="magang-card">
+                    <div class="section-header">Formulir Rencana Magang</div>
+                    <form action="../../backend/magang_end.php" method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nama Perusahaan / Hotel</label>
+                        <input type="text" name="nama_perusahaan" class="form-control" placeholder="Contoh: Ritz Carlton, Marriott, etc." required>
+                        <small style="color: #94A3B8; font-size: 12px;">Pastikan nama perusahaan sesuai ejaan resmi</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Posisi / Departemen</label>
+                        <input type="text" name="posisi" class="form-control" placeholder="Contoh: F&B Service, Kitchen, etc." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Lokasi (Kota, Negara)</label>
+                        <input type="text" name="lokasi" class="form-control" placeholder="Contoh: Jakarta, Indonesia / Dubai, UAE" required>
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label>Periode Pelaksanaan (Mulai)</label>
+                            <input type="date" name="tanggal_mulai" class="form-control" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Selesai</label>
+                            <input type="date" name="tanggal_selesai" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group full">
+                        <label>Kontak Person Industri (Jika Ada)</label>
+                        <input type="text" name="kontak_person" class="form-control" placeholder="Nama HRD / Supervisor - Kontak">
                     </div>
                 </div>
-            </section>
-
-            <section class="card content-card">
-                <div class="card-header-main">
-                    <h2>Formulir Rencana Magang</h2>
+                <div class="btn-group">
+                    <button type="submit" name="action" value="draft" class="btn-draft">Simpan Draft</button>
+                    <button type="submit" name="action" value="submit" class="btn-submit">Ajukan Permohonan</button>
                 </div>
-                <?php if ($magang && $magang['catatan_pimpinan'] && $magang['status_pengajuan'] === 'ditolak_pimpinan'): ?>
-                    <div class="alert alert-danger" style="margin-bottom: 20px;">
-                        <strong>Ditolak Pimpinan:</strong> <?= htmlspecialchars($magang['catatan_pimpinan']) ?>
-                    </div>
-                <?php endif; ?>
-                <?php if ($magang && $magang['catatan_admin'] && $magang['status_verifikasi'] === 'ditolak'): ?>
-                    <div class="alert alert-danger" style="margin-bottom: 20px;">
-                        <strong>Ditolak Admin:</strong> <?= htmlspecialchars($magang['catatan_admin']) ?>
-                    </div>
-                <?php endif; ?>
-
-                <form class="internship-form" id="formAjukan">
-                    <input type="hidden" name="action" value="ajukan">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nama Perusahaan / Hotel</label>
-                            <input type="text" name="nama_tempat" placeholder="Masukkan nama hotel" required>
-                            <small>Pastikan nama perusahaan sesuai ejaan resmi</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Alamat Perusahaan</label>
-                            <input type="text" name="alamat_tempat" placeholder="Masukkan alamat lengkap" required>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Ajukan Permohonan</button>
-                    </div>
-                </form>
-            </section>
-
-            <script>
-                document.getElementById('formAjukan')?.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const formData = new FormData(this);
-                    fetch('../../backend/magangSiswa_end.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        alert(data.message);
-                        if (data.status === 'success') location.reload();
-                    });
-                });
-            </script>
-
-        <?php elseif ($current_step == 2): ?>
-            <!-- STATE 2: MENUNGGU VERIFIKASI -->
-            <section class="card content-card text-center">
-                <div class="card-header-main">
-                    <h2>Pengajuan Magang (On-the-Job Training)</h2>
-                </div>
-                <div class="alert alert-warning-large">
-                    <div class="large-icon"><i class="fas fa-hourglass-half"></i></div>
-                    <div class="alert-content">
-                        <h3>Menunggu Verifikasi</h3>
-                        <p>Pengajuan Anda sedang diproses oleh admin akademik. Mohon menunggu 1-3 hari kerja.</p>
-                    </div>
-                </div>
-                <div class="detail-grid" style="margin-top: 20px;">
-                    <div class="detail-info">
-                        <h3>Detail Pengajuan Anda</h3>
-                        <div class="info-row">
-                            <span class="label">Tempat Magang</span>
-                            <span class="value"><?= htmlspecialchars($magang['nama_tempat'] ?? '-') ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Alamat</span>
-                            <span class="value"><?= htmlspecialchars($magang['alamat_tempat'] ?? '-') ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Status Pengajuan</span>
-                            <span class="value" style="text-transform: capitalize; color: #d97706; font-weight: 600;"><?= ucfirst(str_replace('_', ' ', $magang['status_pengajuan'])) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Status Verifikasi</span>
-                            <span class="value" style="text-transform: capitalize; color: #d97706; font-weight: 600;"><?= ucfirst($magang['status_verifikasi']) ?></span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        <?php elseif ($current_step == 3): ?>
-            <!-- STATE 3: MAGANG AKTIF -->
-            <section class="card content-card">
-                <div class="card-header-main">
-                    <h2>Magang Aktif</h2>
-                </div>
-                <div class="alert alert-info-large">
-                    <div class="large-icon"><i class="fas fa-briefcase"></i></div>
-                    <div class="alert-content">
-                        <h3>Magang Sedang Berlangsung</h3>
-                        <p>Selamat melaksanakan magang! Pastikan Anda mematuhi semua aturan di tempat magang.</p>
-                    </div>
-                </div>
-
-                <div class="detail-grid">
-                    <div class="detail-info">
-                        <h3>Detail Magang</h3>
-                        <div class="info-row">
-                            <span class="label">Industri/Hotel</span>
-                            <span class="value"><?= htmlspecialchars($magang['nama_tempat']) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Alamat</span>
-                            <span class="value"><?= htmlspecialchars($magang['alamat_tempat']) ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Status</span>
-                            <span class="value" style="text-transform: capitalize; color: #10b981; font-weight: 600;">Berlangsung</span>
-                        </div>
-                    </div>
-                    <div class="detail-docs">
-                        <h3>Informasi</h3>
-                        <div class="doc-box">
-                            <p style="font-size: 14px; color: #64748b; line-height: 1.6;">
-                                <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
-                                Jika ada kendala selama magang, segera hubungi admin akademik untuk mendapatkan bantuan.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        <?php elseif ($current_step >= 6): ?>
-            <!-- STATE 6: SELESAI -->
-            <section class="card certificate-card">
-                <div class="certificate-header">
-                    <div class="trophy-icon"><i class="fas fa-star"></i></div>
-                    <h2>Program Magang Selesai!</h2>
-                    <p>Selamat! Anda telah berhasil menyelesaikan program magang di <strong><?= htmlspecialchars($magang['nama_tempat'] ?? '-') ?></strong>.</p>
-                </div>
-
-                <div class="detail-grid" style="margin-top: 20px;">
-                    <div class="detail-info">
-                        <h3>Ringkasan Magang</h3>
-                        <div class="info-row">
-                            <span class="label">Tempat Magang</span>
-                            <span class="value"><?= htmlspecialchars($magang['nama_tempat'] ?? '-') ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Alamat</span>
-                            <span class="value"><?= htmlspecialchars($magang['alamat_tempat'] ?? '-') ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Status</span>
-                            <span class="value" style="text-transform: capitalize; color: #10b981; font-weight: 600;">Selesai</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </form>
+        </div>
+            <?php endif; ?>
         <?php endif; ?>
-    </main>
 
-
-
-    <!-- Logout Popup -->
-    <div id="logoutPopup" class="popup-overlay" style="display: none;">
-        <div class="popup-wrapper">
-            <div class="popup-content">
-                <button class="btn-close-popup" onclick="closeLogoutPopup()">&times;</button>
-                <div class="popup-body">
-                    <h3>Apakah Anda Yakin Ingin Keluar<br>dari Sistem?</h3>
-                    <hr class="popup-divider">
+        <!-- Arsip -->
+        <div class="magang-card">
+            <div class="section-header">Arsip</div>
+            <?php if (mysqli_num_rows($query_riwayat) > 0): ?>
+                <table class="eval-table">
+                    <thead><tr><th>Perusahaan</th><th>Posisi</th><th>Tanggal</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <?php while($r = mysqli_fetch_assoc($query_riwayat)): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($r['nama_perusahaan']) ?></td>
+                            <td><?= htmlspecialchars($r['posisi']) ?></td>
+                            <td><?= $r['tanggal_mulai'] ?> s/d <?= $r['tanggal_selesai'] ?></td>
+                            <td>
+                                <span class="badge" style="background: <?= $r['status_magang'] == 'disetujui' ? '#DEF7EC' : '#FEF3C7' ?>; color: <?= $r['status_magang'] == 'disetujui' ? '#03543F' : '#92400E' ?>;">
+                                    <?= strtoupper($r['status_magang']) ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <div class="archive-empty">
+                    <i class="fas fa-folder-open"></i>
+                    <p>Belum ada riwayat magang</p>
                 </div>
-                <div class="popup-footer">
-                    <a href="../../app/logout.php" class="btn-yakin">Yakin</a>
-                    <button class="btn-tidak" onclick="closeLogoutPopup()">Tidak</button>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <script>
-        function showLogoutPopup(e) {
-            if(e) e.preventDefault();
-            document.getElementById('logoutPopup').style.display = 'flex';
-        }
-        function closeLogoutPopup() {
-            document.getElementById('logoutPopup').style.display = 'none';
-        }
-    </script>
+    <!-- Footer Space -->
+    <div style="height: 50px;"></div>
 </body>
 </html>

@@ -199,7 +199,7 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
                 <h2 class="action-title">Lulus dengan Catatan</h2>
                 <p class="action-desc">Selamat! Rata-rata Anda sudah memenuhi syarat (>= 80). Namun, terdapat <strong>1 mata pelajaran</strong> yang masih remedial. Anda diperbolehkan langsung lanjut magang, atau mengambil remedial terlebih dahulu untuk menyempurnakan nilai.</p>
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="#" class="btn-action btn-magang">
+                    <a href="magang_siswa.php" class="btn-action btn-magang">
                         Lanjut ke Pengajuan Magang <i class="fas fa-arrow-right"></i>
                     </a>
                     <a href="javascript:void(0)" class="btn-action btn-remedial" style="background: #E2E8F0; color: #475569;" onclick="openRemedialModal()">
@@ -210,7 +210,7 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
                 <div class="action-icon" style="color: #22C55E;"><i class="fas fa-certificate"></i></div>
                 <h2 class="action-title">Selamat! Anda Lulus Sempurna</h2>
                 <p class="action-desc">Seluruh mata pelajaran Anda telah memenuhi standar kompetensi dan rata-rata Anda sangat baik. Anda kini berhak melanjutkan ke tahap pengajuan magang.</p>
-                <a href="#" class="btn-action btn-magang">
+                <a href="magang_siswa.php" class="btn-action btn-magang">
                    Lanjut ke Pengajuan Magang <i class="fas fa-arrow-right"></i>
                 </a>
             <?php endif; ?>

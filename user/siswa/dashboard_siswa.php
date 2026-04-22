@@ -180,10 +180,10 @@ $siswa = mysqli_fetch_assoc($query);
     <nav class="navbar <?= ($siswa['status_pembayaran'] !== 'lunas_dp') ? 'nav-disabled' : '' ?>">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
-            <li><a href="#" class="active">Home</a></li>
-            <li><a href="#">Pages</a></li>
-            <li><a href="#">Programs</a></li>
-            <li><a href="#">Admission</a></li>
+            <li><a href="dashboard_siswa.php" class="active">Home</a></li>
+            <li><a href="evaluasi.php">Evaluasi</a></li>
+            <li><a href="pembayaranSiswa.php">Keuangan</a></li>
+            <li><a href="magang_siswa.php">Magang</a></li>
         </ul>
         <div class="nav-action">
             <a href="#" class="nav-bell"><i class="far fa-bell"></i></a>

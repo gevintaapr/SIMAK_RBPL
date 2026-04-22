@@ -7,13 +7,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
     exit;
 }
 
-// Fetch semua data magang + nama siswa dari tabel siswa via user_id
+// Fetch semua data magang + nama siswa
 $query = mysqli_query($conn, "
     SELECT m.*, s.nama_lengkap, s.nim_siswa, u.email 
     FROM magang m 
-    LEFT JOIN siswa s ON m.user_id = s.id_user 
-    LEFT JOIN user u ON m.user_id = u.id_user 
-    ORDER BY m.created_at DESC
+    LEFT JOIN siswa s ON m.id_siswa = s.id_siswa 
+    LEFT JOIN user u ON s.id_user = u.id_user 
+    ORDER BY m.tanggal_pengajuan DESC
 ");
 $magang_list = [];
 if ($query) {
@@ -29,7 +29,7 @@ $stats = [
     'selesai'     => 0
 ];
 foreach ($magang_list as $m) {
-    if ($m['status_magang'] === 'belum_mulai') $stats['pengajuan']++;
+    if ($m['status_magang'] === 'pending' || $m['status_magang'] === 'disetujui') $stats['pengajuan']++;
     elseif ($m['status_magang'] === 'berlangsung') $stats['berlangsung']++;
     elseif ($m['status_magang'] === 'selesai') $stats['selesai']++;
 }
@@ -200,7 +200,7 @@ foreach ($magang_list as $m) {
                                         <tr>
                                             <td><?= htmlspecialchars($magang['nama_lengkap'] ?? 'Unknown') ?></td>
                                             <td><?= htmlspecialchars($magang['nim_siswa'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($magang['nama_tempat']) ?></td>
+                                            <td><?= htmlspecialchars($magang['nama_perusahaan']) ?></td>
                                             <td>
                                                 <?php 
                                                     $status_class = 'status-' . str_replace('_', '-', $magang['status_magang']);
@@ -383,11 +383,11 @@ foreach ($magang_list as $m) {
             document.getElementById('modalNim').innerText = data.nim_siswa || '-';
             document.getElementById('modalId').innerText = 'IDM-' + data.id;
             document.getElementById('modalStatusPengajuan').innerText = (data.status_pengajuan || '').replace(/_/g, ' ').toUpperCase();
-            document.getElementById('modalTempat').innerText = data.nama_tempat || '-';
-            document.getElementById('modalAlamat').innerText = data.alamat_tempat || '-';
-            document.getElementById('modalStatusVerifikasi').innerText = (data.status_verifikasi || '').toUpperCase();
+            document.getElementById('modalTempat').innerText = data.nama_perusahaan || '-';
+            document.getElementById('modalAlamat').innerText = data.lokasi || '-';
+            document.getElementById('modalStatusVerifikasi').innerText = (data.status_admin || 'PENDING').toUpperCase();
             document.getElementById('modalStatusMagang').innerText = (data.status_magang || '').replace(/_/g, ' ').toUpperCase();
-            document.getElementById('modalTanggal').innerText = data.created_at || '-';
+            document.getElementById('modalTanggal').innerText = data.tanggal_pengajuan || '-';
             document.getElementById('modalCatatanPimpinan').innerText = data.catatan_pimpinan || 'Tidak ada';
             document.getElementById('modalCatatanAdmin').innerText = data.catatan_admin || 'Tidak ada';
 
@@ -395,7 +395,8 @@ foreach ($magang_list as $m) {
             const verifSection = document.getElementById('verifikasiAdminSection');
             const selesaiSection = document.getElementById('selesaiSection');
 
-            if (data.status_pengajuan === 'disetujui_pimpinan' && data.status_verifikasi === 'pending') {
+            // Tampilkan verifikasi jika Pimpinan sudah Setuju (disetujui) dan Admin belum proses (pending)
+            if (data.status_magang === 'disetujui' && data.status_admin === 'pending') {
                 verifSection.style.display = 'block';
             } else {
                 verifSection.style.display = 'none';
