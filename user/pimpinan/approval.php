@@ -10,7 +10,7 @@ $db = new Database();
 $conn = $db->getConnection();
 
 // Fetch pending pendaftaran (waiting for pimpinan)
-$stmt_p = $conn->query("SELECT * FROM pendaftaran WHERE status_approval = 'menunggu_pimpinan' ORDER BY id_pendaftaran DESC");
+$stmt_p = $conn->query("SELECT p.*, pr.nama_program FROM pendaftaran p LEFT JOIN program pr ON p.id_program = pr.id_program WHERE p.status_approval = 'menunggu_pimpinan' ORDER BY p.id_pendaftaran DESC");
 $pendaftaran_pending = $stmt_p->fetchAll();
 $count_pendaftaran = count($pendaftaran_pending);
 
@@ -120,7 +120,7 @@ $count_magang = count($magang_pending);
                                     <div class="approval-card">
                                         <div class="ac-left">
                                             <h3 class="ac-name"><?= htmlspecialchars($p['nama_cs']) ?></h3>
-                                            <p class="ac-dept"><?= htmlspecialchars($p['program']) ?></p>
+                                            <p class="ac-dept"><?= htmlspecialchars($p['nama_program'] ?? '-') ?></p>
                                         </div>
                                         <div class="ac-center">
                                             <span class="ac-badge">Menunggu Approval</span>

@@ -9,7 +9,7 @@ if (!isset($_SESSION['siswa_logged_in']) || $_SESSION['siswa_logged_in'] !== tru
 }
 
 $id_pendaftaran = $_SESSION['siswa_id'];
-$query = mysqli_query($conn, "SELECT * FROM pendaftaran WHERE id_pendaftaran = '$id_pendaftaran'");
+$query = mysqli_query($conn, "SELECT p.*, pr.nama_program FROM pendaftaran p LEFT JOIN program pr ON p.id_program = pr.id_program WHERE p.id_pendaftaran = '$id_pendaftaran'");
 $daftar = mysqli_fetch_assoc($query);
 
 if (!$daftar) {
@@ -279,7 +279,7 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
                     </tr>
                     <tr>
                         <td>Program Pilihan</td>
-                        <td><?= htmlspecialchars($daftar['program']) ?></td>
+                        <td><?= htmlspecialchars($daftar['nama_program'] ?? '-') ?></td>
                     </tr>
                     <tr>
                         <td>No HP/WA</td>
