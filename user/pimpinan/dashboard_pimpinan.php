@@ -99,15 +99,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
                     </div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon-wrap">
-                        <i class="fa-solid fa-book-open-reader"></i>
-                    </div>
-                    <div class="stat-body">
-                        <p class="stat-number">3</p>
-                        <p class="stat-label">Evaluasi Menunggu<br>Persetujuan</p>
-                    </div>
-                </div>
 
                 <div class="stat-card">
                     <div class="stat-icon-wrap">
@@ -185,13 +176,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
                                         <td><span class="badge badge-warning">Menunggu</span></td>
                                         <td><a href="#" class="btn-detail" onclick="openPopupMagang(event)">Detail</a></td>
                                     </tr>
-                                    <tr>
-                                        <td>Maria Gomez</td>
-                                        <td>Cruise Ship Culinary</td>
-                                        <td>Evaluasi</td>
-                                        <td><span class="badge badge-danger">Ditolak</span></td>
-                                        <td><a href="#" class="btn-detail" onclick="openPopupEvaluasi(event)">Detail</a></td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -268,66 +252,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
 
     </div>
 
-    <!-- Popup Detail Evaluasi -->
-    <div id="popupEvaluasi" class="popup-overlay" style="display: none; align-items: center; justify-content: center;">
-        <div class="popup-pimpinan">
-            <div class="popup-header-pimpinan">
-                <h2 class="popup-title-pimpinan">Detail Evaluasi</h2>
-                <button class="btn-close-box" onclick="closePopupEvaluasi()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="popup-section-pimpinan">
-                <h3 class="section-title">Identitas Siswa</h3>
-                <div class="grid-identitas">
-                    <div class="identitas-col">
-                        <div class="identitas-row"><span>ID Siswa</span> <strong>HC123</strong></div>
-                        <div class="identitas-row"><span>Nama Lengkap:</span> <strong>Alexander Wibowo</strong></div>
-                    </div>
-                    <div class="identitas-col">
-                        <div class="identitas-row"><span>Program:</span> <strong>F&amp;B Service</strong></div>
-                        <div class="identitas-row"><span>Periode:</span> <strong>1-2025</strong></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="popup-section-pimpinan">
-                <h3 class="section-title">Hasil Evaluasi <span class="section-badge">Menunggu Persetujuan</span></h3>
-                <table class="table-evaluasi">
-                    <thead>
-                        <tr>
-                            <th>Mata Pelajaran (Subject)</th>
-                            <th style="text-align:center;">Nilai (0-100)</th>
-                            <th style="text-align:center;">Grade</th>
-                            <th>Evaluasi Pengajar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>English Basic</td>
-                            <td align="center"><input type="text" value="88" class="eval-input eval-box-small" readonly></td>
-                            <td align="center"><strong>A</strong></td>
-                            <td><input type="text" value="Memiliki kemampuan dasar bahasa In..." class="eval-input" readonly></td>
-                        </tr>
-                        <tr>
-                            <td>Food &amp; Beverage Service</td>
-                            <td align="center"><input type="text" value="89" class="eval-input eval-box-small" readonly></td>
-                            <td align="center"><strong>A</strong></td>
-                            <td><input type="text" value="Menguasai standar pelayanan F&amp;B den..." class="eval-input" readonly></td>
-                        </tr>
-                        <tr>
-                            <td>Housekeeping</td>
-                            <td align="center"><input type="text" value="82" class="eval-input eval-box-small" readonly></td>
-                            <td align="center"><strong>B</strong></td>
-                            <td><input type="text" value="Memahami prosedur dasar housekeepi..." class="eval-input" readonly></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p style="font-size: 0.85rem; color: #666; margin-top:0.5rem;">*scroll to see full list</p>
-            </div>
-
-            <button class="btn-setuju-besar" onclick="closePopupEvaluasi()">Setujui Hasil Evaluasi</button>
-        </div>
-    </div>
 
     <!-- Popup Detail Magang -->
     <div id="popupMagang" class="popup-overlay" style="display: none; align-items: center; justify-content: center;">
@@ -415,14 +339,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
             document.getElementById('logoutPopup').style.display = 'none';
         }
 
-        // Popups
-        function openPopupEvaluasi(e) {
-            if (e) e.preventDefault();
-            document.getElementById('popupEvaluasi').style.display = 'flex';
-        }
-        function closePopupEvaluasi() {
-            document.getElementById('popupEvaluasi').style.display = 'none';
-        }
 
         function openPopupMagang(e) {
             if (e) e.preventDefault();

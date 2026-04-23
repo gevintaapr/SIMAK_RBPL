@@ -23,16 +23,7 @@ $siswa_list = mysqli_fetch_all($query, MYSQLI_ASSOC);
 $query_kelas = mysqli_query($conn, "SELECT id_kelas, nama_kelas FROM kelas");
 $classes_for_assign = mysqli_fetch_all($query_kelas, MYSQLI_ASSOC);
 
-$query_all_jadwal = mysqli_query($conn, "
-    SELECT j.*, m.nama_mapel, k.nama_kelas, u.username as nama_pengajar
-    FROM jadwal j
-    JOIN kurikulum kur ON j.id_kurikulum = kur.id_kurikulum
-    JOIN mata_pelajaran m ON kur.id_mapel = m.id_mapel
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    JOIN user u ON j.id_pengajar = u.id_user
-    ORDER BY k.nama_kelas, FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), jam_mulai ASC
-");
-$all_schedules = mysqli_fetch_all($query_all_jadwal, MYSQLI_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -141,8 +132,6 @@ $all_schedules = mysqli_fetch_all($query_all_jadwal, MYSQLI_ASSOC);
             <div class="akademik-nav-group">
                 <button class="akademik-nav-btn active"><i class="fa-solid fa-users"></i> Daftar Siswa</button>
                 <button class="akademik-nav-btn" onclick="window.location.href='verifPembayaran_akademik.php'"><i class="fa-solid fa-wallet"></i> Verifikasi Pembayaran</button>
-                <button class="akademik-nav-btn"><i class="fa-solid fa-calendar-check"></i> Atur Jadwal</button>
-                <button class="akademik-nav-btn"><i class="fa-solid fa-paste"></i> Verifikasi Evaluasi</button>
             </div>
 
             <!-- Stats -->
@@ -236,48 +225,7 @@ $all_schedules = mysqli_fetch_all($query_all_jadwal, MYSQLI_ASSOC);
                 </div>
             </div>
 
-            <!-- Jadwal Card Section -->
-            <div class="akademik-card-section" style="margin-top: 40px;">
-                <div class="ak-card">
-                    <h2 class="ak-card-title"><i class="fa-solid fa-calendar-days"></i> Monitoring Jadwal Perkuliahan Terintegrasi</h2>
-                    
-                    <div class="ak-controls">
-                        <span style="font-size: 13px; color: #64748b;">Daftar jadwal aktif untuk seluruh kelas dan instruktur.</span>
-                    </div>
 
-                    <table class="ak-table">
-                        <thead>
-                            <tr style="background: #f8fafc;">
-                                <th>KELAS</th>
-                                <th>HARI / JAM</th>
-                                <th>MATA PELAJARAN</th>
-                                <th>PENGAJAR</th>
-                                <th>RUANG</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($all_schedules)): ?>
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 30px; color: #666;">Belum ada jadwal yang diatur.</td>
-                            </tr>
-                            <?php else: ?>
-                                <?php foreach ($all_schedules as $js): ?>
-                                <tr>
-                                    <td style="font-weight: 700;"><?= htmlspecialchars($js['nama_kelas']) ?></td>
-                                    <td>
-                                        <span class="badge" style="background: #E0F2FE; color: #0369A1;"><?= $js['hari'] ?></span>
-                                        <div style="font-size: 11px; margin-top: 3px; color: #64748b;"><?= date('H:i', strtotime($js['jam_mulai'])) ?> - <?= date('H:i', strtotime($js['jam_selesai'])) ?></div>
-                                    </td>
-                                    <td style="font-weight: 600;"><?= htmlspecialchars($js['nama_mapel']) ?></td>
-                                    <td><?= htmlspecialchars($js['nama_pengajar']) ?></td>
-                                    <td><i class="fa-solid fa-location-dot" style="color: #ef4444; margin-right: 5px;"></i> <?= htmlspecialchars($js['ruang']) ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
         </main>
 

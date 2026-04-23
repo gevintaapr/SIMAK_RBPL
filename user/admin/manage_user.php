@@ -204,27 +204,37 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
                 <div id="createErrorBox" style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
                 <form id="createUserForm" onsubmit="submitCreateUser(event)">
                     <div class="form-group">
-                        <label>Username / NIM <span style="color:red">*</span></label>
-                        <input type="text" id="createUsername" class="form-control" placeholder="E.g., 12345678" required>
+                        <label>NIP <span style="color:red">*</span></label>
+                        <input type="text" id="createUsername" class="form-control" placeholder="Masukkan NIP" required>
                     </div>
                     <div class="form-group">
-                        <label>Email <span style="color:red">*</span></label>
-                        <input type="email" id="createEmail" class="form-control" placeholder="E.g., user@gmail.com" required>
+                        <label>Nama Lengkap <span style="color:red">*</span></label>
+                        <input type="text" id="createNama" class="form-control" placeholder="Masukkan Nama Lengkap" required>
                     </div>
                     <div class="form-group">
-                        <label>Password Awal <span style="color:red">*</span></label>
-                        <input type="password" id="createPassword" class="form-control" placeholder="Min. 6 karakter" required>
+                        <label>Tanggal Lahir <span style="color:red">*</span></label>
+                        <input type="date" id="createTglLahir" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat <span style="color:red">*</span></label>
+                        <input type="text" id="createAlamat" class="form-control" placeholder="Masukkan Alamat Lengkap" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor WA <span style="color:red">*</span></label>
+                        <input type="text" id="createNoWA" class="form-control" placeholder="Contoh: 08123456789" required>
                     </div>
                     <div class="form-group">
                         <label>Role Pengguna <span style="color:red">*</span></label>
-                        <select id="createRole" class="form-control" required>
+                        <select id="createRole" class="form-control" required onchange="toggleSpesialisasi()">
                             <option value="">— Pilih Role —</option>
-                            <option value="1">Siswa</option>
-                            <option value="2">Calon Siswa</option>
                             <option value="3">Pengajar</option>
                             <option value="4">Pimpinan</option>
                             <option value="5">Admin</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="formSpesialisasi" style="display:none;">
+                        <label>Spesialisasi <span style="color:red">*</span></label>
+                        <input type="text" id="createSpesialisasi" class="form-control" placeholder="Masukkan Spesialisasi">
                     </div>
                     <button type="submit" class="btn-gold-full" id="createSubmitBtn">
                         <i class="fa-solid fa-plus"></i> Simpan Data Pengguna Baru
@@ -354,7 +364,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
         box.style.border     = '1px solid ' + (type === 'success' ? '#86efac' : '#fca5a5');
         box.style.color      = type === 'success' ? '#166534' : '#991b1b';
         box.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + msg;
-        setTimeout(() => { box.style.display = 'none'; }, 5000);
+        setTimeout(() => { box.style.display = 'none'; }, 10000);
     }
 
     async function loadStats() {
@@ -432,6 +442,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
         openModal('modalDetailAkun');
     }
 
+    function toggleSpesialisasi() {
+        const roleId = document.getElementById('createRole').value;
+        const formSpesialisasi = document.getElementById('formSpesialisasi');
+        const inputSpesialisasi = document.getElementById('createSpesialisasi');
+        if (roleId === '3') {
+            formSpesialisasi.style.display = 'block';
+            inputSpesialisasi.required = true;
+        } else {
+            formSpesialisasi.style.display = 'none';
+            inputSpesialisasi.required = false;
+        }
+    }
+
     async function submitCreateUser(e) {
         e.preventDefault();
         const btn = document.getElementById('createSubmitBtn');
@@ -439,16 +462,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
         const payload = {
             action: 'add',
             username: document.getElementById('createUsername').value.trim(),
-            email: document.getElementById('createEmail').value.trim(),
-            password: document.getElementById('createPassword').value,
+            nama: document.getElementById('createNama').value.trim(),
+            tgl_lahir: document.getElementById('createTglLahir').value,
+            alamat: document.getElementById('createAlamat').value.trim(),
+            no_wa: document.getElementById('createNoWA').value.trim(),
             role_id: parseInt(document.getElementById('createRole').value),
         };
+        if (payload.role_id === 3) {
+            payload.spesialisasi = document.getElementById('createSpesialisasi').value.trim();
+        }
         const { ok, data } = await apiCall(API_BASE, 'POST', payload);
         btn.disabled = false;
         if (!ok) { showAlert(data.message || 'Gagal menambah user', 'error'); return; }
         closeModal('modalInputData');
         document.getElementById('createUserForm').reset();
-        showAlert('Pengguna berhasil ditambahkan!');
+        document.getElementById('formSpesialisasi').style.display = 'none';
+        
+        let msg = 'Pengguna berhasil ditambahkan!';
+        if (data.email && data.password) {
+            msg += `<br>Email: <b>${data.email}</b><br>Password: <b>${data.password}</b>`;
+        }
+        showAlert(msg);
         loadUsers(); loadStats();
     }
 

@@ -106,7 +106,6 @@ $count_magang = count($magang_pending);
                     <div class="custom-tabs">
                         <button class="tab-btn active" onclick="openTab('pendaftaran')">Pendaftaran
                             (<?= $count_pendaftaran ?>)</button>
-                        <button class="tab-btn" onclick="openTab('evaluasi')">Evaluasi (3)</button>
                         <button class="tab-btn" onclick="openTab('magang')">Magang (<?= $count_magang ?>)</button>
                     </div>
 
@@ -140,24 +139,6 @@ $count_magang = count($magang_pending);
                         </div>
                     </div>
 
-                    <!-- Evaluasi -->
-                    <div id="evaluasi" class="tab-pane">
-                        <div class="approval-list">
-                            <div class="approval-card">
-                                <div class="ac-left">
-                                    <h3 class="ac-name">Alexander Wibowo</h3>
-                                    <p class="ac-dept">F&B Services</p>
-                                </div>
-                                <div class="ac-center">
-                                    <span class="ac-badge">Menunggu Approval</span>
-                                    <span class="ac-date">| Periode: 1-2025</span>
-                                </div>
-                                <div class="ac-right">
-                                    <button class="btn-primary-dark" onclick="openModal('evalModal')">Detail</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Magang -->
                     <div id="magang" class="tab-pane">
@@ -258,74 +239,6 @@ $count_magang = count($magang_pending);
          MODALS
          ============================================== -->
 
-    <!-- Evaluasi Modal -->
-    <div class="modal-overlay" id="evalModal">
-        <div class="modal-content">
-            <div class="modal-header-fixed">
-                <h2 class="modal-header">Detail Evaluasi</h2>
-                <button class="btn-close" onclick="closeModal('evalModal')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="identitas-box">
-                    <h3 class="identitas-title">Identitas Siswa</h3>
-                    <div class="identitas-list">
-                        <div class="identitas-row-grid">
-                            <div class="info-row"><span>ID Siswa:</span> <span>HC123</span></div>
-                            <div class="info-row"><span>Periode:</span> <span>1-2025</span></div>
-                        </div>
-                        <div class="info-row full-width"><span>Nama Lengkap:</span> <span>Alexander Wibowo</span></div>
-                        <div class="info-row full-width"><span>Program:</span> <span>F&B Service</span></div>
-                    </div>
-                </div>
-
-                <div class="section-box">
-                    <div class="section-header">
-                        <h3 class="section-title">Hasil Evaluasi</h3>
-                        <span class="status-pill">Menunggu Persetujuan</span>
-                    </div>
-
-                    <table class="eval-table">
-                        <thead>
-                            <tr>
-                                <th>Mata Pelajaran (Subject)</th>
-                                <th>Nilai (0-100)</th>
-                                <th>Grade</th>
-                                <th>Evaluasi Pengajar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>English Basic</td>
-                                <td><input type="text" class="input-nilai" value="88" readonly></td>
-                                <td><strong>A</strong></td>
-                                <td><input type="text" class="input-text" value="Memiliki kemampuan dasar bahasa In..."
-                                        readonly></td>
-                            </tr>
-                            <tr>
-                                <td>Food & Beverage Service</td>
-                                <td><input type="text" class="input-nilai" value="89" readonly></td>
-                                <td><strong>A</strong></td>
-                                <td><input type="text" class="input-text" value="Menguasai standar pelayanan F&B den..."
-                                        readonly></td>
-                            </tr>
-                            <tr>
-                                <td>Housekeeping</td>
-                                <td><input type="text" class="input-nilai" value="82" readonly></td>
-                                <td><strong>B</strong></td>
-                                <td><input type="text" class="input-text" value="Memahami prosedur dasar housekeepi..."
-                                        readonly></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn-approve" style="width:auto;min-width:250px;">Setujui Hasil Evaluasi</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Magang Modal -->
     <div class="modal-overlay" id="magangModal">

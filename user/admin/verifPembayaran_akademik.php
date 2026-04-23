@@ -127,14 +127,6 @@ $payments = $stmt->fetchAll();
                     <i class="fa-solid fa-wallet"></i>
                     Verifikasi Pembayaran
                 </button>
-                <button class="tab-btn" onclick="window.location.href='aturJadwal_akademik.php'">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    Atur Jadwal
-                </button>
-                <button class="tab-btn" onclick="window.location.href='verifEval_akademik.php'">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                    Verifikasi Evaluasi
-                </button>
             </div>
 
             <!-- Pendaftaran List Section / Verif Pembayaran-->
