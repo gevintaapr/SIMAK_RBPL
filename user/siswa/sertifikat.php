@@ -10,12 +10,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
 
 $id_user = $_SESSION['user_id'];
 
-// Ambil Data Siswa Lengkap (Join dengan pendaftaran untuk mendapatkan tanggal_lahir)
+// Ambil Data Siswa Lengkap (Join dengan pendaftaran dan magang untuk No Sertifikat)
 $query_siswa = mysqli_query($conn, "
-    SELECT s.*, p.tanggal_lahir, p.alamat 
+    SELECT s.*, p.tanggal_lahir, p.alamat, pr.nama_program, m.no_sertifikat
     FROM siswa s 
     LEFT JOIN pendaftaran p ON s.id_pendaftaran = p.id_pendaftaran 
+    LEFT JOIN program pr ON p.id_program = pr.id_program
+    LEFT JOIN magang m ON s.id_siswa = m.id_siswa AND m.no_sertifikat IS NOT NULL
     WHERE s.id_user = $id_user
+    ORDER BY m.id_magang DESC LIMIT 1
 ");
 $siswa = mysqli_fetch_assoc($query_siswa);
 
@@ -85,11 +88,12 @@ if (!empty($siswa['tanggal_lahir'])) {
 }
 
 $studentData = [
-    'name' => strtoupper($siswa['nama_lengkap']),
+    'name' => ucwords(strtolower($siswa['nama_lengkap'])),
     'nim' => $siswa['nim_siswa'] ?? '-',
     'pob' => 'INDONESIA', 
     'dob' => $dob_indonesia,
-    'program' => strtoupper($siswa['program_pembelajaran'] ?? 'HOTEL AND CRUISE SHIP'),
+    'program' => strtoupper($siswa['nama_program'] ?? $siswa['program_pembelajaran'] ?? 'HOTEL AND CRUISE SHIP'),
+    'certNo' => $siswa['no_sertifikat'] ?? '...........................',
     'completionDate' => date('M jS Y'),
     'director' => 'Agus Handoyo, SE',
     'grades' => $grades,
@@ -112,6 +116,10 @@ $studentData = [
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     
     <style>
+        @font-face {
+            font-family: 'Silentha Regular';
+            src: local('Silentha Regular'), url('../../assets/fonts/Silentha-Regular.ttf') format('truetype');
+        }
         body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         @media print {
             body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -195,8 +203,8 @@ $studentData = [
                                             </div>
                                         </div>
                                         <div className="text-[11px] font-bold text-indigo-900/80 space-y-1">
-                                            <p>IJIN DINSOSNAKERTRANS NO. 563/200/14</p>
-                                            <p>IJIN DIKNAS NO. 437/2844/640/11</p>
+                                            <p>IZIN DIKNAS NO. 437/2844/640/11</p>
+                                            <p className="mt-1">NOMOR SERTIFIKAT : {studentData.certNo}</p>
                                         </div>
                                     </div>
                                     <div className="text-center mb-10">
@@ -210,7 +218,7 @@ $studentData = [
                                         <p className="mt-6 text-gray-600 italic text-lg">This is proudly presented to</p>
                                     </div>
                                     <div className="text-center mb-12">
-                                        <h4 className="text-6xl text-indigo-950 py-4" style={{ fontFamily: "'Great Vibes', cursive" }}>{studentData.name}</h4>
+                                        <h4 className="text-6xl text-indigo-950 py-4" style={{ fontFamily: "'Silentha Regular', serif" }}>{studentData.name}</h4>
                                         <div className="w-2/3 h-[2px] bg-indigo-200 mx-auto -mt-2"></div>
                                     </div>
                                     <div className="max-w-lg mx-auto w-full space-y-5 mb-12 bg-white/40 p-6 rounded-lg border border-indigo-100 shadow-sm">
@@ -219,8 +227,8 @@ $studentData = [
                                             <div className="w-1/2 font-bold text-gray-800">: {studentData.nim}</div>
                                         </div>
                                         <div className="flex justify-between items-start border-b border-indigo-100 pb-2">
-                                            <div className="w-1/2 text-[12px] font-bold text-indigo-900">TEMPAT TANGGAL LAHIR<br/><span className="text-[10px] italic text-gray-500 font-normal">Place/Date of Birth</span></div>
-                                            <div className="w-1/2 text-gray-800 font-semibold uppercase">: {studentData.pob}, {studentData.dob}</div>
+                                            <div className="w-1/2 text-[12px] font-bold text-indigo-900">TANGGAL LAHIR<br/><span className="text-[10px] italic text-gray-500 font-normal">Date of Birth</span></div>
+                                            <div className="w-1/2 text-gray-800 font-semibold uppercase">: {studentData.dob}</div>
                                         </div>
                                         <div className="flex justify-between items-start border-b border-indigo-100 pb-2">
                                             <div className="w-1/2 text-[12px] font-bold text-indigo-900">JURUSAN<br/><span className="text-[10px] italic text-gray-500 font-normal">PROGRAM</span></div>
@@ -234,7 +242,7 @@ $studentData = [
                                     <div className="mt-auto flex justify-between items-end px-12 pb-12">
                                         <div className="text-center w-52">
                                             <div className="h-24 flex items-center justify-center opacity-30"><LogoSVG className="w-16 h-16" /></div>
-                                            <div className="border-t-2 border-indigo-950 pt-2 font-bold text-sm uppercase text-indigo-950">{studentData.name}</div>
+                                            <div className="border-t-2 border-indigo-950 pt-2 font-bold text-sm text-indigo-950">{studentData.name}</div>
                                         </div>
                                         <div className="text-center text-sm mb-24 italic font-semibold text-indigo-900">Klaten, {studentData.completionDate}</div>
                                         <div className="text-center w-52">
