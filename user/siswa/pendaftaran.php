@@ -11,18 +11,21 @@ $query_program = mysqli_query($conn, "SELECT * FROM program ORDER BY nama_progra
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style/pendaftaran.css">
+    <link rel="stylesheet" href="../../style/dashboard_siswa.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
-            <li><a href="#">Home</a></li>
+            <li><a href="../../public/MainPage.php" class="active">Home</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Programs</a></li>
             <li><a href="#">Admission</a></li>
         </ul>
-        <a href="login.php" class="btn-login">Login</a>
+        <div class="nav-action">
+            <a href="../../public/login/logSiswa.php" class="btn-logout">Login</a>
+        </div>
     </nav>
 
     <!-- Hero Section -->

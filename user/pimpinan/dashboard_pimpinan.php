@@ -1,9 +1,30 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config/config.php';
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
     header("Location: ../../public/login/logPimpinan.php?role=4&error=" . urlencode("Akses ditolak. Silakan login sebagai Pimpinan."));
     exit;
 }
+
+// Stats for Pimpinan
+$q_pending_reg = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pendaftaran WHERE status_approval = 'menunggu_pimpinan'"))['total'];
+$q_pending_magang = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM magang WHERE status_magang = 'menunggu'"))['total'];
+$q_total_siswa = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa"))['total'];
+
+// Fetch Ringkasan Data Akademik (latest 5 approvals/pending)
+$query_ringkasan = mysqli_query($conn, "
+    (SELECT nama_cs as nama, 'Pendaftaran' as jenis, status_approval as status, 'approval_detail_pendaftaran.php' as link
+     FROM pendaftaran 
+     ORDER BY id_pendaftaran DESC LIMIT 5)
+    UNION
+    (SELECT s.nama_lengkap as nama, 'Magang' as jenis, m.status_magang as status, 'approval_magang.php' as link
+     FROM magang m
+     JOIN siswa s ON m.id_siswa = s.id_siswa
+     ORDER BY m.id_magang DESC LIMIT 5)
+    LIMIT 5
+");
+$ringkasan_data = mysqli_fetch_all($query_ringkasan, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -94,18 +115,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
                         <i class="fa-regular fa-user"></i>
                     </div>
                     <div class="stat-body">
-                        <p class="stat-number">12</p>
+                        <p class="stat-number"><?= $q_pending_reg ?></p>
                         <p class="stat-label">Pendaftaran Menunggu<br>Approval</p>
                     </div>
                 </div>
-
 
                 <div class="stat-card">
                     <div class="stat-icon-wrap">
                         <i class="fa-solid fa-briefcase"></i>
                     </div>
                     <div class="stat-body">
-                        <p class="stat-number">5</p>
+                        <p class="stat-number"><?= $q_pending_magang ?></p>
                         <p class="stat-label">Pengajuan Magang<br>Menunggu Persetujuan</p>
                     </div>
                 </div>
@@ -115,7 +135,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
                         <i class="fa-solid fa-graduation-cap"></i>
                     </div>
                     <div class="stat-body">
-                        <p class="stat-number">720</p>
+                        <p class="stat-number"><?= $q_total_siswa ?></p>
                         <p class="stat-label">Total Siswa Aktif</p>
                     </div>
                 </div>
@@ -128,24 +148,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
                     <div class="card-header border-none">
                         <h2 class="card-title">Ringkasan Data Akademik</h2>
                         <div class="table-controls">
-                            <div class="filter-group">
-                                <select class="filter-select" aria-label="Filter Program">
-                                    <option value="">Program</option>
-                                    <option value="hotel">Hotel F&B Service</option>
-                                    <option value="cruise_kadet">Cruise Ship Desk Kadet</option>
-                                    <option value="cruise_culinary">Cruise Ship Culinary</option>
-                                </select>
-                                <select class="filter-select" aria-label="Filter Status">
-                                    <option value="">Status</option>
-                                    <option value="disetujui">Disetujui</option>
-                                    <option value="menunggu">Menunggu</option>
-                                    <option value="ditolak">Ditolak</option>
-                                </select>
-                            </div>
                             <div class="search-box">
                                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                                 <input type="text" placeholder="Cari Nama Siswa" class="search-input">
-                                <button class="clear-search"><i class="fa-solid fa-xmark"></i></button>
                             </div>
                         </div>
                     </div>
@@ -155,27 +160,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 4) {
                                 <thead>
                                     <tr>
                                         <th>NAMA</th>
-                                        <th>PROGRAM</th>
                                         <th>JENIS APPROVAL</th>
                                         <th>STATUS</th>
                                         <th>AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php foreach($ringkasan_data as $row): 
+                                        $badgeClass = 'badge-warning';
+                                        if($row['status'] == 'disetujui' || $row['status'] == 'selesai') $badgeClass = 'badge-success';
+                                        if($row['status'] == 'ditolak') $badgeClass = 'badge-danger';
+                                    ?>
                                     <tr>
-                                        <td>Alexander Wibowo</td>
-                                        <td>Cruise Ship Desk Kadet</td>
-                                        <td>Pendaftaran</td>
-                                        <td><span class="badge badge-success">Disetujui</span></td>
-                                        <td><a href="approval_detail_pendaftaran.php" class="btn-detail">Detail</a></td>
+                                        <td><?= htmlspecialchars($row['nama']) ?></td>
+                                        <td><?= htmlspecialchars($row['jenis']) ?></td>
+                                        <td><span class="badge <?= $badgeClass ?>"><?= ucfirst($row['status']) ?></span></td>
+                                        <td><a href="<?= $row['link'] ?>" class="btn-detail">Detail</a></td>
                                     </tr>
-                                    <tr>
-                                        <td>Jessica Tan</td>
-                                        <td>Hotel F&B Service</td>
-                                        <td>Magang</td>
-                                        <td><span class="badge badge-warning">Menunggu</span></td>
-                                        <td><a href="#" class="btn-detail" onclick="openPopupMagang(event)">Detail</a></td>
-                                    </tr>
+                                    <?php endforeach; ?>
+                                    <?php if(empty($ringkasan_data)): ?>
+                                        <tr><td colspan="4" style="text-align:center; padding: 20px;">Belum ada data pendaftaran/magang.</td></tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>

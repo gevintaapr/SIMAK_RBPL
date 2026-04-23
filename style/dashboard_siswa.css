@@ -64,77 +64,106 @@ a {
 
 /* Navbar */
 .navbar {
-    position: relative;
-    z-index: 999;
-    padding: 1.5rem 5%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0.8rem 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--footer-bg);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    background-color: #00264d;
+    /* Darker Blue */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     width: 100%;
 }
 
 .nav-brand {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    letter-spacing: 1px;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #EBC372;
+    /* Premium Gold */
+    letter-spacing: 1.5px;
     flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .nav-menu {
     list-style: none;
     display: flex;
-    gap: 2.5rem;
+    gap: 3rem;
     justify-content: center;
     flex: 2;
 }
 
 .nav-menu li a {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 400;
-    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    font-size: 0.95rem;
     transition: all 0.3s;
+    position: relative;
+    padding: 5px 0;
+}
+
+.nav-menu li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #EBC372;
+    transition: width 0.3s;
+}
+
+.nav-menu li a:hover::after,
+.nav-menu li a.active::after {
+    width: 100%;
 }
 
 .nav-menu li a:hover,
-.nav-menu li a.active:hover {
+.nav-menu li a.active {
     color: #FFFFFF;
-    font-weight: 500;
 }
 
 .nav-action {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 1.5rem;
+    gap: 2rem;
     flex: 1;
 }
 
 .btn-logout {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    padding: 0.5rem 1.75rem;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: background-color 0.3s;
+    background-color: #EBC372;
+    color: #00264d;
+    padding: 0.5rem 2rem;
+    border-radius: 50px;
+    /* Fully rounded like image */
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .btn-logout:hover {
     background-color: #fce8a9;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .nav-bell {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
 }
 
 .nav-bell:hover {
-    color: #FFFFFF;
+    color: #EBC372;
+    transform: scale(1.1);
 }
 
 /* Hero Content */

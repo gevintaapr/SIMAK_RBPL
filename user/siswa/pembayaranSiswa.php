@@ -41,20 +41,22 @@ $biaya_list = mysqli_fetch_all($res_bp, MYSQLI_ASSOC);
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style/pembayaranSiswa.css">
+    <link rel="stylesheet" href="../../style/dashboard_siswa.css">
+    <link rel="stylesheet" href="../../style/popup_logout.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
-            <li><a href="dashboard_siswa.php" class="active">Home</a></li>
-            <li><a href="#">Pages</a></li>
-            <li><a href="#">Programs</a></li>
-            <li><a href="#">Admission</a></li>
+            <li><a href="dashboard_siswa.php">Home</a></li>
+            <li><a href="evaluasi.php">Evaluasi</a></li>
+            <li><a href="pembayaranSiswa.php" class="active">Keuangan</a></li>
+            <li><a href="magang_siswa.php">Magang</a></li>
         </ul>
         <div class="nav-action">
             <a href="#" class="nav-bell"><i class="far fa-bell"></i></a>
-            <a href="../../app/logout.php" class="btn-logout">Logout</a>
+            <a href="#" onclick="showLogoutPopup(event)" class="btn-logout">Logout</a>
         </div>
     </nav>
 
@@ -261,7 +263,32 @@ $biaya_list = mysqli_fetch_all($res_bp, MYSQLI_ASSOC);
 
 
 
+    <!-- Logout Popup -->
+    <div id="logoutPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-wrapper">
+            <div class="popup-content">
+                <button class="btn-close-popup" onclick="closeLogoutPopup()">&times;</button>
+                <div class="popup-body">
+                    <h3>Apakah Anda Yakin Ingin Keluar<br>dari Sistem?</h3>
+                    <hr class="popup-divider">
+                </div>
+                <div class="popup-footer">
+                    <a href="../../app/logout.php" class="btn-yakin">Yakin</a>
+                    <button class="btn-tidak" onclick="closeLogoutPopup()">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function showLogoutPopup(e) {
+            if(e) e.preventDefault();
+            document.getElementById('logoutPopup').style.display = 'flex';
+        }
+        function closeLogoutPopup() {
+            document.getElementById('logoutPopup').style.display = 'none';
+        }
+
         function showKonfirmasi(id) {
             document.getElementById('riwayat-view').style.display = 'none';
             document.getElementById('konfirmasi-view').style.display = 'block';

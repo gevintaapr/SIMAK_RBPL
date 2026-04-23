@@ -90,6 +90,7 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style/dashboard_siswa.css">
     <link rel="stylesheet" href="../../style/evaluasi_siswa.css">
+    <link rel="stylesheet" href="../../style/popup_logout.css">
 </head>
 <body>
     <!-- Navbar -->
@@ -97,11 +98,13 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
             <li><a href="dashboard_siswa.php">Home</a></li>
-            <li><a href="#" class="active">Evaluasi</a></li>
+            <li><a href="evaluasi.php" class="active">Evaluasi</a></li>
             <li><a href="pembayaranSiswa.php">Keuangan</a></li>
+            <li><a href="magang_siswa.php">Magang</a></li>
         </ul>
         <div class="nav-action">
-            <a href="../../app/logout.php" class="btn-logout">Logout</a>
+            <a href="#" class="nav-bell"><i class="far fa-bell"></i></a>
+            <a href="#" onclick="showLogoutPopup(event)" class="btn-logout">Logout</a>
         </div>
     </nav>
 
@@ -299,7 +302,32 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
     <!-- Footer Space -->
     <div style="height: 100px;"></div>
 
+    <!-- Logout Popup -->
+    <div id="logoutPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-wrapper">
+            <div class="popup-content">
+                <button class="btn-close-popup" onclick="closeLogoutPopup()">&times;</button>
+                <div class="popup-body">
+                    <h3>Apakah Anda Yakin Ingin Keluar<br>dari Sistem?</h3>
+                    <hr class="popup-divider">
+                </div>
+                <div class="popup-footer">
+                    <a href="../../app/logout.php" class="btn-yakin">Yakin</a>
+                    <button class="btn-tidak" onclick="closeLogoutPopup()">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function showLogoutPopup(e) {
+            if(e) e.preventDefault();
+            document.getElementById('logoutPopup').style.display = 'flex';
+        }
+        function closeLogoutPopup() {
+            document.getElementById('logoutPopup').style.display = 'none';
+        }
+
         function openRemedialModal() {
             document.getElementById('remedialModal').style.display = 'flex';
         }

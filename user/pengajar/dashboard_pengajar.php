@@ -11,8 +11,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
 $query_ann = mysqli_query($conn, "SELECT * FROM pengumuman WHERE target_role IS NULL OR target_role = 3 ORDER BY created_at DESC LIMIT 3");
 $announcements = mysqli_fetch_all($query_ann, MYSQLI_ASSOC);
 
-// Fetch Instructor Schedules
+// Stats for Instructor
 $instructor_id = $_SESSION['user_id'];
+$q_total_siswa = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ks.id_siswa) as total FROM jadwal j JOIN kelas_siswa ks ON j.id_kelas = ks.id_kelas WHERE j.id_pengajar = $instructor_id"))['total'];
+$q_avg_score = mysqli_fetch_assoc(mysqli_query($conn, "SELECT AVG(rata_rata) as avg FROM evaluasi WHERE id_pengajar = $instructor_id"))['avg'] ?? 0;
+// Pending eval count is total students minus those already evaluated this period
+$q_pending_eval = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ks.id_siswa) as total FROM jadwal j JOIN kelas_siswa ks ON j.id_kelas = ks.id_kelas WHERE j.id_pengajar = $instructor_id AND ks.id_siswa NOT IN (SELECT id_siswa FROM evaluasi WHERE periode_semester = 'Semester Ganjil 2025')"))['total'];
+
+// Fetch latest students in this instructor's classes
+$query_latest_siswa = mysqli_query($conn, "
+    SELECT DISTINCT s.*, p.nama_program
+    FROM siswa s
+    JOIN kelas_siswa ks ON s.id_siswa = ks.id_siswa
+    JOIN jadwal j ON ks.id_kelas = j.id_kelas
+    JOIN program p ON s.id_program = p.id_program
+    WHERE j.id_pengajar = $instructor_id
+    ORDER BY s.id_siswa DESC
+    LIMIT 5
+");
+$latest_students = mysqli_fetch_all($query_latest_siswa, MYSQLI_ASSOC);
+
+// Fetch Instructor Schedules
 $query_jadwal = mysqli_query($conn, "
     SELECT j.*, m.nama_mapel, k.nama_kelas 
     FROM jadwal j
@@ -161,9 +180,9 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
             <section class="stats-section">
                 <div class="stat-card">
                     <div class="stat-text-wrap">
-                        <p class="stat-label">Total Siswa</p>
-                        <p class="stat-number">45</p>
-                        <p class="stat-trend positive">+ 5 Siswa Baru</p>
+                        <p class="stat-label">Total Siswa Anda</p>
+                        <p class="stat-number"><?= $q_total_siswa ?></p>
+                        <p class="stat-trend positive">Aktif Semester Ini</p>
                     </div>
                     <div class="stat-icon-wrap">
                         <i class="fa-solid fa-user-group"></i>
@@ -173,8 +192,8 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
                 <div class="stat-card">
                     <div class="stat-text-wrap">
                         <p class="stat-label">Perlu Dievaluasi</p>
-                        <p class="stat-number alert">12</p>
-                        <p class="stat-trend warning">Pending</p>
+                        <p class="stat-number alert"><?= $q_pending_eval ?></p>
+                        <p class="stat-trend warning">Belum Dinilai</p>
                     </div>
                     <div class="stat-icon-wrap">
                         <i class="fa-solid fa-book-open-reader"></i>
@@ -184,8 +203,8 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
                 <div class="stat-card">
                     <div class="stat-text-wrap">
                         <p class="stat-label">Rata-rata Kelas</p>
-                        <p class="stat-number success">82.5</p>
-                        <p class="stat-trend positive">Baik</p>
+                        <p class="stat-number success"><?= number_format($q_avg_score, 1) ?></p>
+                        <p class="stat-trend <?= $q_avg_score >= 80 ? 'positive' : 'warning' ?>"><?= $q_avg_score >= 80 ? 'Sangat Baik' : 'Cukup' ?></p>
                     </div>
                     <div class="stat-icon-wrap">
                         <i class="fa-solid fa-clipboard-check"></i>
@@ -198,7 +217,7 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
                 <!-- Siswa Terbaru Masuk -->
                 <div class="card card-table">
                     <div class="card-header border-none">
-                        <h2 class="card-title">Siswa Terbaru Masuk</h2>
+                        <h2 class="card-title">Daftar Mahasiswa di Kelas Anda</h2>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -206,30 +225,23 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
                                 <thead>
                                     <tr>
                                         <th>Nama Siswa</th>
-                                        <th>Departemen</th>
-                                        <th>Tanggal Masuk</th>
-                                        <th>Status Evaluasi</th>
+                                        <th>Departemen / Program</th>
+                                        <th style="text-align: center;">NIM</th>
+                                        <th style="text-align: center;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php foreach($latest_students as $s): ?>
                                     <tr>
-                                        <td>Andi Pratama</td>
-                                        <td>Housekeeping</td>
-                                        <td>10 Desember 2025</td>
-                                        <td><span class="badge badge-warning-light">Belum Dinilai</span></td>
+                                        <td><strong><?= htmlspecialchars($s['nama_lengkap']) ?></strong></td>
+                                        <td><?= htmlspecialchars($s['nama_program']) ?></td>
+                                        <td style="text-align: center;"><?= htmlspecialchars($s['nim_siswa']) ?></td>
+                                        <td style="text-align: center;"><a href="detail_siswa.php?id=<?= $s['id_siswa'] ?>" class="btn-detail" style="text-decoration: none; padding: 5px 15px; background: #003B73; color: white; border-radius: 5px; font-size: 11px;">Detail</a></td>
                                     </tr>
-                                    <tr>
-                                        <td>Alexander Wibowo</td>
-                                        <td>F&amp;B Service</td>
-                                        <td>11 Desember 2025</td>
-                                        <td><span class="badge badge-warning-light">Belum Dinilai</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Siti Jumairah</td>
-                                        <td>Kitchen</td>
-                                        <td>12 Desember 2025</td>
-                                        <td><span class="badge badge-success-light">Selesai</span></td>
-                                    </tr>
+                                    <?php endforeach; ?>
+                                    <?php if(empty($latest_students)): ?>
+                                        <tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;">Belum ada siswa di kelas Anda.</td></tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>

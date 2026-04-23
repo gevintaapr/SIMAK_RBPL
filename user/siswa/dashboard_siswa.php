@@ -8,7 +8,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
 }
 
 $id_user = $_SESSION['user_id'];
-$query = mysqli_query($conn, "SELECT * FROM siswa WHERE id_user = $id_user");
+$query = mysqli_query($conn, "
+    SELECT s.*, pr.nama_program 
+    FROM siswa s 
+    LEFT JOIN program pr ON s.id_program = pr.id_program 
+    WHERE s.id_user = $id_user
+");
 $siswa = mysqli_fetch_assoc($query);
 $id_siswa = $siswa['id_siswa'];
 
@@ -213,7 +218,7 @@ $taiwan_status = mysqli_fetch_assoc($query_taiwan)['status'] ?? null;
     <?php endif; ?>
 
     <!-- Navbar -->
-    <nav class="navbar <?= ($siswa['status_pembayaran'] !== 'lunas_dp') ? 'nav-disabled' : '' ?>">
+    <nav class="navbar">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
             <li><a href="dashboard_siswa.php" class="active">Home</a></li>
@@ -291,7 +296,7 @@ $taiwan_status = mysqli_fetch_assoc($query_taiwan)['status'] ?? null;
         <section class="card status-card">
             <div class="status-left">
                 <h2 class="status-title">Status: <span class="badge-success">Siswa Aktif</span></h2>
-                <p class="status-desc">Program <?= htmlspecialchars($siswa['program_pembelajaran'] ?? 'Hotel & Cruise Ship Selection') ?> | NIM: <?= htmlspecialchars($siswa['nim_siswa'] ?? '-') ?></p>
+                <p class="status-desc">Program <?= htmlspecialchars($siswa['nama_program'] ?? 'Hotel & Cruise Ship Selection') ?> | NIM: <?= htmlspecialchars($siswa['nim_siswa'] ?? '-') ?></p>
             </div>
             <div class="status-right">
                 <span class="status-label">Kelengkapan Berkas</span>

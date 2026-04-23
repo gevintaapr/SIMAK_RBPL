@@ -11,84 +11,6 @@ body {
     color: #333;
 }
 
-/* Navbar */
-.navbar {
-    position: relative;
-    z-index: 999;
-    padding: 1.5rem 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #073458;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    width: 100%;
-}
-
-.nav-brand {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #EBC372;
-    letter-spacing: 1px;
-    flex: 1;
-}
-
-.nav-menu {
-    list-style: none;
-    display: flex;
-    gap: 2.5rem;
-    justify-content: center;
-    flex: 2;
-}
-
-.nav-menu li a {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 400;
-    font-size: 1rem;
-    transition: all 0.3s;
-    text-decoration: none;
-}
-
-.nav-menu li a:hover,
-.nav-menu li a.active:hover {
-    color: #FFFFFF;
-    font-weight: 500;
-}
-
-.nav-action {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 1.5rem;
-    flex: 1;
-}
-
-.btn-logout {
-    background-color: #EBC372;
-    color: #003B73;
-    padding: 0.5rem 1.75rem;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: background-color 0.3s;
-    text-decoration: none;
-}
-
-.btn-logout:hover {
-    background-color: #fce8a9;
-}
-
-.nav-bell {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    transition: color 0.3s;
-    text-decoration: none;
-}
-
-.nav-bell:hover {
-    color: #FFFFFF;
-}
-
 /* Hero Section */
 .hero-section {
     position: relative;
@@ -104,7 +26,10 @@ body {
 
 .hero-overlay {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: linear-gradient(to right, rgba(0, 48, 102, 0.9), rgba(0, 77, 153, 0.7));
 }
 
@@ -145,7 +70,7 @@ body {
     background: white;
     border-radius: 10px;
     padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
 }
 
@@ -166,7 +91,8 @@ body {
     border-collapse: collapse;
 }
 
-.data-table th, .data-table td {
+.data-table th,
+.data-table td {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -283,7 +209,8 @@ body {
 
 /* Konfirmasi Pembayaran View */
 #konfirmasi-view {
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
 }
 
 .back-header {
@@ -393,7 +320,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     font-size: 4rem;
-    color: rgba(0,0,0,0.03);
+    color: rgba(0, 0, 0, 0.03);
 }
 
 .warning-box {
@@ -561,7 +488,7 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1.5fr;
     gap: 2rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 3rem;
     margin-bottom: 1.5rem;
 }
@@ -583,7 +510,7 @@ body {
     display: inline-block;
     width: 35px;
     height: 35px;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     text-align: center;
     line-height: 35px;
@@ -655,7 +582,7 @@ body {
     .konfirmasi-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .footer-container {
         grid-template-columns: 1fr 1fr;
     }
@@ -665,20 +592,24 @@ body {
     .nav-menu {
         display: none;
     }
-    
+
     .footer-container {
         grid-template-columns: 1fr;
     }
-    
-    .data-table, .data-table tbody, .data-table tr, .data-table td, .data-table th {
+
+    .data-table,
+    .data-table tbody,
+    .data-table tr,
+    .data-table td,
+    .data-table th {
         display: block;
         width: 100%;
     }
-    
+
     .data-table thead {
         display: none;
     }
-    
+
     .data-table tr {
         background: #fff;
         border: 1px solid #eee;
@@ -686,14 +617,14 @@ body {
         padding: 10px;
         border-radius: 8px;
     }
-    
+
     .data-table td {
         border: none;
         position: relative;
         padding-left: 50%;
         text-align: right;
     }
-    
+
     .data-table td:before {
         position: absolute;
         top: 12px;
@@ -704,11 +635,28 @@ body {
         font-weight: 600;
         text-align: left;
     }
-    
-    .data-table td:nth-of-type(1):before { content: "ID Transaksi"; }
-    .data-table td:nth-of-type(2):before { content: "Deskripsi"; }
-    .data-table td:nth-of-type(3):before { content: "Tanggal"; }
-    .data-table td:nth-of-type(4):before { content: "Nominal"; }
-    .data-table td:nth-of-type(5):before { content: "Status"; }
-    .data-table td:nth-of-type(6):before { content: "Aksi"; }
+
+    .data-table td:nth-of-type(1):before {
+        content: "ID Transaksi";
+    }
+
+    .data-table td:nth-of-type(2):before {
+        content: "Deskripsi";
+    }
+
+    .data-table td:nth-of-type(3):before {
+        content: "Tanggal";
+    }
+
+    .data-table td:nth-of-type(4):before {
+        content: "Nominal";
+    }
+
+    .data-table td:nth-of-type(5):before {
+        content: "Status";
+    }
+
+    .data-table td:nth-of-type(6):before {
+        content: "Aksi";
+    }
 }

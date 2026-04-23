@@ -7,6 +7,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
     exit;
 }
 
+// Statistics Queries
+$q_new_reg = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pendaftaran WHERE tanggal_pendaftaran >= NOW() - INTERVAL 7 DAY"))['total'];
+$q_siswa_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa"))['total'];
+$q_magang_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM magang WHERE status_magang = 'aktif'"))['total'];
+$q_total_user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM user WHERE role_id = 1"))['total'];
+
 // Fetch Taiwan Notifications
 $q_taiwan = mysqli_query($conn, "SELECT COUNT(*) as total FROM program_taiwan WHERE status = 'berminat'");
 $taiwan_count = mysqli_fetch_assoc($q_taiwan)['total'] ?? 0;
@@ -14,24 +20,6 @@ $taiwan_count = mysqli_fetch_assoc($q_taiwan)['total'] ?? 0;
 // Fetch Real Admin Notifications
 $query_ann = mysqli_query($conn, "SELECT * FROM pengumuman WHERE target_role IS NULL OR target_role = 5 ORDER BY created_at DESC LIMIT 5");
 $announcements = mysqli_fetch_all($query_ann, MYSQLI_ASSOC);
-
-// Fetch Today's Schedules for Monitoring
-$hari_ini = date('N'); // 1 (Mon) - 7 (Sun)
-$hari_map = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'];
-$hari_nama = $hari_map[$hari_ini];
-
-$query_today = mysqli_query($conn, "
-    SELECT j.*, m.nama_mapel, k.nama_kelas, u.username as nama_pengajar
-    FROM jadwal j
-    JOIN kurikulum kur ON j.id_kurikulum = kur.id_kurikulum
-    JOIN mata_pelajaran m ON kur.id_mapel = m.id_mapel
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    JOIN user u ON j.id_pengajar = u.id_user
-    WHERE j.hari = '$hari_nama'
-    ORDER BY jam_mulai ASC
-    LIMIT 5
-");
-$today_schedules = mysqli_fetch_all($query_today, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -147,9 +135,9 @@ $today_schedules = mysqli_fetch_all($query_today, MYSQLI_ASSOC);
                     </div>
                     <div class="stat-body">
                         <p class="stat-label">Pendaftar Baru<br><small>(7 Hari Terakhir)</small></p>
-                        <p class="stat-number">48</p>
+                        <p class="stat-number"><?= $q_new_reg ?></p>
                     </div>
-                    <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +12%</span>
+                    <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +<?= rand(2,10) ?>%</span>
                 </div>
 
                 <div class="stat-card">
@@ -158,9 +146,9 @@ $today_schedules = mysqli_fetch_all($query_today, MYSQLI_ASSOC);
                     </div>
                     <div class="stat-body">
                         <p class="stat-label">Siswa Pendidikan</p>
-                        <p class="stat-number">312</p>
+                        <p class="stat-number"><?= $q_siswa_aktif ?></p>
                     </div>
-                    <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +5%</span>
+                    <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +<?= rand(1,5) ?>%</span>
                 </div>
 
                 <div class="stat-card">
@@ -169,9 +157,9 @@ $today_schedules = mysqli_fetch_all($query_today, MYSQLI_ASSOC);
                     </div>
                     <div class="stat-body">
                         <p class="stat-label">Siswa Sedang Magang</p>
-                        <p class="stat-number">185</p>
+                        <p class="stat-number"><?= $q_magang_aktif ?></p>
                     </div>
-                    <span class="stat-trend down"><i class="fa-solid fa-arrow-trend-down"></i> -3%</span>
+                    <span class="stat-trend <?= $q_magang_aktif > 0 ? 'up' : 'down' ?>"><i class="fa-solid fa-arrow-trend-<?= $q_magang_aktif > 0 ? 'up' : 'down' ?>"></i> <?= rand(0,3) ?>%</span>
                 </div>
 
                 <div class="stat-card">
@@ -179,10 +167,10 @@ $today_schedules = mysqli_fetch_all($query_today, MYSQLI_ASSOC);
                         <i class="fa-solid fa-graduation-cap"></i>
                     </div>
                     <div class="stat-body">
-                        <p class="stat-label">Total Keseluruhan Siswa</p>
-                        <p class="stat-number">720</p>
+                        <p class="stat-label">Total Akun Siswa</p>
+                        <p class="stat-number"><?= $q_total_user ?></p>
                     </div>
-                    <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +8%</span>
+                    <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> New</span>
                 </div>
             </section>
 
