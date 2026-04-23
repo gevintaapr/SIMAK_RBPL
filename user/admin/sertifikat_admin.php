@@ -35,6 +35,11 @@ $query_riwayat = mysqli_query($conn, "
 ");
 $riwayat_sertifikat = mysqli_fetch_all($query_riwayat, MYSQLI_ASSOC);
 
+// Get Next Certificate Sequence
+$query_seq = mysqli_query($conn, "SELECT COUNT(*) as total FROM magang WHERE no_sertifikat IS NOT NULL");
+$row_seq = mysqli_fetch_assoc($query_seq);
+$next_cert_seq = (int)$row_seq['total'] + 1;
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -324,7 +329,10 @@ $riwayat_sertifikat = mysqli_fetch_all($query_riwayat, MYSQLI_ASSOC);
                             </div>
                              <div class="input-group">
                                  <label>Nomor Sertifikat</label>
-                                 <input type="text" id="noSertifikat" placeholder="Ex: HCTS/SRT/2025/1234">
+                                 <div style="display: flex; gap: 8px;">
+                                     <input type="text" id="noSertifikat" placeholder="Ex: 001/123/HCTS/SL-1/2026" style="flex: 1;">
+                                     <button class="btn-detail" onclick="refreshCertNo()" style="padding: 8px 12px;"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                 </div>
                              </div>
                              <div class="input-group">
                                  <label>Tanggal Terbit</label>
@@ -358,9 +366,11 @@ $riwayat_sertifikat = mysqli_fetch_all($query_riwayat, MYSQLI_ASSOC);
 
         const modal = document.getElementById('sertifikatModal');
         let currentMagangId = null;
+        let nextCertSeq = <?= $next_cert_seq ?>;
 
-        function openModal(data) {
+         function openModal(data) {
             currentMagangId = data.id_magang;
+            window.currentModalData = data; // Store for refresh
             document.getElementById('valNama').innerText = data.nama_lengkap;
             document.getElementById('valIdSiswa').innerText = data.nim_siswa || ('HC' + data.id_siswa);
             document.getElementById('valTglLahir').innerText = data.tanggal_lahir || '-';
@@ -373,7 +383,37 @@ $riwayat_sertifikat = mysqli_fetch_all($query_riwayat, MYSQLI_ASSOC);
             document.getElementById('valCourtesy').innerText = data.courtesy || '0';
             document.getElementById('valAppearance').innerText = data.personal_appearance || '0';
             document.getElementById('valAttendance').innerText = data.attendance || '0';
+            
+            // Auto-generate Unique ID
+            refreshCertNo();
+            
             modal.classList.add('show');
+        }
+
+        function generateUniqueId(data) {
+            const now = new Date();
+            const year = now.getFullYear();
+            
+            // 1. Sequence Number (001)
+            const seqStr = String(nextCertSeq).padStart(3, '0');
+            
+            // 2. Last 3 digits of NIM
+            let nim3 = '000';
+            if (data.nim_siswa) {
+                nim3 = data.nim_siswa.toString().slice(-3);
+            } else {
+                // Fallback to last 3 digits of id_siswa if NIM is missing
+                nim3 = String(data.id_siswa).padStart(3, '0').slice(-3);
+            }
+            
+            // Format: {SEQ}/{NIM_3}/HCTS/SL-1/{YEAR}
+            return `${seqStr}/${nim3}/HCTS/SL-1/${year}`;
+        }
+
+        function refreshCertNo() {
+            if (window.currentModalData) {
+                document.getElementById('noSertifikat').value = generateUniqueId(window.currentModalData);
+            }
         }
 
         function terbitkanSertifikat() {
@@ -394,7 +434,10 @@ $riwayat_sertifikat = mysqli_fetch_all($query_riwayat, MYSQLI_ASSOC);
             .then(res => res.json())
             .then(data => {
                 alert(data.message);
-                if (data.status === 'success') location.reload();
+                if (data.status === 'success') {
+                    nextCertSeq++; // Increment for next issuance in same session
+                    location.reload();
+                }
             });
         }
 
