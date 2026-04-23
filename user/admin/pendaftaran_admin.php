@@ -45,6 +45,10 @@ $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
                 <i class="fa-solid fa-book"></i>
                 <span>Akademik</span>
             </a>
+            <a href="sertifikat_admin.php" class="sidebar-link">
+                <i class="fa-solid fa-certificate"></i>
+                <span>Sertifikat</span>
+            </a>
             <a href="#" class="sidebar-link">
                 <i class="fa-solid fa-globe"></i>
                 <span>Program Taiwan</span>

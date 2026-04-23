@@ -9,10 +9,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
 
 // Fetch semua data magang + nama siswa
 $query = mysqli_query($conn, "
-    SELECT m.*, s.nama_lengkap, s.nim_siswa, u.email 
+    SELECT m.*, s.nama_lengkap, s.nim_siswa, pr.nama_program, u.email 
     FROM magang m 
     LEFT JOIN siswa s ON m.id_siswa = s.id_siswa 
     LEFT JOIN user u ON s.id_user = u.id_user 
+    LEFT JOIN program pr ON s.id_program = pr.id_program
     ORDER BY m.tanggal_pengajuan DESC
 ");
 $magang_list = [];
@@ -70,6 +71,10 @@ foreach ($magang_list as $m) {
             <a href="akademik_admin.php" class="sidebar-link">
                 <i class="fa-solid fa-book"></i>
                 <span>Akademik</span>
+            </a>
+            <a href="sertifikat_admin.php" class="sidebar-link">
+                <i class="fa-solid fa-certificate"></i>
+                <span>Sertifikat</span>
             </a>
             <a href="#" class="sidebar-link">
                 <i class="fa-solid fa-globe"></i>
@@ -222,7 +227,7 @@ foreach ($magang_list as $m) {
 
     </div>
 
-    <!-- MODAL DETAIL MAGANG -->
+    <!-- MODAL DETAIL MAGANG (Redesigned to match Pimpinan) -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -233,7 +238,7 @@ foreach ($magang_list as $m) {
             
             <div class="modal-body">
                 
-                <!-- Identitas Siswa Full Width -->
+                <!-- Identitas Siswa -->
                 <div class="detail-card">
                     <div class="detail-card-header">
                         <h3 class="detail-card-title">Identitas Siswa</h3>
@@ -245,18 +250,18 @@ foreach ($magang_list as $m) {
                                 <span class="detail-text-val" id="modalNama">-</span>
                             </div>
                             <div class="detail-text-row" style="margin-top: 14px;">
-                                <span class="detail-text-label">Email:</span>
-                                <span class="detail-text-val" id="modalEmail">-</span>
-                            </div>
-                        </div>
-                        <div class="identitas-col">
-                            <div class="detail-text-row">
                                 <span class="detail-text-label">NIM:</span>
                                 <span class="detail-text-val" id="modalNim">-</span>
                             </div>
                             <div class="detail-text-row" style="margin-top: 14px;">
-                                <span class="detail-text-label">ID Magang:</span>
-                                <span class="detail-text-val" id="modalId">-</span>
+                                <span class="detail-text-label">Program:</span>
+                                <span class="detail-text-val" id="modalProgram">-</span>
+                            </div>
+                        </div>
+                        <div class="identitas-col">
+                            <div class="detail-text-row">
+                                <span class="detail-text-label">Status Magang:</span>
+                                <span class="detail-text-val" id="modalStatusMagang">-</span>
                             </div>
                         </div>
                     </div>
@@ -266,65 +271,115 @@ foreach ($magang_list as $m) {
                     <!-- Kolom Kiri -->
                     <div class="modal-col-left">
                         <!-- Detail Pengajuan -->
-                        <div class="detail-card" style="padding-bottom: 24px;">
+                        <div class="detail-card">
                             <div class="detail-card-header">
                                 <h3 class="detail-card-title">Detail Pengajuan</h3>
-                                <span class="badge-light-green" id="modalStatusPengajuan">-</span>
+                                <span class="badge-light-green" id="modalStatusAdmin">-</span>
                             </div>
                             <div style="margin-top: 16px;">
                                 <div class="detail-text-row">
-                                    <span class="detail-text-label">Nama Perusahaan/Hotel:</span>
+                                    <span class="detail-text-label">Industri/Hotel:</span>
                                     <span class="detail-text-val" id="modalTempat">-</span>
                                 </div>
                                 <div class="detail-text-row" style="margin-top: 14px;">
-                                    <span class="detail-text-label">Alamat:</span>
-                                    <span class="detail-text-val" id="modalAlamat">-</span>
+                                    <span class="detail-text-label">Posisi:</span>
+                                    <span class="detail-text-val" id="modalPosisi">-</span>
                                 </div>
                                 <div class="detail-text-row" style="margin-top: 14px;">
-                                    <span class="detail-text-label">Status Verifikasi Admin:</span>
-                                    <span class="detail-text-val" id="modalStatusVerifikasi">-</span>
+                                    <span class="detail-text-label">Periode:</span>
+                                    <span class="detail-text-val" id="modalPeriode">-</span>
                                 </div>
                             </div>
-                            
-                            <div id="verifikasiAdminSection" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Catatan (Wajib jika menolak):</label>
-                                <textarea id="adminCatatan" style="width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 8px; margin-bottom: 12px;"></textarea>
+
+                            <!-- Action: Verifikasi Akhir (Muncul jika sudah disetujui pimpinan) -->
+                            <div id="verifAkhirSection" style="display:none; margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Catatan Verifikasi:</label>
+                                <textarea id="adminCatatan" style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; min-height: 80px;"></textarea>
                                 <div style="display: flex; gap: 10px; justify-content: center;">
                                     <button onclick="prosesVerifikasi('ditolak')" class="btn-detail" style="background: #ef4444; color: white;">Tolak</button>
-                                    <button onclick="prosesVerifikasi('diterima')" class="btn-primary-yellow">Terima & Mulai</button>
+                                    <button onclick="prosesVerifikasi('diterima')" class="btn-primary-yellow" style="margin-top:0;">Verifikasi & Aktifkan</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tombol Selesai -->
-                        <div id="selesaiSection" style="display:none; margin-top: 20px;">
-                            <button onclick="prosesSelesai()" class="btn-primary-yellow" style="width: 100%; height: 50px; font-size: 16px;">Selesaikan Program Magang</button>
+                        <!-- Laporan Kegiatan Harian -->
+                        <div class="detail-card">
+                            <div class="detail-card-header">
+                                <h3 class="detail-card-title">Laporan & Dokumen Harian</h3>
+                            </div>
+                            <div id="laporanSection" style="margin-top: 16px;">
+                                <div class="laporan-box">
+                                    <i class="fa-solid fa-file-pdf laporan-icon"></i>
+                                    <span class="laporan-title">Dokumen_Harian.pdf</span>
+                                    <button class="btn-lihat" id="btnLihatLaporan"><i class="fa-solid fa-eye"></i> Lihat</button>
+                                </div>
+                                <div id="evaluasiLaporanBlock" style="margin-top: 20px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <label id="labelEvaluasi" style="margin-bottom: 0; font-weight: 600; font-size: 14px;">Evaluasi Dokumen Harian:</label>
+                                        <span id="statusLaporanBadge" class="badge-status-blue" style="font-size: 11px; padding: 4px 10px; display: none;">-</span>
+                                    </div>
+                                    <textarea id="evaluasiLaporan" class="form-input" style="width:100%; border:1px solid #ddd; border-radius:8px; padding:10px; min-height:60px;" placeholder="Berikan evaluasi terkait dokumen yang diunggah..."></textarea>
+                                </div>
+                                <div id="verifLaporanButtons" style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                                    <button onclick="verifLaporan('ditolak')" class="btn-detail" style="background: #ef4444; color: white;">Tolak</button>
+                                    <button onclick="verifLaporan('disetujui')" class="btn-primary-yellow" style="margin-top: 0; width: auto; padding: 8px 20px;">Verifikasi</button>
+                                </div>
+                            </div>
+                            <div id="noLaporan" style="display:none; text-align:center; padding: 20px; color: #94A1B2;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 32px; margin-bottom: 10px;"></i>
+                                <p>Siswa belum mengunggah laporan.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Kolom Kanan (Info Tambahan) -->
+                    <!-- Kolom Kanan (Nilai) -->
                     <div class="modal-col-right">
                         <div class="detail-card" style="height: 100%;">
                             <div class="detail-card-header">
-                                <h3 class="detail-card-title">Informasi Tambahan</h3>
+                                <h3 class="detail-card-title">Hasil Nilai Magang</h3>
                             </div>
-                            <div id="infoTambahan" style="margin-top: 16px;">
-                                <div class="detail-text-row">
-                                    <span class="detail-text-label">Status Magang:</span>
-                                    <span class="detail-text-val" id="modalStatusMagang">-</span>
+                            <div class="nilai-magang-inputs" style="margin-top: 20px;">
+                                <div id="gradeLockNotice" style="background: #FFF9C4; padding: 12px; border-radius: 8px; font-size: 13px; color: #856404; margin-bottom: 15px;">
+                                    <i class="fa-solid fa-lock"></i> Input nilai dapat diisi setelah Dokumen Harian disetujui/diverifikasi.
                                 </div>
-                                <div class="detail-text-row" style="margin-top: 14px;">
-                                    <span class="detail-text-label">Tanggal Pengajuan:</span>
-                                    <span class="detail-text-val" id="modalTanggal">-</span>
+                                <div class="grade-inputs-grid" id="gradeInputsGrid">
+                                    <div class="input-group">
+                                        <label>Job Knowledge</label>
+                                        <input type="number" id="job_knowledge" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Quantity of Work</label>
+                                        <input type="number" id="quantity_of_work" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Quality of Work</label>
+                                        <input type="number" id="quality_of_work" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Character</label>
+                                        <input type="number" id="character_val" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Personality</label>
+                                        <input type="number" id="personality" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Courtesy</label>
+                                        <input type="number" id="courtesy" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Personal Appearance</label>
+                                        <input type="number" id="personal_appearance" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Attendance</label>
+                                        <input type="number" id="attendance" step="0.01" min="1" max="4" placeholder="1.00 - 4.00">
+                                    </div>
                                 </div>
-                                <div class="detail-text-row" style="margin-top: 14px;">
-                                    <span class="detail-text-label">Catatan Pimpinan:</span>
-                                    <span class="detail-text-val" id="modalCatatanPimpinan">-</span>
-                                </div>
-                                <div class="detail-text-row" style="margin-top: 14px;">
-                                    <span class="detail-text-label">Catatan Admin:</span>
-                                    <span class="detail-text-val" id="modalCatatanAdmin">-</span>
-                                </div>
+
+                                <button onclick="simpanNilai()" id="btnSimpanNilai" class="btn-primary-yellow" style="margin-top: 20px; width: 100%;">
+                                    Simpan Nilai & Evaluasi
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -379,50 +434,139 @@ foreach ($magang_list as $m) {
             currentMagang = data;
             
             document.getElementById('modalNama').innerText = data.nama_lengkap || 'Unknown';
-            document.getElementById('modalEmail').innerText = data.email || '-';
             document.getElementById('modalNim').innerText = data.nim_siswa || '-';
-            document.getElementById('modalId').innerText = 'IDM-' + data.id;
-            document.getElementById('modalStatusPengajuan').innerText = (data.status_pengajuan || '').replace(/_/g, ' ').toUpperCase();
-            document.getElementById('modalTempat').innerText = data.nama_perusahaan || '-';
-            document.getElementById('modalAlamat').innerText = data.lokasi || '-';
-            document.getElementById('modalStatusVerifikasi').innerText = (data.status_admin || 'PENDING').toUpperCase();
+            document.getElementById('modalProgram').innerText = data.nama_program || '-';
             document.getElementById('modalStatusMagang').innerText = (data.status_magang || '').replace(/_/g, ' ').toUpperCase();
-            document.getElementById('modalTanggal').innerText = data.tanggal_pengajuan || '-';
-            document.getElementById('modalCatatanPimpinan').innerText = data.catatan_pimpinan || 'Tidak ada';
-            document.getElementById('modalCatatanAdmin').innerText = data.catatan_admin || 'Tidak ada';
+            
+            document.getElementById('modalStatusAdmin').innerText = (data.status_admin || 'PENDING').toUpperCase();
+            document.getElementById('modalTempat').innerText = data.nama_perusahaan || '-';
+            document.getElementById('modalPosisi').innerText = data.posisi || '-';
+            
+            let tglMulai = data.tanggal_mulai ? new Date(data.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            let tglSelesai = data.tanggal_selesai ? new Date(data.tanggal_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            document.getElementById('modalPeriode').innerText = (tglMulai && tglSelesai) ? `${tglMulai} - ${tglSelesai}` : '-';
 
             // Sections visibility
-            const verifSection = document.getElementById('verifikasiAdminSection');
-            const selesaiSection = document.getElementById('selesaiSection');
+            const verifSection = document.getElementById('verifAkhirSection');
+            const laporanSection = document.getElementById('laporanSection');
+            const noLaporan = document.getElementById('noLaporan');
+            const gradeLockNotice = document.getElementById('gradeLockNotice');
+            const gradeInputsGrid = document.getElementById('gradeInputsGrid');
+            const btnSimpanNilai = document.getElementById('btnSimpanNilai');
 
-            // Tampilkan verifikasi jika Pimpinan sudah Setuju (disetujui) dan Admin belum proses (pending)
+            // Show verifikasi if status_magang is 'disetujui' (by pimpinan) and status_admin is still 'pending'
             if (data.status_magang === 'disetujui' && data.status_admin === 'pending') {
                 verifSection.style.display = 'block';
             } else {
                 verifSection.style.display = 'none';
             }
 
-            if (data.status_magang === 'berlangsung') {
-                selesaiSection.style.display = 'block';
+            // Check for report
+            if (data.file_laporan) {
+                laporanSection.style.display = 'block';
+                noLaporan.style.display = 'none';
+                document.getElementById('btnLihatLaporan').onclick = () => {
+                    window.open('../../assets/uploads/laporan/' + data.file_laporan, '_blank');
+                };
+                // Show filename if needed
+                const titleEl = laporanSection.querySelector('.laporan-title');
+                if(titleEl) titleEl.innerText = data.file_laporan;
             } else {
-                selesaiSection.style.display = 'none';
+                laporanSection.style.display = 'none';
+                noLaporan.style.display = 'block';
             }
+
+            // Populate Scores if they exist (need to fetch from nilai_magang)
+            fetch('../../backend/getNilaiMagang.php?magang_id=' + data.id_magang)
+            .then(res => res.json())
+            .then(resData => {
+                const statusLaporan = data.status_laporan || 'pending';
+                const badgeLaporan = document.getElementById('statusLaporanBadge');
+                const verifButtons = document.getElementById('verifLaporanButtons');
+                const evaluasiArea = document.getElementById('evaluasiLaporan');
+
+                badgeLaporan.style.display = 'inline-block';
+                if (statusLaporan === 'disetujui') {
+                    badgeLaporan.className = 'badge-status-green';
+                    badgeLaporan.innerText = 'Disetujui';
+                    verifButtons.style.display = 'none';
+                    evaluasiArea.readOnly = true;
+                } else if (statusLaporan === 'ditolak') {
+                    badgeLaporan.className = 'badge-status-red';
+                    badgeLaporan.innerText = 'Ditolak (Butuh Revisi)';
+                    verifButtons.style.display = 'none'; // Hides buttons after rejection
+                    evaluasiArea.readOnly = true;
+                } else {
+                    badgeLaporan.className = 'badge-status-blue';
+                    badgeLaporan.innerText = 'Menunggu Verifikasi';
+                    verifButtons.style.display = 'flex';
+                    evaluasiArea.readOnly = false;
+                }
+
+                if (statusLaporan === 'disetujui') {
+                    gradeLockNotice.style.display = 'none';
+                    gradeInputsGrid.style.opacity = '1';
+                    gradeInputsGrid.style.pointerEvents = 'auto';
+                    btnSimpanNilai.disabled = false;
+                    btnSimpanNilai.style.opacity = '1';
+                } else {
+                    gradeLockNotice.style.display = 'block';
+                    gradeInputsGrid.style.opacity = '0.5';
+                    gradeInputsGrid.style.pointerEvents = 'none';
+                    btnSimpanNilai.disabled = true;
+                    btnSimpanNilai.style.opacity = '0.5';
+                }
+
+                if(resData.status === 'success' && resData.data) {
+                    const evalText = resData.data.evaluasi_laporan || '';
+                    document.getElementById('evaluasiLaporan').value = evalText;
+                    
+                    // Sembunyikan textarea jika sudah disetujui dan tidak ada evaluasi
+                    if (statusLaporan === 'disetujui' && !evalText) {
+                        document.getElementById('evaluasiLaporan').style.display = 'none';
+                        document.getElementById('labelEvaluasi').style.display = 'none';
+                    } else {
+                        document.getElementById('evaluasiLaporan').style.display = 'block';
+                        document.getElementById('labelEvaluasi').style.display = 'block';
+                    }
+
+                    document.getElementById('job_knowledge').value = resData.data.job_knowledge || '';
+                    document.getElementById('quantity_of_work').value = resData.data.quantity_of_work || '';
+                    document.getElementById('quality_of_work').value = resData.data.quality_of_work || '';
+                    document.getElementById('character_val').value = resData.data.character_val || '';
+                    document.getElementById('personality').value = resData.data.personality || '';
+                    document.getElementById('courtesy').value = resData.data.courtesy || '';
+                    document.getElementById('personal_appearance').value = resData.data.personal_appearance || '';
+                    document.getElementById('attendance').value = resData.data.attendance || '';
+                    document.getElementById('evaluasiLaporan').value = resData.data.evaluasi_laporan || '';
+                } else {
+                    const fields = ['job_knowledge', 'quantity_of_work', 'quality_of_work', 'character_val', 'personality', 'courtesy', 'personal_appearance', 'attendance', 'evaluasiLaporan'];
+                    fields.forEach(f => {
+                        const el = document.getElementById(f);
+                        if(el) el.value = '';
+                    });
+                    document.getElementById('evaluasiLaporan').style.display = 'block';
+                    document.getElementById('labelEvaluasi').style.display = 'block';
+                }
+            });
 
             modal.classList.add('show');
         }
 
-        function prosesVerifikasi(status) {
-            const catatan = document.getElementById('adminCatatan').value;
-            if (status === 'ditolak' && !catatan) {
-                alert('Catatan wajib diisi jika menolak.');
+        function verifLaporan(status) {
+            const evaluasi = document.getElementById('evaluasiLaporan').value;
+            if (status === 'ditolak' && !evaluasi) {
+                alert('Catatan evaluasi wajib diisi jika menolak laporan.');
                 return;
             }
 
+            if (!confirm('Anda yakin ingin ' + (status === 'disetujui' ? 'menyetujui' : 'menolak') + ' laporan ini?')) return;
+
             const formData = new FormData();
-            formData.append('action', 'verifikasi');
-            formData.append('magang_id', currentMagang.id);
+            formData.append('action', 'verifikasi_laporan');
+            formData.append('magang_id', currentMagang.id_magang);
             formData.append('status', status);
-            formData.append('catatan', catatan);
+            formData.append('evaluasi', evaluasi);
 
             fetch('../../backend/magangAdmin_end.php', {
                 method: 'POST',
@@ -435,12 +579,53 @@ foreach ($magang_list as $m) {
             });
         }
 
-        function prosesSelesai() {
-            if (!confirm('Apakah Anda yakin ingin menyelesaikan program magang ini?')) return;
+        function simpanNilai() {
+            const fields = ['job_knowledge', 'quantity_of_work', 'quality_of_work', 'character_val', 'personality', 'courtesy', 'personal_appearance', 'attendance'];
+            const values = {};
+            let isValid = true;
+
+            fields.forEach(f => {
+                const val = document.getElementById(f).value;
+                if (!val) isValid = false;
+                values[f] = val;
+            });
+
+            const evaluasi = document.getElementById('evaluasiLaporan').value;
+
+            if (!isValid) {
+                alert('Semua nilai wajib diisi (1.00 - 4.00).');
+                return;
+            }
 
             const formData = new FormData();
-            formData.append('action', 'selesai');
-            formData.append('magang_id', currentMagang.id);
+            formData.append('action', 'simpan_nilai');
+            formData.append('magang_id', currentMagang.id_magang);
+            fields.forEach(f => formData.append(f, values[f]));
+            formData.append('evaluasi_laporan', evaluasi);
+
+            fetch('../../backend/magangAdmin_end.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') location.reload();
+            });
+        }
+
+        function prosesVerifikasi(status) {
+            const catatan = document.getElementById('adminCatatan').value;
+            if (status === 'ditolak' && !catatan) {
+                alert('Catatan wajib diisi jika menolak.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'verifikasi');
+            formData.append('magang_id', currentMagang.id_magang);
+            formData.append('status', status);
+            formData.append('catatan', catatan);
 
             fetch('../../backend/magangAdmin_end.php', {
                 method: 'POST',

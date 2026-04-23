@@ -8,11 +8,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $magang_id = $_POST['magang_id'];
     $status = $_POST['status'];
-    $catatan = $_POST['catatan'] ?? '';
 
     try {
-        $stmt = $conn->prepare("UPDATE magang SET status_pengajuan = ?, catatan_pimpinan = ? WHERE id = ?");
-        $stmt->execute([$status, $catatan, $magang_id]);
+        $stmt = $conn->prepare("UPDATE magang SET status_magang = ? WHERE id_magang = ?");
+        $stmt->execute([$status, $magang_id]);
 
         echo json_encode(['status' => 'success', 'message' => 'Status magang berhasil diperbarui.']);
     } catch (PDOException $e) {

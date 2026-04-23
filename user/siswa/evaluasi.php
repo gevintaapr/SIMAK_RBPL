@@ -210,9 +210,14 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
                 <div class="action-icon" style="color: #22C55E;"><i class="fas fa-certificate"></i></div>
                 <h2 class="action-title">Selamat! Anda Lulus Sempurna</h2>
                 <p class="action-desc">Seluruh mata pelajaran Anda telah memenuhi standar kompetensi dan rata-rata Anda sangat baik. Anda kini berhak melanjutkan ke tahap pengajuan magang.</p>
-                <a href="magang_siswa.php" class="btn-action btn-magang">
-                   Lanjut ke Pengajuan Magang <i class="fas fa-arrow-right"></i>
-                </a>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                    <a href="magang_siswa.php" class="btn-action btn-magang">
+                       Lanjut ke Pengajuan Magang <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="sertifikat.php" class="btn-action" style="background: #059669; color: white;">
+                       <i class="fas fa-certificate"></i> Cetak Sertifikat
+                    </a>
+                </div>
             <?php endif; ?>
         </div>
         <?php else: ?>

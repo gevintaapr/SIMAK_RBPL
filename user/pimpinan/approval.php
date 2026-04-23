@@ -15,12 +15,13 @@ $pendaftaran_pending = $stmt_p->fetchAll();
 $count_pendaftaran = count($pendaftaran_pending);
 
 // Fetch pending magang applications
-$stmt_m = $conn->query("SELECT m.*, s.nama_lengkap as name, u.email FROM magang m LEFT JOIN `user` u ON m.user_id = u.id_user LEFT JOIN `siswa` s ON u.id_user = s.id_user WHERE m.status_pengajuan = 'pending' ORDER BY m.created_at DESC");
+$stmt_m = $conn->query("SELECT m.*, s.nama_lengkap as name, s.nim_siswa, u.email, pr.nama_program FROM magang m LEFT JOIN `siswa` s ON m.id_siswa = s.id_siswa LEFT JOIN `user` u ON s.id_user = u.id_user LEFT JOIN `program` pr ON s.id_program = pr.id_program WHERE m.status_magang = 'pending' ORDER BY m.tanggal_pengajuan DESC");
 $magang_pending = $stmt_m->fetchAll();
 $count_magang = count($magang_pending);
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +29,7 @@ $count_magang = count($magang_pending);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../../style/approval.css?v=<?= time() ?>">
 </head>
+
 <body>
 
     <!-- ===== SIDEBAR ===== -->
@@ -100,9 +102,10 @@ $count_magang = count($magang_pending);
                     <div class="table-header">
                         <h2 class="table-title">Persetujuan Menunggu Tindakan</h2>
                     </div>
-                    
+
                     <div class="custom-tabs">
-                        <button class="tab-btn active" onclick="openTab('pendaftaran')">Pendaftaran (<?= $count_pendaftaran ?>)</button>
+                        <button class="tab-btn active" onclick="openTab('pendaftaran')">Pendaftaran
+                            (<?= $count_pendaftaran ?>)</button>
                         <button class="tab-btn" onclick="openTab('evaluasi')">Evaluasi (3)</button>
                         <button class="tab-btn" onclick="openTab('magang')">Magang (<?= $count_magang ?>)</button>
                     </div>
@@ -124,10 +127,12 @@ $count_magang = count($magang_pending);
                                         </div>
                                         <div class="ac-center">
                                             <span class="ac-badge">Menunggu Approval</span>
-                                            <span class="ac-date">| Wawancara Selesai Pada: <?= date('d M Y', strtotime($p['jadwal_wawancara'])) ?></span>
+                                            <span class="ac-date">| Wawancara Selesai Pada:
+                                                <?= date('d M Y', strtotime($p['jadwal_wawancara'])) ?></span>
                                         </div>
                                         <div class="ac-right">
-                                            <a href="approval_detail_pendaftaran.php?id=<?= $p['id_pendaftaran'] ?>" class="btn-primary-dark">Detail</a>
+                                            <a href="approval_detail_pendaftaran.php?id=<?= $p['id_pendaftaran'] ?>"
+                                                class="btn-primary-dark">Detail</a>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -166,14 +171,16 @@ $count_magang = count($magang_pending);
                                     <div class="approval-card">
                                         <div class="ac-left">
                                             <h3 class="ac-name"><?= htmlspecialchars($magang['name'] ?? '-') ?></h3>
-                                            <p class="ac-dept"><?= htmlspecialchars($magang['nama_tempat']) ?></p>
+                                            <p class="ac-dept"><?= htmlspecialchars($magang['nama_perusahaan'] ?? '-') ?></p>
                                         </div>
                                         <div class="ac-center">
                                             <span class="ac-badge">Menunggu Approval</span>
-                                            <span class="ac-date">| Diajukan: <?= date('d M Y', strtotime($magang['created_at'])) ?></span>
+                                            <span class="ac-date">| Diajukan:
+                                                <?= date('d M Y', strtotime($magang['tanggal_pengajuan'])) ?></span>
                                         </div>
                                         <div class="ac-right">
-                                            <button class="btn-primary-dark" onclick='openMagangModal(<?= json_encode($magang) ?>)'>Detail</button>
+                                            <button class="btn-primary-dark"
+                                                onclick='openMagangModal(<?= json_encode($magang) ?>)'>Detail</button>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -183,7 +190,7 @@ $count_magang = count($magang_pending);
 
                 </div>
             </section>
-            
+
         </main>
 
         <!-- ===== FOOTER ===== -->
@@ -191,12 +198,14 @@ $count_magang = count($magang_pending);
             <div class="footer-top">
                 <div class="footer-col footer-brand-col">
                     <h3 class="footer-brand">HCTS</h3>
-                    <p class="footer-desc">Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
+                    <p class="footer-desc">Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan
+                        dan kapal pesiar.</p>
                     <div class="footer-socials">
                         <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
                         <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
                         <a href="#" class="social-btn" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="social-btn" aria-label="LinkedIn"><i
+                                class="fa-brands fa-linkedin-in"></i></a>
                     </div>
                 </div>
 
@@ -225,7 +234,8 @@ $count_magang = count($magang_pending);
                 <div class="footer-col">
                     <h4 class="footer-heading">Kontak Kami</h4>
                     <ul class="footer-contact">
-                        <li><i class="fa-solid fa-location-dot"></i> <span>123 Maritime Avenue, Harbor District, HD 12345</span></li>
+                        <li><i class="fa-solid fa-location-dot"></i> <span>123 Maritime Avenue, Harbor District, HD
+                                12345</span></li>
                         <li><i class="fa-solid fa-phone"></i> <span>+1 (555) 123-4567</span></li>
                         <li><i class="fa-regular fa-envelope"></i> <span>info@hcts.edu</span></li>
                     </ul>
@@ -251,55 +261,64 @@ $count_magang = count($magang_pending);
     <!-- Evaluasi Modal -->
     <div class="modal-overlay" id="evalModal">
         <div class="modal-content">
-            <button class="btn-close" onclick="closeModal('evalModal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="modal-header">Detail Evaluasi</h2>
-            
-            <div class="identitas-box">
-                <h3 class="identitas-title">Identitas Siswa</h3>
-                <div class="identitas-grid">
-                    <div class="info-row"><span>ID Siswa</span> <span>HC123</span></div>
-                    <div class="info-row"><span>Program:</span> <span>F&B Service</span></div>
-                    <div class="info-row"><span>Nama Lengkap:</span> <span>Alexander Wibowo</span></div>
-                    <div class="info-row"><span>Periode:</span> <span>1-2025</span></div>
-                </div>
+            <div class="modal-header-fixed">
+                <h2 class="modal-header">Detail Evaluasi</h2>
+                <button class="btn-close" onclick="closeModal('evalModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <div class="section-box">
-                <div class="section-header">
-                    <h3 class="section-title">Hasil Evaluasi</h3>
-                    <span class="status-pill">Menunggu Persetujuan</span>
+            <div class="modal-body">
+                <div class="identitas-box">
+                    <h3 class="identitas-title">Identitas Siswa</h3>
+                    <div class="identitas-list">
+                        <div class="identitas-row-grid">
+                            <div class="info-row"><span>ID Siswa:</span> <span>HC123</span></div>
+                            <div class="info-row"><span>Periode:</span> <span>1-2025</span></div>
+                        </div>
+                        <div class="info-row full-width"><span>Nama Lengkap:</span> <span>Alexander Wibowo</span></div>
+                        <div class="info-row full-width"><span>Program:</span> <span>F&B Service</span></div>
+                    </div>
                 </div>
-                
-                <table class="eval-table">
-                    <thead>
-                        <tr>
-                            <th>Mata Pelajaran (Subject)</th>
-                            <th>Nilai (0-100)</th>
-                            <th>Grade</th>
-                            <th>Evaluasi Pengajar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>English Basic</td>
-                            <td><input type="text" class="input-nilai" value="88" readonly></td>
-                            <td><strong>A</strong></td>
-                            <td><input type="text" class="input-text" value="Memiliki kemampuan dasar bahasa In..." readonly></td>
-                        </tr>
-                        <tr>
-                            <td>Food & Beverage Service</td>
-                            <td><input type="text" class="input-nilai" value="89" readonly></td>
-                            <td><strong>A</strong></td>
-                            <td><input type="text" class="input-text" value="Menguasai standar pelayanan F&B den..." readonly></td>
-                        </tr>
-                        <tr>
-                            <td>Housekeeping</td>
-                            <td><input type="text" class="input-nilai" value="82" readonly></td>
-                            <td><strong>B</strong></td>
-                            <td><input type="text" class="input-text" value="Memahami prosedur dasar housekeepi..." readonly></td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <div class="section-box">
+                    <div class="section-header">
+                        <h3 class="section-title">Hasil Evaluasi</h3>
+                        <span class="status-pill">Menunggu Persetujuan</span>
+                    </div>
+
+                    <table class="eval-table">
+                        <thead>
+                            <tr>
+                                <th>Mata Pelajaran (Subject)</th>
+                                <th>Nilai (0-100)</th>
+                                <th>Grade</th>
+                                <th>Evaluasi Pengajar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>English Basic</td>
+                                <td><input type="text" class="input-nilai" value="88" readonly></td>
+                                <td><strong>A</strong></td>
+                                <td><input type="text" class="input-text" value="Memiliki kemampuan dasar bahasa In..."
+                                        readonly></td>
+                            </tr>
+                            <tr>
+                                <td>Food & Beverage Service</td>
+                                <td><input type="text" class="input-nilai" value="89" readonly></td>
+                                <td><strong>A</strong></td>
+                                <td><input type="text" class="input-text" value="Menguasai standar pelayanan F&B den..."
+                                        readonly></td>
+                            </tr>
+                            <tr>
+                                <td>Housekeeping</td>
+                                <td><input type="text" class="input-nilai" value="82" readonly></td>
+                                <td><strong>B</strong></td>
+                                <td><input type="text" class="input-text" value="Memahami prosedur dasar housekeepi..."
+                                        readonly></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -311,43 +330,88 @@ $count_magang = count($magang_pending);
     <!-- Magang Modal -->
     <div class="modal-overlay" id="magangModal">
         <div class="modal-content">
-            <button class="btn-close" onclick="closeModal('magangModal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="modal-header">Detail Magang</h2>
-
-            <div class="identitas-box">
-                <h3 class="identitas-title">Identitas Siswa</h3>
-                <div class="identitas-grid">
-                    <div class="info-row"><span>Nama Lengkap:</span> <span id="mNama">-</span></div>
-                    <div class="info-row"><span>Email:</span> <span id="mEmail">-</span></div>
-                    <div class="info-row"><span>ID Magang:</span> <span id="mId">-</span></div>
-                </div>
+            <div class="modal-header-fixed">
+                <h2 class="modal-header">Detail Magang</h2>
+                <button class="btn-close" onclick="closeModal('magangModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <div class="magang-grid">
-                <div class="magang-col" style="width: 100%;">
-                    <div class="section-box" style="margin-bottom:0;">
-                        <div class="section-header">
-                            <h3 class="section-title">Detail Pengajuan</h3>
-                            <span class="status-pill">Menunggu Persetujuan</span>
+            <div class="modal-body">
+                <div class="identitas-box">
+                    <h3 class="identitas-title">Identitas Siswa</h3>
+                    <div class="identitas-list">
+                        <div class="identitas-row-grid">
+                            <div class="info-row"><span>ID Siswa:</span> <span id="mIdSiswa">-</span></div>
+                            <div class="info-row"><span>Periode:</span> <span id="mPeriode">1-2025</span></div>
                         </div>
-                        <div class="magang-details">
-                            <div class="md-row"><span>Nama Perusahaan/Hotel:</span> <span id="mTempat">-</span></div>
-                            <div class="md-row"><span>Alamat:</span> <span id="mAlamat">-</span></div>
+                        <div class="info-row full-width"><span>Nama Lengkap:</span> <span id="mNama">-</span></div>
+                        <div class="info-row full-width"><span>Program:</span> <span id="mProgram">-</span></div>
+                    </div>
+                </div>
+
+                <div class="magang-grid">
+                    <div class="magang-col">
+                        <div class="section-box detail-pengajuan-box">
+                            <div class="section-header">
+                                <h3 class="section-title">Detail Pengajuan</h3>
+                                <span class="status-pill">Menunggu Persetujuan</span>
+                            </div>
+                            <div class="magang-details">
+                                <div class="md-row">
+                                    <span>Nama Perusahaan/Hotel:</span> 
+                                    <span id="mTempat">-</span>
+                                </div>
+                                <div class="md-row">
+                                    <span>Posisi/Departemen:</span> 
+                                    <span id="mPosisi">-</span>
+                                </div>
+                                <div class="md-row">
+                                    <span>Lokasi:</span> 
+                                    <span id="mAlamat">-</span>
+                                </div>
+                                <div class="md-row">
+                                    <span>Periode Pelaksanaan:</span> 
+                                    <span id="mPelaksanaan">-</span>
+                                </div>
+                            </div>
+
+                            <div class="magang-actions">
+                                <button class="btn-magang-reject" onclick="prosesApproveMagang('ditolak')">Tolak Pengajuan Magang</button>
+                                <button class="btn-magang-approve" onclick="prosesApproveMagang('disetujui')">Setujui Pengajuan Magang</button>
+                            </div>
                         </div>
                         
-                        <div class="approval-action-box" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Catatan (Wajib jika menolak):</label>
-                            <textarea id="pimpinanCatatan" style="width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 10px; margin-bottom: 16px; min-height: 80px;"></textarea>
+                        <div class="section-box">
+                            <h3 class="section-title border-bottom">Laporan Kegiatan Harian</h3>
+                            <div class="empty-state-text">
+                                <span>Belum Di Unggah</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="magang-col">
+                        <div class="section-box height-full">
+                            <h3 class="section-title border-bottom">Hasil Nilai Magang</h3>
                             
-                            <div class="magang-actions" style="display: flex; gap: 15px; justify-content: flex-end;">
-                                <button class="btn-magang-reject" onclick="prosesApproveMagang('ditolak_pimpinan')" style="background: #ef4444; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer;">Tolak</button>
-                                <button class="btn-magang-approve" onclick="prosesApproveMagang('disetujui_pimpinan')" style="background: #1e293b; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer;">Setujui</button>
+                            <div class="nilai-magang-list">
+                                <div class="form-group">
+                                    <label class="form-label">Nilai Disiplin & Kehadiran</label>
+                                    <input type="text" class="form-input-readonly" id="mNilaiDisiplin" readonly placeholder="Belum ada nilai">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Nilai Kinerja Teknis</label>
+                                    <input type="text" class="form-input-readonly" id="mNilaiKinerja" readonly placeholder="Belum ada nilai">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Nilai Laporan Kegiatan Harian</label>
+                                    <input type="text" class="form-input-readonly" id="mNilaiLaporan" readonly placeholder="Belum ada nilai">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -367,7 +431,7 @@ $count_magang = count($magang_pending);
         function openTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-            
+
             event.target.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
@@ -376,46 +440,56 @@ $count_magang = count($magang_pending);
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
         }
-        
+
         let currentMagang = null;
         function openMagangModal(data) {
             currentMagang = data;
-            document.getElementById('mNama').innerText = data.name;
-            document.getElementById('mEmail').innerText = data.email;
-            document.getElementById('mId').innerText = 'IDM-' + data.id;
-            document.getElementById('mTempat').innerText = data.nama_tempat;
-            document.getElementById('mAlamat').innerText = data.alamat_tempat;
+            document.getElementById('mNama').innerText = data.name || '-';
+            document.getElementById('mIdSiswa').innerText = data.nim_siswa || ('HC' + data.id_siswa);
+            document.getElementById('mProgram').innerText = data.nama_program || '-';
+            // Periode default '1-2025' tetap jika tidak ada di data
             
+            document.getElementById('mTempat').innerText = data.nama_perusahaan || '-';
+            document.getElementById('mPosisi').innerText = data.posisi || '-';
+            document.getElementById('mAlamat').innerText = data.lokasi || '-';
+            
+            let tglMulai = data.tanggal_mulai ? new Date(data.tanggal_mulai).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : '';
+            let tglSelesai = data.tanggal_selesai ? new Date(data.tanggal_selesai).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : '';
+            document.getElementById('mPelaksanaan').innerText = (tglMulai && tglSelesai) ? `${tglMulai} - ${tglSelesai}` : '-';
+
+            // Populate Scores (Read-only for Pimpinan)
+            document.getElementById('mNilaiDisiplin').value = data.nilai_disiplin || '';
+            document.getElementById('mNilaiKinerja').value = data.nilai_kinerja || '';
+            document.getElementById('mNilaiLaporan').value = data.nilai_laporan || '';
+
             openModal('magangModal');
         }
 
         function prosesApproveMagang(status) {
-            const catatan = document.getElementById('pimpinanCatatan').value;
-            if (status === 'ditolak_pimpinan' && !catatan) {
-                alert('Catatan wajib diisi jika menolak.');
-                return;
-            }
-
             const formData = new FormData();
             formData.append('action', 'approve');
-            formData.append('magang_id', currentMagang.id);
+            formData.append('magang_id', currentMagang.id_magang);
             formData.append('status', status);
-            formData.append('catatan', catatan);
 
             fetch('../../backend/approvalMagang.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                if (data.status === 'success') location.reload();
-            });
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') location.reload();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Terjadi kesalahan.");
+                });
         }
-        
+
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
     </script>
 </body>
+
 </html>

@@ -204,13 +204,18 @@ $siswa = mysqli_fetch_assoc($query);
     <!-- Main Content -->
     <main class="dashboard-container <?= ($siswa['status_pembayaran'] !== 'lunas_dp') ? 'nav-disabled' : '' ?>">
         <!-- Success Notification -->
-        <?php if ($siswa['status_pembayaran'] === 'lunas_dp'): ?>
+        <?php if ($siswa['status_pembayaran'] === 'lunas_dp' && $siswa['dp_notified'] == 0): ?>
             <div style="background: #d4edda; color: #155724; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border: 1px solid #c3e6cb;">
                 <i class="fas fa-check-circle" style="font-size: 20px;"></i>
                 <div>
                     <strong>Pembayaran DP Berhasil!</strong> Dashboard Anda kini telah aktif sepenuhnya. Selamat belajar!
                 </div>
             </div>
+            <?php 
+                // Set flag agar tidak muncul lagi
+                $id_siswa = $siswa['id_siswa'];
+                mysqli_query($conn, "UPDATE siswa SET dp_notified = 1 WHERE id_siswa = $id_siswa");
+            ?>
         <?php endif; ?>
 
         <!-- Status Card -->
