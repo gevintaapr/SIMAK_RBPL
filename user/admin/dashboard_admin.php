@@ -1,9 +1,37 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../config/config.php';
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
     header("Location: ../../public/login/logAdmin.php?role=5&error=" . urlencode("Akses ditolak. Silakan login sebagai Admin."));
     exit;
 }
+
+// Fetch Taiwan Notifications
+$q_taiwan = mysqli_query($conn, "SELECT COUNT(*) as total FROM program_taiwan WHERE status = 'berminat'");
+$taiwan_count = mysqli_fetch_assoc($q_taiwan)['total'] ?? 0;
+
+// Fetch Real Admin Notifications
+$query_ann = mysqli_query($conn, "SELECT * FROM pengumuman WHERE target_role IS NULL OR target_role = 5 ORDER BY created_at DESC LIMIT 5");
+$announcements = mysqli_fetch_all($query_ann, MYSQLI_ASSOC);
+
+// Fetch Today's Schedules for Monitoring
+$hari_ini = date('N'); // 1 (Mon) - 7 (Sun)
+$hari_map = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'];
+$hari_nama = $hari_map[$hari_ini];
+
+$query_today = mysqli_query($conn, "
+    SELECT j.*, m.nama_mapel, k.nama_kelas, u.username as nama_pengajar
+    FROM jadwal j
+    JOIN kurikulum kur ON j.id_kurikulum = kur.id_kurikulum
+    JOIN mata_pelajaran m ON kur.id_mapel = m.id_mapel
+    JOIN kelas k ON j.id_kelas = k.id_kelas
+    JOIN user u ON j.id_pengajar = u.id_user
+    WHERE j.hari = '$hari_nama'
+    ORDER BY jam_mulai ASC
+    LIMIT 5
+");
+$today_schedules = mysqli_fetch_all($query_today, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -49,6 +77,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
             <a href="taiwan.php" class="sidebar-link">
                 <i class="fa-solid fa-globe"></i>
                 <span>Program Taiwan</span>
+            </a>
+            <a href="manajemen_form.php" class="sidebar-link">
+                <i class="fa-solid fa-file-pen"></i>
+                <span>Manajemen Form</span>
             </a>
             <a href="manage_user.php" class="sidebar-link">
                 <i class="fa-solid fa-users-gear"></i>
@@ -155,7 +187,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
             </section>
 
             <!-- ===== BOTTOM CARDS SECTION ===== -->
-            <section class="bottom-section">
+            <section class="bottom-section" style="margin-top: 25px;">
 
                 <!-- Card Peringatan & Notifikasi -->
                 <div class="card card-warnings">
@@ -166,46 +198,31 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
                         </h2>
                     </div>
                     <div class="card-body">
-                        <div class="notif-item notif-warning">
+                        <?php if ($taiwan_count > 0): ?>
+                        <div class="notif-item notif-warning" style="border-left: 4px solid #F59E0B; background: #FFFBEB;">
                             <div class="notif-bar"></div>
                             <div class="notif-text">
-                                <p class="notif-main">Teruskan 5 Approval Pendaftaran</p>
-                                <p class="notif-sub">Pendaftaran Siswa Baru disetujui. Lakukan Aksi!</p>
+                                <p class="notif-main">Ada <?= $taiwan_count ?> Siswa Berminat Program Taiwan</p>
+                                <p class="notif-sub">Peminat program internasional baru. Cek datanya!</p>
                             </div>
-                            <button class="notif-action-btn">Tindak Lanjut</button>
+                            <a href="taiwan.php" class="notif-action-btn" style="text-decoration:none; display:inline-block; text-align:center;">Cek Peminat</a>
                         </div>
-                        <div class="notif-item notif-info">
-                            <div class="notif-bar"></div>
-                            <div class="notif-text">
-                                <p class="notif-main">Unggah Hasil Evaluasi Siswa</p>
-                                <p class="notif-sub">Hasil Evaluasi Siswa Perlu di bagikan ke Siswa.</p>
-                            </div>
-                            <button class="notif-action-btn">Unggah</button>
-                        </div>
-                        <div class="notif-item notif-warning">
-                            <div class="notif-bar"></div>
-                            <div class="notif-text">
-                                <p class="notif-main">Pengajuan Magang dari 12 Siswa Menunggu</p>
-                                <p class="notif-sub">Pengajuan Magang belum diverifikasi admin!</p>
-                            </div>
-                            <button class="notif-action-btn">Verifikasi</button>
-                        </div>
-                        <div class="notif-item notif-danger">
-                            <div class="notif-bar"></div>
-                            <div class="notif-text">
-                                <p class="notif-main">Ada 35 Laporan Belum Dicek</p>
-                                <p class="notif-sub">Laporan OJT belum dicek. Cek Segera!</p>
-                            </div>
-                            <button class="notif-action-btn">Cek Sekarang</button>
-                        </div>
-                        <div class="notif-item notif-danger">
-                            <div class="notif-bar"></div>
-                            <div class="notif-text">
-                                <p class="notif-main">Deadline Input Nilai OJT dari Hotel</p>
-                                <p class="notif-sub">Tersisa 4 hari untuk Periode Juni 2024.</p>
-                            </div>
-                            <button class="notif-action-btn">Input Nilai</button>
-                        </div>
+                        <?php endif; ?>
+
+                        <?php if (empty($announcements)): ?>
+                            <p style="text-align: center; color: #64748b; padding: 20px;">Tidak ada peringatan sistem saat ini.</p>
+                        <?php else: ?>
+                            <?php foreach ($announcements as $ann): ?>
+                                <div class="notif-item notif-<?= $ann['type'] ?>">
+                                    <div class="notif-bar"></div>
+                                    <div class="notif-text">
+                                        <p class="notif-main"><?= htmlspecialchars($ann['title']) ?></p>
+                                        <p class="notif-sub"><?= htmlspecialchars($ann['message']) ?></p>
+                                    </div>
+                                    <button class="notif-action-btn">Detail</button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 

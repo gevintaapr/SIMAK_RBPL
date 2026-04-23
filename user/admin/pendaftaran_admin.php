@@ -53,6 +53,10 @@ $pendaftaran = mysqli_fetch_all($query, MYSQLI_ASSOC);
                 <i class="fa-solid fa-globe"></i>
                 <span>Program Taiwan</span>
             </a>
+            <a href="manajemen_form.php" class="sidebar-link">
+                <i class="fa-solid fa-file-pen"></i>
+                <span>Manajemen Form</span>
+            </a>
             <a href="manage_user.php" class="sidebar-link">
                 <i class="fa-solid fa-users-gear"></i>
                 <span>Manajemen Pengguna</span>

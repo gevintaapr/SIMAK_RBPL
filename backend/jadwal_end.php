@@ -21,16 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
             break;
 
         case 'add':
-            $program = mysqli_real_escape_string($conn, $_POST['program']);
+            $id_kelas = mysqli_real_escape_string($conn, $_POST['id_kelas']);
             $hari = mysqli_real_escape_string($conn, $_POST['hari']);
             $jam_mulai = mysqli_real_escape_string($conn, $_POST['jam_mulai']);
             $jam_selesai = mysqli_real_escape_string($conn, $_POST['jam_selesai']);
-            $materi = mysqli_real_escape_string($conn, $_POST['materi']);
+            $id_kurikulum = mysqli_real_escape_string($conn, $_POST['id_kurikulum']);
             $id_pengajar = mysqli_real_escape_string($conn, $_POST['id_pengajar']);
-            $ruangan = mysqli_real_escape_string($conn, $_POST['ruangan']);
+            $ruang = mysqli_real_escape_string($conn, $_POST['ruang']);
 
-            $query = "INSERT INTO jadwal (program, hari, jam_mulai, jam_selesai, materi, id_pengajar, ruangan) 
-                      VALUES ('$program', '$hari', '$jam_mulai', '$jam_selesai', '$materi', '$id_pengajar', '$ruangan')";
+            $query = "INSERT INTO jadwal (id_kelas, hari, jam_mulai, jam_selesai, id_kurikulum, id_pengajar, ruang) 
+                      VALUES ('$id_kelas', '$hari', '$jam_mulai', '$jam_selesai', '$id_kurikulum', '$id_pengajar', '$ruang')";
             
             if (mysqli_query($conn, $query)) {
                 echo json_encode(['status' => 'success', 'message' => 'Jadwal berhasil ditambahkan.']);
@@ -41,22 +41,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
 
         case 'edit':
             $id_jadwal = mysqli_real_escape_string($conn, $_POST['id_jadwal']);
-            $program = mysqli_real_escape_string($conn, $_POST['program']);
+            $id_kelas = mysqli_real_escape_string($conn, $_POST['id_kelas']);
             $hari = mysqli_real_escape_string($conn, $_POST['hari']);
             $jam_mulai = mysqli_real_escape_string($conn, $_POST['jam_mulai']);
             $jam_selesai = mysqli_real_escape_string($conn, $_POST['jam_selesai']);
-            $materi = mysqli_real_escape_string($conn, $_POST['materi']);
+            $id_kurikulum = mysqli_real_escape_string($conn, $_POST['id_kurikulum']);
             $id_pengajar = mysqli_real_escape_string($conn, $_POST['id_pengajar']);
-            $ruangan = mysqli_real_escape_string($conn, $_POST['ruangan']);
+            $ruang = mysqli_real_escape_string($conn, $_POST['ruang']);
 
             $query = "UPDATE jadwal SET 
-                      program = '$program', 
+                      id_kelas = '$id_kelas', 
                       hari = '$hari', 
                       jam_mulai = '$jam_mulai', 
                       jam_selesai = '$jam_selesai', 
-                      materi = '$materi', 
+                      id_kurikulum = '$id_kurikulum', 
                       id_pengajar = '$id_pengajar', 
-                      ruangan = '$ruangan' 
+                      ruang = '$ruang' 
                       WHERE id_jadwal = '$id_jadwal'";
             
             if (mysqli_query($conn, $query)) {

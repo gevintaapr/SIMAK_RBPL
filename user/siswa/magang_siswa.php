@@ -749,9 +749,28 @@ $is_ditolak = ($status_laporan === 'ditolak');
                                 <i class="fas fa-briefcase"></i>
                             </div>
                             <div class="status-content">
-                                <h2>Magang Aktif</h2>
-                                <p>Selamat melaksanakan magang! Anda kini dapat mengunduh dokumen harian yang wajib diisi selama periode
-                                    magang.</p>
+                                <h2>Magang Sedang Berlangsung</h2>
+                                <p>Selamat bekerja! Saat ini Anda sedang melaksanakan program magang di
+                                    <strong><?= htmlspecialchars($magang_aktif['nama_perusahaan']) ?></strong>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Download Logbook Template -->
+                        <div class="magang-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                    <div>
+                                        <h3 style="margin: 0; font-size: 1.2rem;">Laporan Kegiatan Harian (Logbook)</h3>
+                                        <p style="margin: 5px 0 0; opacity: 0.7; font-size: 0.85rem;">Gunakan format resmi ini untuk mencatat aktivitas harian Anda selama magang.</p>
+                                    </div>
+                                </div>
+                                <a href="download_template.php?code=laporan_harian" target="_blank" style="background: #E9C46A; color: #003B73; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-download"></i> Unduh Format
+                                </a>
                             </div>
                         </div>
                     <?php elseif ($is_waiting_sertifikat): ?>

@@ -10,7 +10,12 @@ if (session_status() === PHP_SESSION_NONE) {
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 3600)) {
     session_unset();
     session_destroy();
-    header("Location: ../public/MainLogin.php?error=" . urlencode("Sesi berakhir karena tidak ada aktifitas selama 1 jam."));
+    
+    // Redirect menggunakan path relatif yang aman atau link login utama
+    echo "<script>
+        alert('Sesi Anda telah berakhir karena tidak ada aktifitas selama 1 jam. Silakan login kembali.');
+        window.location.href = '/SIMAK_RBPL/SIMAK_RBPL/public/MainLogin.php';
+    </script>";
     exit();
 }
 $_SESSION['last_activity'] = time();

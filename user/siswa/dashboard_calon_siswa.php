@@ -263,33 +263,141 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
                     <div class="icon-folder">
                         <i class="fas fa-folder"></i>
                     </div>
-                    <h4><?= $status_badge_text ?></h4>
-                    <p>Status pendaftaran saat ini: <?= $status_verifikasi ?></p>
-                    <div class="status-pill" style="background: <?= $alert_bg ?>; color: <?= $alert_text ?>;"><?= $status_verifikasi ?></div>
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+            <div class="main-column">
+                <!-- Info Status -->
+                <div class="card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin:0; color: #003B73;">Status Berkas & Administrasi</h3>
+                        <span style="font-size: 12px; color: #666;">Diperbarui: <?= date('d M Y') ?></span>
+                    </div>
+                    <?php if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] === '1'): ?>
+                    <div class="content-card" style="border-color: #c2e2af; background: #fdfdfd;">
+                        <h3>Informasi Akademik</h3>
+                        <div class="doc-status" style="background:#f0faeb; border: 1px solid #c2e2af; border-radius: 12px; padding: 2.5rem 1rem;">
+                            <div class="icon-folder" style="background:none; color:#4a9e22; margin-bottom: 0;">
+                                <i class="fas fa-graduation-cap" style="font-size:3rem;"></i>
+                            </div>
+                            <h4 style="color: #2b6110; margin-bottom: 0.5rem;">Selamat! Anda Telah Lulus</h4>
+                            <p style="color:#3d7522; margin-bottom: 1.5rem;">Berikut adalah informasi akun belajar HCTS Anda.</p>
+                            <div style="background:white; padding: 20px; border-radius: 8px; margin: 0 15px; text-align: left; border: 1px solid #d4ebc6;">
+                                <strong style="color: #333; font-size:0.9rem;">Email Belajar:</strong><br>
+                                <?php
+                                    $nodaftar = $daftar['id_pendaftaran'];
+                                    $nama_parts = explode(' ', strtolower(trim($daftar['nama_cs'])));
+                                    $nama_awal = preg_replace('/[^a-z]/', '', $nama_parts[0]);
+                                    $dummy_email = $nama_awal . substr($nodaftar, -4) . '.26@hcts.ac.id';
+                                ?>
+                                <span style="color:#0369a1; font-weight:700; font-size: 1.2rem;"><?= htmlspecialchars($daftar['email_belajar'] ?? $dummy_email) ?></span>
+                                <br><br>
+                                <strong style="color: #333; font-size:0.9rem;">Password Awal:</strong><br>
+                                <span style="color:#555; font-family: monospace; font-size: 1.1rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">HCTS2026</span>
+                            </div>
+                            <a href="../../public/login/logSiswa.php" style="display:inline-block; margin-top:20px; background:#4a9e22; color:white; padding: 12px 25px; border-radius: 8px; text-decoration:none; font-weight:600;">Login ke Portal Belajar</a>
+                        </div>
+                    </div>
+                    <?php elseif ($daftar['status_approval'] === 'menunggu_pimpinan'): ?>
+                    <div class="content-card">
+                        <h3>Informasi Wawancara</h3>
+                        <div class="doc-status" style="text-align: center; padding: 3rem 1rem;">
+                            <div class="icon-folder" style="color: #059669; background: #D1FAE5; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                <i class="fas fa-check-double" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 style="color: #003B73; font-weight: 700; font-size: 1.3rem; margin-bottom: 15px;">Wawancara Telah Selesai!</h4>
+                            <p style="color: #4A5568; font-size: 1rem; line-height: 1.6;">
+                                Selamat! Anda telah menyelesaikan seluruh rangkaian tahap wawancara.<br>
+                                Hasil seleksi akan segera diumumkan setelah mendapatkan persetujuan dari Pimpinan.<br>
+                                <strong>Pantau terus dashboard Anda secara berkala.</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <?php elseif (!empty($daftar['jadwal_wawancara'])): ?>
+                    <div class="content-card">
+                        <h3>Informasi Wawancara</h3>
+                        <div class="doc-status" style="text-align: center;">
+                            <div class="icon-folder" style="color: #0d6efd; background: #e7f1ff; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                <i class="fas fa-calendar-check" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 style="color: #003B73; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px;">Jadwal Wawancara Anda:</h4>
+                            <div style="text-align: left; font-size: 0.9rem; color: #003B73; display: inline-block; margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                                <p style="margin-bottom: 8px;"><i class="fas fa-clock" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Waktu:</strong> <?= date('l, d F Y, H:i', strtotime($daftar['jadwal_wawancara'])) ?> WIB</p>
+                                <p style="margin-bottom: 8px;"><i class="fas fa-video" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Metode:</strong> Online via Zoom Meeting</p>
+                                <p style="margin-bottom: 0;"><i class="fas fa-link" style="margin-right: 10px; color: #0d6efd;"></i> <strong>Link:</strong> Akan dikirim via WhatsApp</p>
+                            </div>
+                            <p style="font-size: 0.8rem; font-style: italic; color: #666;">Harap persiapkan koneksi internet yang stabil.</p>
+                        </div>
+                    </div>
+                    <?php elseif ($daftar['status_berkas'] === 'valid'): ?>
+                    <div class="content-card">
+                        <h3>Status Dokumen</h3>
+                        <div class="doc-status" style="text-align: center; padding: 2rem 1rem;">
+                            <div class="icon-folder" style="color: #059669; background: #D1FAE5; width: 80px; height: 80px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                <i class="fas fa-file-circle-check" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 style="color: #003B73; font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;">Berkas Terverifikasi</h4>
+                            <p style="color: #4A5568; font-size: 0.95rem;">Dokumen Anda telah divalidasi oleh Admin. Mohon tunggu penetapan jadwal wawancara.</p>
+                        </div>
+                    </div>
+                    <?php else: ?>
+                    <div class="content-card">
+                        <h3>Status Dokumen</h3>
+                        <div class="doc-status">
+                            <div class="icon-folder">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <h4><?= $status_badge_text ?></h4>
+                            <p>Status pendaftaran saat ini: <?= $status_verifikasi ?></p>
+                            <div class="status-pill" style="background: <?= $alert_bg ?>; color: <?= $alert_text ?>;"><?= $status_verifikasi ?></div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- NEW: Download Card -->
+                <div class="card" style="background: linear-gradient(135deg, #003B73 0%, #00264d 100%); padding: 30px; border-radius: 15px; color: white; display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div>
+                        <h3 style="margin:0; font-size: 1.4rem;">Surat Pernyataan Kebenaran Dokumen</h3>
+                        <p style="margin: 10px 0 0; opacity: 0.8; font-size: 0.9rem;">Unduh, lengkapi, dan simpan dokumen ini sebagai syarat verifikasi akhir pendaftaran Anda.</p>
+                    </div>
+                    <a href="download_template.php?code=surat_pernyataan" target="_blank" style="background: #E9C46A; color: #003B73; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 700; white-space: nowrap; transition: 0.3s; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-file-download"></i> Unduh Template
+                    </a>
                 </div>
             </div>
-            <?php endif; ?>
 
-            <div class="content-card">
-                <h3>Ringkasan Data</h3>
-                <table class="data-summary">
-                    <tr>
-                        <td>Nama Lengkap</td>
-                        <td><?= htmlspecialchars($data['nama_cs'] ?? $daftar['nama_cs']) ?></td>
-                    </tr>
-                    <tr>
-                        <td>Program Pilihan</td>
-                        <td><?= htmlspecialchars($daftar['nama_program'] ?? '-') ?></td>
-                    </tr>
-                    <tr>
-                        <td>No HP/WA</td>
-                        <td><?= htmlspecialchars($daftar['no_wa'] ?? '-') ?></td>
-                    </tr>
-                    <tr>
-                        <td>Status Alur</td>
-                        <td class="highlight-text" style="color: <?= $status_color ?? '#f59e0b' ?>; font-weight: 700;"><?= $status_verifikasi ?></td>
-                    </tr>
-                </table>
+            <div class="side-column">
+                <div class="card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <h3 style="margin: 0 0 20px 0; color: #003B73; font-size: 1.1rem;">Aksi Cepat</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="kontak_admin.php" style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-headset"></i> Hubungi Admin
+                        </a>
+                        <a href="#" style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; color: #475569; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-book"></i> Panduan Siswa
+                        </a>
+                    </div>
+                </div>
+                <div class="content-card" style="margin-top: 25px;">
+                    <h3>Ringkasan Data</h3>
+                    <table class="data-summary">
+                        <tr>
+                            <td>Nama Lengkap</td>
+                            <td><?= htmlspecialchars($data['nama_cs'] ?? $daftar['nama_cs']) ?></td>
+                        </tr>
+                        <tr>
+                            <td>Program Pilihan</td>
+                            <td><?= htmlspecialchars($daftar['nama_program'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                            <td>No HP/WA</td>
+                            <td><?= htmlspecialchars($daftar['no_wa'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                            <td>Status Alur</td>
+                            <td class="highlight-text" style="color: <?= $status_color ?? '#f59e0b' ?>; font-weight: 700;"><?= $status_verifikasi ?></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </main>

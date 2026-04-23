@@ -7,9 +7,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
 }
 
 // Fetch Schedules
-$query = "SELECT j.*, u.username as nama_pengajar 
+$query = "SELECT j.*, u.username as nama_pengajar, m.nama_mapel as materi, k.nama_kelas as program, j.ruang as ruangan
           FROM jadwal j 
           LEFT JOIN user u ON j.id_pengajar = u.id_user 
+          LEFT JOIN kurikulum kur ON j.id_kurikulum = kur.id_kurikulum
+          LEFT JOIN mata_pelajaran m ON kur.id_mapel = m.id_mapel
+          LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
           ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), j.jam_mulai ASC";
 $res_jadwal = mysqli_query($conn, $query);
 $jadwal_list = [];
@@ -20,7 +23,7 @@ if ($res_jadwal) {
 }
 
 // Fetch Pengajar (Instructors)
-$query_pengajar = "SELECT id_user, username FROM user WHERE role_id = 3 AND is_active = 1";
+$query_pengajar = "SELECT id_user, username FROM user WHERE role_id = 102 OR role_id = 109 OR role_id = 2"; // Adjusting roles for instructors
 $res_pengajar = mysqli_query($conn, $query_pengajar);
 $pengajar_list = [];
 if ($res_pengajar) {
@@ -28,6 +31,14 @@ if ($res_pengajar) {
         $pengajar_list[] = $row;
     }
 }
+
+// Fetch Kelas
+$res_kelas = mysqli_query($conn, "SELECT id_kelas, nama_kelas FROM kelas");
+$kelas_list = mysqli_fetch_all($res_kelas, MYSQLI_ASSOC);
+
+// Fetch Kurikulum (Mata Pelajaran)
+$res_kur = mysqli_query($conn, "SELECT kur.id_kurikulum, m.nama_mapel FROM kurikulum kur JOIN mata_pelajaran m ON kur.id_mapel = m.id_mapel");
+$kurikulum_list = mysqli_fetch_all($res_kur, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -258,12 +269,12 @@ if ($res_pengajar) {
                 <input type="hidden" name="id_jadwal" id="id_jadwal">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Program</label>
-                        <select class="form-select" name="program" id="program" required>
-                            <option value="" disabled selected>Pilih Program</option>
-                            <option value="Hotel F&B Service">Hotel F&B Service</option>
-                            <option value="Cruise Ship Deck Kadet">Cruise Ship Deck Kadet</option>
-                            <option value="Cruise Ship Culinary">Cruise Ship Culinary</option>
+                        <label class="form-label">Kelas</label>
+                        <select class="form-select" name="id_kelas" id="id_kelas" required>
+                            <option value="" disabled selected>Pilih Kelas</option>
+                            <?php foreach ($kelas_list as $k): ?>
+                                <option value="<?= $k['id_kelas'] ?>"><?= htmlspecialchars($k['nama_kelas']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     
@@ -293,8 +304,13 @@ if ($res_pengajar) {
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Materi Pembelajaran</label>
-                        <input type="text" class="form-input" name="materi" id="materi" placeholder="E.g., Basic English" required>
+                        <label class="form-label">Mata Pelajaran (Kurikulum)</label>
+                        <select class="form-select" name="id_kurikulum" id="id_kurikulum" required>
+                            <option value="" disabled selected>Pilih Mata Pelajaran</option>
+                            <?php foreach ($kurikulum_list as $kur): ?>
+                                <option value="<?= $kur['id_kurikulum'] ?>"><?= htmlspecialchars($kur['nama_mapel']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -309,7 +325,7 @@ if ($res_pengajar) {
 
                     <div class="form-group">
                         <label class="form-label">Ruangan</label>
-                        <select class="form-select" name="ruangan" id="ruangan" required>
+                        <select class="form-select" name="ruang" id="ruang" required>
                             <option value="" disabled selected>Pilih Ruangan</option>
                             <option value="Ruang A1">Ruang A1</option>
                             <option value="Ruang A2">Ruang A2</option>
@@ -355,13 +371,13 @@ if ($res_pengajar) {
         function editJadwal(data) {
             document.getElementById('modalTitle').textContent = 'Edit Jadwal';
             document.getElementById('id_jadwal').value = data.id_jadwal;
-            document.getElementById('program').value = data.program;
+            document.getElementById('id_kelas').value = data.id_kelas;
             document.getElementById('hari').value = data.hari;
             document.getElementById('jam_mulai').value = data.jam_mulai;
             document.getElementById('jam_selesai').value = data.jam_selesai;
-            document.getElementById('materi').value = data.materi;
+            document.getElementById('id_kurikulum').value = data.id_kurikulum;
             document.getElementById('id_pengajar').value = data.id_pengajar;
-            document.getElementById('ruangan').value = data.ruangan;
+            document.getElementById('ruang').value = data.ruangan; // Database result is aliased as 'ruangan' in PHP
             modal.classList.add('show');
         }
 

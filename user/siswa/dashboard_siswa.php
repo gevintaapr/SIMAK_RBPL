@@ -10,6 +10,38 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
 $id_user = $_SESSION['user_id'];
 $query = mysqli_query($conn, "SELECT * FROM siswa WHERE id_user = $id_user");
 $siswa = mysqli_fetch_assoc($query);
+$id_siswa = $siswa['id_siswa'];
+
+// Cek Sertifikat
+$query_cert = mysqli_query($conn, "SELECT no_sertifikat FROM magang WHERE id_siswa = $id_siswa AND no_sertifikat IS NOT NULL LIMIT 1");
+$has_certificate = mysqli_num_rows($query_cert) > 0;
+
+// Cek Status Taiwan
+$query_taiwan = mysqli_query($conn, "SELECT status FROM program_taiwan WHERE id_siswa = $id_siswa");
+$taiwan_status = mysqli_fetch_assoc($query_taiwan)['status'] ?? null;
+
+// Fetch Student Schedule (Support Multiple Classes)
+$query_ks = mysqli_query($conn, "SELECT id_kelas FROM kelas_siswa WHERE id_siswa = $id_siswa");
+$kelas_ids = [];
+while ($row = mysqli_fetch_assoc($query_ks)) {
+    $kelas_ids[] = $row['id_kelas'];
+}
+
+$student_schedules = [];
+if (!empty($kelas_ids)) {
+    $ids_str = implode(',', $kelas_ids);
+    $query_sch = mysqli_query($conn, "
+        SELECT j.*, m.nama_mapel, u.username as nama_pengajar, k.nama_kelas
+        FROM jadwal j
+        JOIN kurikulum kur ON j.id_kurikulum = kur.id_kurikulum
+        JOIN mata_pelajaran m ON kur.id_mapel = m.id_mapel
+        JOIN user u ON j.id_pengajar = u.id_user
+        JOIN kelas k ON j.id_kelas = k.id_kelas
+        WHERE j.id_kelas IN ($ids_str)
+        ORDER BY FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'), jam_mulai ASC
+    ");
+    $student_schedules = mysqli_fetch_all($query_sch, MYSQLI_ASSOC);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -133,6 +165,31 @@ $siswa = mysqli_fetch_assoc($query);
             pointer-events: none !important;
             filter: blur(2px) grayscale(0.5);
         }
+
+        /* Floating Notification Taiwan */
+        .taiwan-notif-bar {
+            position: fixed;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(254, 243, 199, 0.95);
+            border: 1px solid #F59E0B;
+            padding: 12px 25px;
+            border-radius: 50px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.3);
+            border-left: 5px solid #F59E0B;
+            animation: slideDown 0.5s ease-out;
+            max-width: 90%;
+            width: fit-content;
+        }
+        @keyframes slideDown {
+            from { top: 50px; opacity: 0; }
+            to { top: 85px; opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -191,6 +248,33 @@ $siswa = mysqli_fetch_assoc($query);
         </div>
     </nav>
 
+    <!-- Floating Notification Taiwan -->
+    <?php if ($has_certificate && !$taiwan_status): ?>
+    <div class="taiwan-notif-bar">
+        <i class="fas fa-plane-departure" style="color: #D97706; font-size: 1.2rem;"></i>
+        <div style="font-size: 0.9rem; color: #92400E; font-weight: 600;">
+            Kabar Gembira! Anda memenuhi syarat untuk mengikuti <span style="color: #B45309; text-decoration: underline;">Program Magang Taiwan</span>.
+        </div>
+        <a href="taiwan_siswa.php" style="background: #D97706; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: 0.3s;" onmouseover="this.style.background='#B45309'" onmouseout="this.style.background='#D97706'">Cek Program</a>
+    </div>
+    <?php elseif ($taiwan_status): 
+        $status_texts = [
+            'berminat' => 'Menunggu konfirmasi admin',
+            'diajukan_mitra' => 'Menunggu konfirmasi pihak Taiwan',
+            'lolos' => 'Selamat! Anda Lolos Program Taiwan',
+            'ditolak' => 'Mohon maaf, Anda belum lolos'
+        ];
+        $status_text = $status_texts[$taiwan_status] ?? 'Sedang diproses';
+    ?>
+    <div class="taiwan-notif-bar" style="background: rgba(224, 242, 254, 0.95); border-color: #38BDF8; border-left-color: #0284C7;">
+        <i class="fas fa-info-circle" style="color: #0284C7; font-size: 1.2rem;"></i>
+        <div style="font-size: 0.9rem; color: #075985; font-weight: 600;">
+            Status Program Taiwan: <span style="color: #0369A1;"><?= $status_text ?></span>
+        </div>
+        <a href="taiwan_siswa.php" style="background: #0284C7; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">Cek Detail</a>
+    </div>
+    <?php endif; ?>
+
     <!-- Hero Section (Welcome) -->
     <header class="hero-section" style="background-image: url('../assets/Hero.png');">
         <div class="hero-overlay"></div>
@@ -218,11 +302,66 @@ $siswa = mysqli_fetch_assoc($query);
             ?>
         <?php endif; ?>
 
+        <!-- Jadwal Section -->
+        <section class="schedule-section" style="margin-bottom: 35px;">
+            <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f4f8;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; color: #003B73; margin: 0;">
+                        <i class="fas fa-calendar-alt" style="margin-right: 10px; color: #E9C46A;"></i> Jadwal Perkuliahan
+                    </h2>
+                    <span style="background: #EEF6FF; color: #003B73; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 700;">Semester Ganjil 2024/2025</span>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+                        <thead>
+                            <tr style="text-align: left; color: #94a3b8; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">
+                                <th style="padding: 10px 20px;">Hari / Waktu</th>
+                                <th style="padding: 10px 20px;">Mata Kuliah / Kelas</th>
+                                <th style="padding: 10px 20px;">Instruktur</th>
+                                <th style="padding: 10px 20px;">Ruangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($student_schedules)): ?>
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 40px; color: #64748b; background: #f8fafc; border-radius: 15px;">
+                                        Anda belum terdaftar di kelas manapun. Silakan hubungi bagian akademik.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($student_schedules as $sch): ?>
+                                    <tr style="background: #f8fbff; transition: 0.3s;">
+                                        <td style="padding: 20px; border-radius: 15px 0 0 15px; border-left: 5px solid #003B73;">
+                                            <div style="font-weight: 700; color: #003B73;"><?= $sch['hari'] ?></div>
+                                            <div style="font-size: 12px; color: #64748b; margin-top: 5px;"><i class="far fa-clock"></i> <?= date('H:i', strtotime($sch['jam_mulai'])) ?> - <?= date('H:i', strtotime($sch['jam_selesai'])) ?></div>
+                                        </td>
+                                        <td style="padding: 20px;">
+                                            <div style="font-weight: 600; color: #1e293b;"><?= htmlspecialchars($sch['nama_mapel']) ?></div>
+                                            <div style="font-size: 12px; color: #0369A1; font-weight: 600; margin-top: 4px;"><i class="fas fa-users"></i> <?= htmlspecialchars($sch['nama_kelas']) ?></div>
+                                        </td>
+                                        <td style="padding: 20px; color: #475569; font-size: 14px;">
+                                            <i class="far fa-user-circle" style="margin-right: 5px;"></i> <?= htmlspecialchars($sch['nama_pengajar']) ?>
+                                        </td>
+                                        <td style="padding: 20px; border-radius: 0 15px 15px 0;">
+                                            <span style="background: #e1effe; color: #1e429f; padding: 5px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                                                <i class="fas fa-map-marker-alt" style="margin-right: 5px;"></i> <?= htmlspecialchars($sch['ruang']) ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- Status Card -->
         <section class="card status-card">
             <div class="status-left">
                 <h2 class="status-title">Status: <span class="badge-success">Siswa Aktif</span></h2>
-                <p class="status-desc">Program <?= htmlspecialchars($siswa['program_pembelajaran'] ?? 'Hotel & Cruise Ship') ?> | NIM: <?= htmlspecialchars($siswa['nim_siswa'] ?? '-') ?></p>
+                <p class="status-desc">Program <?= htmlspecialchars($siswa['program_pembelajaran'] ?? 'Hotel & Cruise Ship Selection') ?> | NIM: <?= htmlspecialchars($siswa['nim_siswa'] ?? '-') ?></p>
             </div>
             <div class="status-right">
                 <span class="status-label">Kelengkapan Berkas</span>
@@ -239,20 +378,24 @@ $siswa = mysqli_fetch_assoc($query);
                     <a href="#" class="view-all">Lihat Semua &rarr;</a>
                 </div>
                 <div class="card-body">
-                    <div class="schedule-item">
-                        <div class="schedule-icon"><i class="fas fa-book"></i></div>
-                        <div class="schedule-details">
-                            <h3>English for Hospitality</h3>
-                            <p>Senin, 09:00 - 11:00 | Ruang A2</p>
+                    <?php if (empty($student_schedules)): ?>
+                        <p style="text-align: center; color: #64748b; padding: 20px;">Belum ada jadwal.</p>
+                    <?php else: ?>
+                        <?php 
+                        // Take only first 3 for summary
+                        $summary_schedules = array_slice($student_schedules, 0, 3);
+                        foreach ($summary_schedules as $ssch): 
+                        ?>
+                        <div class="schedule-item">
+                            <div class="schedule-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="schedule-details">
+                                <h3><?= htmlspecialchars($ssch['nama_mapel']) ?></h3>
+                                <p><?= $ssch['hari'] ?>, <?= date('H:i', strtotime($ssch['jam_mulai'])) ?> - <?= date('H:i', strtotime($ssch['jam_selesai'])) ?> | <?= htmlspecialchars($ssch['ruang']) ?></p>
+                                <small style="color: #0369A1;"><?= htmlspecialchars($ssch['nama_kelas']) ?></small>
+                            </div>
                         </div>
-                    </div>
-                    <div class="schedule-item">
-                        <div class="schedule-icon"><i class="fas fa-utensils"></i></div>
-                        <div class="schedule-details">
-                            <h3>F&B Service Practice</h3>
-                            <p>Selasa, 12:30 - 14:00 | Lab Restaurant</p>
-                        </div>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -275,7 +418,7 @@ $siswa = mysqli_fetch_assoc($query);
                             <div class="qa-icon"><i class="fas fa-user-tie"></i></div>
                             <span>Magang</span>
                         </a>
-                        <a href="#" class="qa-item">
+                        <a href="taiwan_siswa.php" class="qa-item">
                             <div class="qa-icon"><i class="fas fa-plane"></i></div>
                             <span>Taiwan</span>
                         </a>
@@ -288,27 +431,34 @@ $siswa = mysqli_fetch_assoc($query);
         <section class="card announcement-card">
             <h2 class="announcement-title">Papan Pengumuman</h2>
             <div class="card-body announcement-list">
-                <div class="announcement-item">
+                <?php if ($has_certificate && !$taiwan_status): ?>
+                <div class="announcement-item" style="border-left: 4px solid #F59E0B; background: #FFFBEB;">
                     <div class="announcement-main">
-                        <h3>Pembayaran SPP Bulan November telah berhasil diverifikasi.</h3>
-                        <p>Batas akhir pengumpulan laporan magang tahap 1 adalah tanggal 30 Oktober.</p>
+                        <h3 style="color: #92400E;">Penawaran Program Magang & Kuliah Taiwan</h3>
+                        <p>Selamat! Berdasarkan hasil sertifikasi Anda, Anda berhak mendaftar program internship internasional ke Taiwan. Segera lengkapi minat Anda di menu Taiwan.</p>
                     </div>
-                    <div class="announcement-date">2 Jam yang lalu</div>
+                    <div class="announcement-date">Prioritas</div>
                 </div>
-                <div class="announcement-item">
-                    <div class="announcement-main">
-                        <h3>Pembayaran Terverifikasi</h3>
-                        <p>Pembayaran SPP Bulan November telah berhasil diverifikasi.</p>
-                    </div>
-                    <div class="announcement-date">Kemarin</div>
-                </div>
-                <div class="announcement-item">
-                    <div class="announcement-main">
-                        <h3>Kegiatan Table Manner Bulan Desember</h3>
-                        <p>Batas akhir pengumpulan laporan magang tahap 1 adalah tanggal 30 Oktober.</p>
-                    </div>
-                    <div class="announcement-date">Kemarin</div>
-                </div>
+                <?php endif; ?>
+
+                <?php if (empty($announcements)): ?>
+                    <p style="text-align: center; color: #64748b; padding: 20px;">Belum ada pengumuman terbaru.</p>
+                <?php else: ?>
+                    <?php foreach ($announcements as $ann): ?>
+                        <div class="announcement-item">
+                            <div class="announcement-main">
+                                <h3 class="text-<?= $ann['type'] ?>"><?= htmlspecialchars($ann['title']) ?></h3>
+                                <p><?= htmlspecialchars($ann['message']) ?></p>
+                            </div>
+                            <div class="announcement-date">
+                                <?php 
+                                    $date = strtotime($ann['created_at']);
+                                    echo date('d M', $date);
+                                ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
     </main>

@@ -81,8 +81,8 @@ $query_program = mysqli_query($conn, "SELECT * FROM program ORDER BY nama_progra
                     <label>Dokumen Pendaftaran <span class="required">*</span></label>
                     <div class="upload-info">
                         <i class="fas fa-info-circle"></i>
-                        <span>Sebelum mengunggah, silakan unduh template <a href="#">Surat Pernyataan</a> di bawah ini. Isi dengan lengkap dan tanda tangani, kemudian scan/foto dan unggah kembali.<br>
-                        <a href="#"><i class="fas fa-download"></i> Unduh Surat Pernyataan (.pdf)</a></span>
+                        <span>Sebelum mengunggah, silakan unduh template <a href="download_template.php?code=surat_pernyataan" target="_blank">Surat Pernyataan</a> di bawah ini. Isi dengan lengkap dan tanda tangani, kemudian scan/foto dan unggah kembali.<br>
+                        <a href="download_template.php?code=surat_pernyataan" target="_blank"><i class="fas fa-download"></i> Unduh Surat Pernyataan (.pdf)</a></span>
                     </div>
                     
                     <div class="upload-grid">
