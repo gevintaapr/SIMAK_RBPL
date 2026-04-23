@@ -1,8 +1,9 @@
-<?php
+session_start();
 require_once '../../config/config.php';
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] != 3) {
-    // role 3 = pengajar
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
+    header("Location: ../../public/login/logPengajar.php");
+    exit;
 }
 
 // Ambil daftar pengajuan remedial yang pending, dikelompokkan per siswa

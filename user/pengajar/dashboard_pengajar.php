@@ -2,13 +2,13 @@
 session_start();
 require_once __DIR__ . '/../../config/config.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 2) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
     header("Location: ../../public/login/logPengajar.php");
     exit;
 }
 
 // Fetch Real Instructor Notifications
-$query_ann = mysqli_query($conn, "SELECT * FROM pengumuman WHERE target_role IS NULL OR target_role = 2 ORDER BY created_at DESC LIMIT 3");
+$query_ann = mysqli_query($conn, "SELECT * FROM pengumuman WHERE target_role IS NULL OR target_role = 3 ORDER BY created_at DESC LIMIT 3");
 $announcements = mysqli_fetch_all($query_ann, MYSQLI_ASSOC);
 
 // Fetch Instructor Schedules

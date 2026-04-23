@@ -1,5 +1,10 @@
-<?php
 session_start();
+require_once '../../config/config.php';
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
+    header("Location: ../../public/login/logPengajar.php");
+    exit;
+}
 // Dummy data
 $students = [
     ['id' => '124240110', 'nama' => 'Budi Santoso', 'jurusan' => 'F&B Service', 'angkatan' => '1/2025', 'status' => 'Aktif'],

@@ -1,8 +1,9 @@
-<?php
+session_start();
 require_once '../../config/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
-   // Pengajar usually role 3 or similar, check config
+    header("Location: ../../public/login/logPengajar.php");
+    exit;
 }
 
 // Fetch batch evaluations in pivoted format

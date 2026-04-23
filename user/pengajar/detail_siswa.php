@@ -1,5 +1,10 @@
-<?php
 session_start();
+require_once '../../config/config.php';
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
+    header("Location: ../../public/login/logPengajar.php");
+    exit;
+}
 $nama_siswa = "Alexander Wibowo";
 ?>
 <!DOCTYPE html>
