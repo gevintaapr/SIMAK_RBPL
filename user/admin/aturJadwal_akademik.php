@@ -65,7 +65,7 @@ if ($res_pengajar) {
                 <i class="fa-solid fa-book"></i>
                 <span>Akademik</span>
             </a>
-            <a href="#" class="sidebar-link">
+            <a href="taiwan.php" class="sidebar-link">
                 <i class="fa-solid fa-globe"></i>
                 <span>Program Taiwan</span>
             </a>
