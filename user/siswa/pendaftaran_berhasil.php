@@ -18,7 +18,6 @@
             <li><a href="../../public/MainPage.php" class="active">Home</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Programs</a></li>
-            <li><a href="#">Admission</a></li>
         </ul>
         <div class="nav-action">
             <a href="../../public/login/logSiswa.php" class="btn-logout">Login</a>
@@ -76,57 +75,7 @@
         <div class="image-section"></div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-grid">
-            <div class="footer-col brand-col">
-                <h3 class="footer-logo">HCTS</h3>
-                <p>Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
-                <div class="social-icons" style="margin-top: 1rem;">
-                    <a href="#" style="color: #ccc; margin-right: 15px;"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" style="color: #ccc; margin-right: 15px;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="color: #ccc; margin-right: 15px;"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" style="color: #ccc;"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4>Aksi Cepat</h4>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Our Programs</a></li>
-                    <li><a href="#">Admission Process</a></li>
-                    <li><a href="#">Career Opportunities</a></li>
-                    <li><a href="#">Student Stories</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Program Kami</h4>
-                <ul>
-                    <li><a href="#">Hotel Management</a></li>
-                    <li><a href="#">Cruise Ship Operations</a></li>
-                    <li><a href="#">Culinary Arts</a></li>
-                    <li><a href="#">Hospitality Services</a></li>
-                    <li><a href="#">Tourism Management</a></li>
-                </ul>
-            </div>
-            <div class="footer-col contact-col">
-                <h4>Kontak Kami</h4>
-                <ul>
-                    <li><a href="#"><i class="fas fa-map-marker-alt" style="margin-right: 10px;"></i> 123 Maritime Avenue,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Harbor District, HD 12345</a></li>
-                    <li><a href="#"><i class="fas fa-phone-alt" style="margin-right: 10px;"></i> +1 (555) 123-4567</a></li>
-                    <li><a href="#"><i class="fas fa-envelope" style="margin-right: 10px;"></i> info@hcts.edu</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copy">&copy; 2025 HCTS International. All rights reserved.</div>
-            <div class="footer-legal">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Cookie Policy</a>
-            </div>
-        </div>
-    </footer>
+    <div style="height: 50px;"></div>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const copyIcons = document.querySelectorAll('.data-value i.fa-copy');

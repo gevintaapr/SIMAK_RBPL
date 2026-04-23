@@ -106,117 +106,21 @@
     color: #ffffff;
 }
 
-/* =========================================
-   HALAMAN LOGIN ADMIN
-   ========================================= */
-
+/* Section Backgrounds */
 .admin-section {
     background-color: #f5eff9;
-    min-height: calc(100vh - 70px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
 }
-
-/* Kotak form agar rapi ke tengah */
-.login-card {
-    background: #ffffff;
-    width: 100%;
-    max-width: 400px;
-    padding: 30px 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    text-align: center;
-    margin: auto;
-}
-
-.icon-purple {
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: center;
-}
-
-/* Tombol ungu khusus Admin */
-.btn-purple {
-    width: 100%;
-    background-color: #7e22ce;
-    /* Warna ungu solid */
-    color: #ffffff;
-    padding: 12px;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 15px;
-    transition: background-color 0.3s;
-}
-
-.btn-purple:hover {
-    background-color: #6b21a8;
-    /* Warna ungu lebih gelap saat di-hover */
-}
-
-/* =========================================
-   HALAMAN LOGIN PENGAJAR
-   ========================================= */
-
-/* Warna latar hijau muda (#F1F8E9) dari Figma */
-
-
 
 .pengajar-section {
     background-color: #F1F8E9;
-    min-height: calc(100vh - 70px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
 }
 
-.icon-green {
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: center;
+.status-section {
+    background-color: #fdf9ec;
 }
 
-.btn-gold {
-    width: 100%;
-    background-color: #EBC372;
-    color: #003B73;
-    /* Teks warna biru gelap */
-    padding: 12px;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 15px;
-    transition: background-color 0.3s;
-}
-
-.btn-gold:hover {
-    background-color: #d6af63;
-    /* Emas yang sedikit lebih gelap saat disorot */
-}
-
-/* Reset Dasar */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Mengatur Body agar tingginya pas selayar (100vh) */
-body {
+.login-wrapper {
     background-color: #F4F6F9;
-    /* Warna background abu-abu terang */
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
 }
 
 /* --- NAVBAR STYLING --- */
@@ -237,6 +141,8 @@ body {
     display: flex;
     align-items: center;
     position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .logo {
@@ -245,7 +151,6 @@ body {
     font-weight: bold;
     font-family: 'Playfair Display', serif;
     letter-spacing: 1px;
-    flex-shrink: 0;
 }
 
 nav {
@@ -273,32 +178,69 @@ nav {
     color: #F8B44A;
 }
 
-/* --- LOGIN WRAPPER & CARD STYLING --- */
-
-/* Ini yang bikin di tengah dan tidak overflow */
-.login-wrapper {
+/* --- LOGIN CARD STYLING --- */
+.login-wrapper,
+.admin-section,
+.pengajar-section,
+.status-section {
     flex: 1;
-    /* Mengisi seluruh sisa tinggi layar di bawah navbar */
+    min-height: calc(100vh - 70px);
     display: flex;
     align-items: center;
-    /* Tengah secara vertikal */
     justify-content: center;
-    /* Tengah secara horizontal */
     padding: 20px;
-    /* Jarak aman agar di HP tidak nempel pinggir */
 }
 
-/* Ini yang bikin ukuran card pas (tidak kebesaran) */
 .login-card {
     background-color: white;
     width: 100%;
-    max-width: 400px;
-    /* Batas maksimal lebar card */
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.05);
-    /* Bayangan estetik */
+    max-width: 480px;
+    padding: 45px;
+    border-radius: 28px;
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
+
+.login-card:hover {
+    transform: translateY(-5px);
+}
+
+.status-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 20px;
+    }
+
+    nav {
+        display: none;
+    }
+
+    .login-card,
+    .status-card {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .login-card,
+    .status-card {
+        padding: 25px 20px;
+        border-radius: 16px;
+    }
+}
+
+
 
 /* --- ISI CARD (FORM) --- */
 .card-header {

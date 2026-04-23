@@ -415,6 +415,14 @@ button {
     display: flex;
     flex-direction: column;
     gap: 0;
+    width: 100%;
+}
+
+.page-content>section {
+    width: 100%;
+    max-width: 1450px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ============================================================
@@ -430,11 +438,13 @@ button {
     align-items: center;
     justify-content: center;
     text-align: center;
+    width: 100% !important;
+    max-width: none !important;
 }
 
 .banner-content {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1450px;
     text-align: center;
 }
 

@@ -370,57 +370,7 @@ $taiwan_status = mysqli_fetch_assoc($query_taiwan)['status'] ?? null;
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-col brand-col">
-                <h3 class="footer-brand">HCTS</h3>
-                <p>Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4 class="footer-title">Aksi Cepat</h4>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Our Programs</a></li>
-                    <li><a href="#">Admission Process</a></li>
-                    <li><a href="#">Career Opportunities</a></li>
-                    <li><a href="#">Student Stories</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4 class="footer-title">Program Kami</h4>
-                <ul>
-                    <li><a href="#">Hotel Management</a></li>
-                    <li><a href="#">Cruise Ship Operations</a></li>
-                    <li><a href="#">Culinary Arts</a></li>
-                    <li><a href="#">Hospitality Services</a></li>
-                    <li><a href="#">Tourism Management</a></li>
-                </ul>
-            </div>
-            <div class="footer-col contact-col">
-                <h4 class="footer-title">Kontak Kami</h4>
-                <ul>
-                    <li><i class="fas fa-map-marker-alt"></i> <span>123 Maritime Avenue,<br>Harbor District, HD 12345</span></li>
-                    <li><i class="fas fa-phone-alt"></i> <span>+1 (555) 123-4567</span></li>
-                    <li><i class="fas fa-envelope"></i> <span>info@hcts.edu</span></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copy">&copy; 2025 HCTS International. All rights reserved.</div>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Cookie Policy</a>
-            </div>
-        </div>
-    </footer>
+    <div style="height: 100px;"></div>
 
     <!-- Logout Popup -->
     <div id="logoutPopup" class="popup-overlay" style="display: none;">

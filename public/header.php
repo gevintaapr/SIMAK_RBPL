@@ -18,7 +18,6 @@
                     <li><a href="../public/MainPage.php#home">Home</a></li>
                     <li><a href="../public/MainPage.php#about">About</a></li>
                     <li><a href="../public/MainPage.php#program">Programs</a></li>
-                    <li><a href="../user/siswa/pendaftaran.php">Admission</a></li>
                 </ul>
             </nav>
             <a href="../public/MainLogin.php" class="btn-login">Login</a>

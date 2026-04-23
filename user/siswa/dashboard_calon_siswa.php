@@ -328,33 +328,7 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-grid">
-            <div class="footer-col brand-col">
-                <h3 class="footer-logo">HCTS</h3>
-                <p>Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Program Kami</h4>
-                <ul>
-                    <li><a href="#">Hotel Management</a></li>
-                    <li><a href="#">Cruise Ship Operations</a></li>
-                    <li><a href="#">Culinary Arts</a></li>
-                </ul>
-            </div>
-            <div class="footer-col contact-col">
-                <h4>Kontak Kami</h4>
-                <ul>
-                    <li><i class="fas fa-envelope" style="margin-right: 10px;"></i> info@hcts.edu</li>
-                    <li><i class="fas fa-phone-alt" style="margin-right: 10px;"></i> +1 (555) 123-4567</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copy">&copy; 2026 HCTS International. All rights reserved.</div>
-        </div>
-    </footer>
+    <div style="height: 50px;"></div>
     <!-- Logout Popup -->
     <div id="logoutPopup" class="popup-overlay" style="display: none;">
         <div class="popup-wrapper">

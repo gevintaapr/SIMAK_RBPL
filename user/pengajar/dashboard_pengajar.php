@@ -276,70 +276,7 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
 
         </main>
 
-        <!-- ===== FOOTER ===== -->
-        <footer class="footer">
-            <div class="footer-top">
-                <div class="footer-col footer-brand-col">
-                    <h3 class="footer-brand">HCTS</h3>
-                    <p class="footer-desc">Sekolah pelatihan internasional terkemuka untuk karier di bidang perhotelan dan kapal pesiar.</p>
-                    <div class="footer-socials">
-                        <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="#" class="social-btn" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-                    </div>
-                </div>
-
-                <div class="footer-col">
-                    <h4 class="footer-heading">Aksi Cepat</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Our Programs</a></li>
-                        <li><a href="#">Admission Process</a></li>
-                        <li><a href="#">Career Opportunities</a></li>
-                        <li><a href="#">Student Stories</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4 class="footer-heading">Program Kami</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Hotel Management</a></li>
-                        <li><a href="#">Cruise Ship Operations</a></li>
-                        <li><a href="#">Culinary Arts</a></li>
-                        <li><a href="#">Hospitality Services</a></li>
-                        <li><a href="#">Tourism Management</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4 class="footer-heading">Kontak Kami</h4>
-                    <ul class="footer-contact">
-                        <li>
-                            <i class="fa-solid fa-location-dot"></i>
-                            <span>123 Maritime Avenue, Harbor District, HD 12345</span>
-                        </li>
-                        <li>
-                            <i class="fa-solid fa-phone"></i>
-                            <span>+1 (555) 123-4567</span>
-                        </li>
-                        <li>
-                            <i class="fa-regular fa-envelope"></i>
-                            <span>info@hcts.edu</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p class="footer-copy">&copy; 2025 HCTS International. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Cookie Policy</a>
-                </div>
-            </div>
-        </footer>
+        <div style="height: 50px;"></div>
 
     </div>
 
