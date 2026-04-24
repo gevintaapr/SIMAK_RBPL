@@ -12,12 +12,12 @@
 <body>
         <header class="navbar">
         <div class="container nav-container">
-            <a href="../public/MainPage.php" class="logo" style="text-decoration: none; color: #EBC372;">HCTS</a>
+            <a href="../public/index.php" class="logo" style="text-decoration: none; color: #EBC372;">HCTS</a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="../public/MainPage.php#home">Home</a></li>
-                    <li><a href="../public/MainPage.php#about">About</a></li>
-                    <li><a href="../public/MainPage.php#program">Programs</a></li>
+                    <li><a href="../public/index.php#home">Home</a></li>
+                    <li><a href="../public/index.php#about">About</a></li>
+                    <li><a href="../public/index.php#program">Programs</a></li>
                 </ul>
             </nav>
             <a href="../public/MainLogin.php" class="btn-login">Login</a>

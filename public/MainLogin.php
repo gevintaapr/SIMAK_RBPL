@@ -56,7 +56,7 @@
                 </a>
             </div>
 
-            <a href="MainPage.php" class="btn-outline-primary">
+            <a href="index.php" class="btn-outline-primary">
                 Kembali ke Halaman Utama 
                 <span class="arrow-icon">→</span>
             </a>

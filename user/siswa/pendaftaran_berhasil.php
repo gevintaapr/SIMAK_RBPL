@@ -15,7 +15,7 @@
     <nav class="navbar">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
-            <li><a href="../../public/MainPage.php" class="active">Home</a></li>
+            <li><a href="../../public/index.php" class="active">Home</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Programs</a></li>
         </ul>
@@ -67,7 +67,7 @@
             
             <div class="action-buttons">
                 <a href="../../public/login/logCalonSiswa.php" class="btn-blue">Login Sekarang</a>
-                <a href="../public/MainPage.php" class="btn-outline">Kembali ke Beranda</a>
+                <a href="../../public/index.php" class="btn-outline">Kembali ke Beranda</a>
             </div>
         </div>
         

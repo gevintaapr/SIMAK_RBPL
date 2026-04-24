@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 5) {
 }
 
 // Statistics Queries
-$q_new_reg = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pendaftaran WHERE tanggal_pendaftaran >= NOW() - INTERVAL 7 DAY"))['total'];
+$q_new_reg = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pendaftaran p JOIN user u ON p.id_user = u.id_user WHERE u.create_at >= NOW() - INTERVAL 7 DAY"))['total'];
 $q_siswa_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa"))['total'];
 $q_magang_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM magang WHERE status_magang = 'aktif'"))['total'];
 $q_total_user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM user WHERE role_id = 1"))['total'];

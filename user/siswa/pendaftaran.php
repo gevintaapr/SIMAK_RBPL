@@ -18,7 +18,7 @@ $query_program = mysqli_query($conn, "SELECT * FROM program ORDER BY nama_progra
     <nav class="navbar">
         <div class="nav-brand">HCTS</div>
         <ul class="nav-menu">
-            <li><a href="../../public/MainPage.php" class="active">Home</a></li>
+            <li><a href="../../public/index.php" class="active">Home</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Programs</a></li>
         </ul>
