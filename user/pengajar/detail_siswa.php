@@ -5,7 +5,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
     header("Location: ../../public/login/logPengajar.php");
     exit;
 }
-$nama_siswa = "Alexander Wibowo";
+
+$id_siswa = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$nama_siswa = "Siswa Tidak Ditemukan";
+$data_siswa = null;
+
+if ($id_siswa > 0) {
+    $query = mysqli_query($conn, "SELECT s.*, p.nama_program FROM siswa s LEFT JOIN program p ON s.id_program = p.id_program WHERE s.id_siswa = $id_siswa");
+    if ($row = mysqli_fetch_assoc($query)) {
+        $data_siswa = $row;
+        $nama_siswa = $row['nama_lengkap'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -107,44 +118,44 @@ $nama_siswa = "Alexander Wibowo";
                         <div class="info-col">
                             <div class="info-item">
                                 <label>Nama Lengkap</label>
-                                <strong>Alexander Wibowo</strong>
+                                <strong><?= htmlspecialchars($data_siswa['nama_lengkap'] ?? '-') ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Nomor Whatsapp</label>
-                                <strong>+62 813 2345 0987</strong>
+                                <strong><?= htmlspecialchars($data_siswa['no_telp'] ?? '-') ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Asal Sekolah</label>
-                                <strong>SMK Pariwisata Bahari</strong>
+                                <strong><?= htmlspecialchars($data_siswa['asal_sekolah'] ?? '-') ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Alamat Lengkap</label>
-                                <strong>Jalan Jendral Sudirman, No. 3 Sragen, Solo, Indonesia</strong>
+                                <strong><?= htmlspecialchars($data_siswa['alamat'] ?? '-') ?></strong>
                             </div>
                         </div>
                         <div class="info-col">
                             <div class="info-item">
-                                <label>Email</label>
-                                <strong>ocean.098@gmail.com</strong>
+                                <label>Email Akun</label>
+                                <strong><?= htmlspecialchars($data_siswa['email_institusi'] ?? '-') ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Tanggal Lahir</label>
-                                <strong>11 Maret 2002</strong>
+                                <strong><?= !empty($data_siswa['tanggal_lahir']) ? date('d F Y', strtotime($data_siswa['tanggal_lahir'])) : '-' ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Posisi-Program Pilihan</label>
-                                <strong>Hotel - F&B Service</strong>
+                                <strong><?= htmlspecialchars($data_siswa['nama_program'] ?? '-') ?></strong>
                             </div>
                         </div>
                         <div class="photo-col">
                             <div class="photo-wrapper">
                                 <!-- Dummy silhouette or photo -->
-                                <img src="../../assets/student_dummy.jpg" alt="Photo" onerror="this.src='https://via.placeholder.com/150x200?text=Photo'">
+                                <img src="../../<?= htmlspecialchars($data_siswa['foto_siswa'] ?? 'assets/student_dummy.jpg') ?>" alt="Photo" onerror="this.src='https://via.placeholder.com/150x200?text=Photo'">
                             </div>
                             <div class="badge-magang">
-                                <i class="fa-regular fa-calendar-check"></i> MAGANG
+                                <i class="fa-regular fa-calendar-check"></i> AKTIF
                             </div>
-                            <p class="id-siswa">ID Siswa: HC124</p>
+                            <p class="id-siswa">NIM: <?= htmlspecialchars($data_siswa['nim_siswa'] ?? '-') ?></p>
                         </div>
                     </div>
                 </div>
