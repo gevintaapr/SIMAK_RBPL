@@ -1,3 +1,4 @@
+<?php
 session_start();
 require_once '../../config/config.php';
 
@@ -11,7 +12,7 @@ $nama_siswa = "Siswa Tidak Ditemukan";
 $data_siswa = null;
 
 if ($id_siswa > 0) {
-    $query = mysqli_query($conn, "SELECT s.*, p.nama_program FROM siswa s LEFT JOIN program p ON s.id_program = p.id_program WHERE s.id_siswa = $id_siswa");
+    $query = mysqli_query($conn, "SELECT s.*, p.nama_program, pd.no_wa, pd.alamat, pd.tanggal_lahir, pd.foto_siswa FROM siswa s LEFT JOIN program p ON s.id_program = p.id_program LEFT JOIN pendaftaran pd ON s.id_pendaftaran = pd.id_pendaftaran WHERE s.id_siswa = $id_siswa");
     if ($row = mysqli_fetch_assoc($query)) {
         $data_siswa = $row;
         $nama_siswa = $row['nama_lengkap'];
@@ -122,11 +123,11 @@ if ($id_siswa > 0) {
                             </div>
                             <div class="info-item">
                                 <label>Nomor Whatsapp</label>
-                                <strong><?= htmlspecialchars($data_siswa['no_telp'] ?? '-') ?></strong>
+                                <strong><?= htmlspecialchars($data_siswa['no_wa'] ?? '-') ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Asal Sekolah</label>
-                                <strong><?= htmlspecialchars($data_siswa['asal_sekolah'] ?? '-') ?></strong>
+                                <strong>-</strong>
                             </div>
                             <div class="info-item">
                                 <label>Alamat Lengkap</label>
@@ -136,7 +137,7 @@ if ($id_siswa > 0) {
                         <div class="info-col">
                             <div class="info-item">
                                 <label>Email Akun</label>
-                                <strong><?= htmlspecialchars($data_siswa['email_institusi'] ?? '-') ?></strong>
+                                <strong><?= htmlspecialchars($data_siswa['email_belajar'] ?? '-') ?></strong>
                             </div>
                             <div class="info-item">
                                 <label>Tanggal Lahir</label>
