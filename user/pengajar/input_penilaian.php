@@ -64,9 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluasi'])) {
     }
 }
 
-// Ambil data siswa untuk dropdown
+// Ambil data siswa untuk dropdown (Hanya yang BELUM dievaluasi)
 $siswaDropdown = [];
-$query_siswa = mysqli_query($conn, "SELECT s.*, p.nama_program as program_pembelajaran FROM siswa s JOIN program p ON s.id_program = p.id_program");
+$query_siswa = mysqli_query($conn, "SELECT s.*, p.nama_program as program_pembelajaran FROM siswa s JOIN program p ON s.id_program = p.id_program WHERE s.id_siswa NOT IN (SELECT id_siswa FROM evaluasi WHERE periode_semester = 'Semester Ganjil 2025')");
 if ($query_siswa) {
     while($row = mysqli_fetch_assoc($query_siswa)) {
         $siswaDropdown[] = $row;

@@ -198,16 +198,26 @@ $is_waiting_remedial = ($data_remedial['aktif'] > 0);
                     </a>
                 <?php endif; ?>
             <?php elseif ($has_option): ?>
-                <div class="action-icon" style="color: #F59E0B;"><i class="fas fa-exclamation-circle"></i></div>
-                <h2 class="action-title">Lulus dengan Catatan</h2>
-                <p class="action-desc">Selamat! Rata-rata Anda sudah memenuhi syarat (>= 80). Namun, terdapat <strong>1 mata pelajaran</strong> yang masih remedial. Anda diperbolehkan langsung lanjut magang, atau mengambil remedial terlebih dahulu untuk menyempurnakan nilai.</p>
+                <div class="action-icon" style="color: <?= $is_waiting_remedial ? '#3B82F6' : '#F59E0B' ?>;">
+                    <i class="fas <?= $is_waiting_remedial ? 'fa-spinner fa-spin' : 'fa-exclamation-circle' ?>"></i>
+                </div>
+                <h2 class="action-title"><?= $is_waiting_remedial ? 'Remedial Sedang Diproses' : 'Lulus dengan Catatan' ?></h2>
+                <p class="action-desc">
+                    <?php if ($is_waiting_remedial): ?>
+                        Permohonan remedial Anda sudah diterima dan sedang diproses. Anda bisa menunggu hasilnya atau langsung lanjut ke pengajuan magang.
+                    <?php else: ?>
+                        Selamat! Rata-rata Anda sudah memenuhi syarat (>= 80). Namun, terdapat <strong>1 mata pelajaran</strong> yang masih remedial. Anda diperbolehkan langsung lanjut magang, atau mengambil remedial terlebih dahulu untuk menyempurnakan nilai.
+                    <?php endif; ?>
+                </p>
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                     <a href="magang_siswa.php" class="btn-action btn-magang">
                         Lanjut ke Pengajuan Magang <i class="fas fa-arrow-right"></i>
                     </a>
+                    <?php if (!$is_waiting_remedial): ?>
                     <a href="javascript:void(0)" class="btn-action btn-remedial" style="background: #E2E8F0; color: #475569;" onclick="openRemedialModal()">
                         Ambil Remedial Terlebih Dahulu
                     </a>
+                    <?php endif; ?>
                 </div>
             <?php else: ?>
                 <div class="action-icon" style="color: #22C55E;"><i class="fas fa-certificate"></i></div>

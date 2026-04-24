@@ -11,6 +11,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
 $query_ann = mysqli_query($conn, "SELECT * FROM pengumuman WHERE target_role IS NULL OR target_role = 3 ORDER BY created_at DESC LIMIT 3");
 $announcements = mysqli_fetch_all($query_ann, MYSQLI_ASSOC);
 
+// Check pending remedials for announcements
+$query_pending_rems = mysqli_query($conn, "SELECT COUNT(DISTINCT id_siswa) as total_siswa FROM pengajuan_remedial WHERE status_remedial != 'selesai'");
+$pending_rem_count = mysqli_fetch_assoc($query_pending_rems)['total_siswa'] ?? 0;
+if ($pending_rem_count > 0) {
+    // Add a fake announcement at the top
+    $dynamic_ann = [
+        'title' => "Tindakan Diperlukan: Pengajuan Remedial",
+        'message' => "Ada $pending_rem_count antrean siswa yang sedang mengajukan remedial evaluasi dan menunggu penilaian dari Anda. Silakan periksa menu Kelola Remedial.",
+        'created_at' => date('Y-m-d H:i:s'),
+        'is_urgent' => true
+    ];
+    array_unshift($announcements, $dynamic_ann);
+}
+
 // Stats for Instructor
 $instructor_id = $_SESSION['user_id'];
 $q_total_siswa = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ks.id_siswa) as total FROM jadwal j JOIN kelas_siswa ks ON j.id_kelas = ks.id_kelas WHERE j.id_pengajar = $instructor_id"))['total'];
@@ -30,6 +44,18 @@ $query_latest_siswa = mysqli_query($conn, "
     LIMIT 5
 ");
 $latest_students = mysqli_fetch_all($query_latest_siswa, MYSQLI_ASSOC);
+
+if (empty($latest_students)) {
+    // Fallback if class schedules are not populated: display any registered student
+    $query_fallback = mysqli_query($conn, "
+        SELECT s.*, p.nama_program
+        FROM siswa s
+        JOIN program p ON s.id_program = p.id_program
+        ORDER BY s.id_siswa DESC
+        LIMIT 5
+    ");
+    $latest_students = mysqli_fetch_all($query_fallback, MYSQLI_ASSOC);
+}
 
 // Fetch Instructor Schedules
 $query_jadwal = mysqli_query($conn, "
@@ -133,18 +159,18 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
             </section>
 
             <!-- Jadwal Section -->
-            <section class="schedule-section" style="margin-top: -30px; position: relative; z-index: 10; margin-bottom: 40px;">
+            <section class="schedule-section" style="margin-top: -30px; position: relative; z-index: 10; margin-bottom: 40px; padding: 0 40px;">
                 <div class="card card-table">
-                    <div class="card-header" style="background: white; border-bottom: 1px solid #f1f5f9; padding: 20px 24px;">
+                    <div class="card-header border-none" style="padding: 24px 32px 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h2 class="card-title" style="margin: 0;"><i class="fa-solid fa-calendar-days"></i> Jadwal Mengajar Minggu Ini</h2>
-                            <span class="badge-status-blue" style="padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: 700;">Semester Ganjil 2024/2025</span>
+                            <h2 class="card-title"><i class="fa-solid fa-calendar-days"></i> Jadwal Mengajar Minggu Ini</h2>
+                            <span class="badge badge-info-light" style="background: #E0F2FE; color: #0369A1; padding: 6px 16px;">Semester Ganjil 2024/2025</span>
                         </div>
                     </div>
-                    <div class="card-body" style="padding: 0;">
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table">
-                                <thead style="background: #F8FAFC;">
+                            <table class="data-table">
+                                <thead>
                                     <tr>
                                         <th>Hari</th>
                                         <th>Jam</th>
@@ -164,7 +190,7 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
                                                 <td style="font-weight: 700; color: #003B73;"><?= $sch['hari'] ?></td>
                                                 <td><i class="fa-regular fa-clock" style="margin-right: 5px; color: #E9C46A;"></i> <?= date('H:i', strtotime($sch['jam_mulai'])) ?> - <?= date('H:i', strtotime($sch['jam_selesai'])) ?></td>
                                                 <td style="font-weight: 600;"><?= htmlspecialchars($sch['nama_mapel']) ?></td>
-                                                <td><span class="badge badge-info-light" style="background: #E0F2FE; color: #0369A1; padding: 4px 10px; border-radius: 6px; font-size: 12px;"><?= htmlspecialchars($sch['nama_kelas']) ?></span></td>
+                                                <td><span class="badge badge-info-light" style="background: #E0F2FE; color: #0369A1; font-size: 12px;"><?= htmlspecialchars($sch['nama_kelas']) ?></span></td>
                                                 <td><i class="fa-solid fa-location-dot" style="margin-right: 5px; color: #EF4444;"></i> <?= htmlspecialchars($sch['ruang']) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -259,8 +285,8 @@ $schedules = mysqli_fetch_all($query_jadwal, MYSQLI_ASSOC);
                         <?php else: ?>
                             <?php foreach ($announcements as $ann): ?>
                                 <div style="border-bottom: 1px solid #eee; padding: 15px 0; display: flex; align-items: flex-start; gap: 15px;">
-                                    <div style="background: #E0F2FE; color: #0284C7; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="fa-solid fa-info-circle"></i>
+                                    <div style="background: <?= isset($ann['is_urgent']) ? '#FEF2F2' : '#E0F2FE' ?>; color: <?= isset($ann['is_urgent']) ? '#DC2626' : '#0284C7' ?>; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fa-solid <?= isset($ann['is_urgent']) ? 'fa-triangle-exclamation' : 'fa-info-circle' ?>"></i>
                                     </div>
                                     <div>
                                         <h4 style="margin: 0; color: #003B73; font-size: 15px;"><?= htmlspecialchars($ann['title']) ?></h4>
