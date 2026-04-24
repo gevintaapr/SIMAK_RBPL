@@ -1,3 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-color: #fdf9ec;
+}
+
 .status-section {
     background-color: #fdf9ec;
     /* Warna latar krem muda sesuai desain */
