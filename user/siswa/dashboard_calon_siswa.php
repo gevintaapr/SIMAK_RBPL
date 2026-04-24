@@ -189,7 +189,7 @@ if ($daftar['status_approval'] === 'disetujui' || $daftar['status_approval'] ===
         </div>
 
 
-        <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <div class="dashboard-grid">
             <div class="main-column">
                 <!-- Info Status -->
                 <div class="card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;">
