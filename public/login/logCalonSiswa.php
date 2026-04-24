@@ -31,13 +31,13 @@ $role = $_GET['role'] ?? null;
     <!-- NAVBAR -->
     <header class="navbar">
         <div class="nav-container">
-            <div class="logo">HCTS</div>
+            <a href="../index.php" style="text-decoration: none;"><div class="logo">HCTS</div></a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Programs</a></li>
-                    <li><a href="#">Admission</a></li>
+                    <li><a href="../index.php">Home</a></li>
+                    <li><a href="../index.php#tentang">About</a></li>
+                    <li><a href="../index.php#mengapa">Programs</a></li>
+                    <li><a href="../index.php#hcts">Admission</a></li>
                 </ul>
             </nav>
         </div>
