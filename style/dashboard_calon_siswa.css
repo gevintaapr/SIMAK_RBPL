@@ -346,6 +346,330 @@ body {
     margin-left: 1rem;
 }
 
+/* Alert Boxes */
+.alert-box {
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 30px;
+    border-left: 4px solid transparent;
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    margin-top: 3px;
+}
+
+.alert-content h4 {
+    margin: 0 0 5px 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+}
+
+.alert-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left-color: #c3e6cb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left-color: #ffeeba;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left-color: #f5c6cb;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left-color: #bee5eb;
+}
+
+.alert-secondary {
+    background-color: #e2e3e5;
+    color: #383d41;
+    border-left-color: #d6d8db;
+}
+
+/* Status Cards */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+.status-container .card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.status-container h3 {
+    margin: 0;
+    color: #003B73;
+    font-size: 1.25rem;
+}
+
+.status-container span {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.success-card {
+    border-color: #c2e2af;
+    background: #fdfdfd;
+}
+
+.card-pass {
+    background: #f0faeb;
+    border: 1px solid #c2e2af;
+    border-radius: 12px;
+    padding: 2.5rem 1rem;
+    text-align: center;
+}
+
+.icon-pass {
+    background: none !important;
+    color: #4a9e22;
+    margin-bottom: 0;
+    font-size: 3rem;
+}
+
+.card-pass h4 {
+    color: #2b6110;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.card-pass p {
+    color: #3d7522;
+    margin-bottom: 1.5rem;
+}
+
+.info-box-pass {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 0 15px;
+    text-align: left;
+    border: 1px solid #d4ebc6;
+}
+
+.info-box-pass strong {
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.email-text {
+    color: #0369a1;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.password-code {
+    color: #555;
+    font-family: monospace;
+    font-size: 1.1rem;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.btn-login-pass {
+    display: inline-block;
+    margin-top: 20px;
+    background: #4a9e22;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-login-pass:hover {
+    background: #3d861d;
+    color: white;
+}
+
+/* Centered Status (Wawancara/Validasi) */
+.centered-status {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.rounded-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 2.5rem;
+}
+
+.check-double {
+    color: #059669;
+    background: #D1FAE5;
+}
+
+.interview-icon {
+    color: #0d6efd;
+    background: #e7f1ff;
+}
+
+.centered-status h4 {
+    color: #003B73;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+.centered-status p {
+    color: #4A5568;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.interview-box {
+    text-align: left;
+    font-size: 0.9rem;
+    color: #003B73;
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.interview-box p {
+    margin-bottom: 8px;
+}
+
+.interview-box p:last-child {
+    margin-bottom: 0;
+}
+
+.interview-box i {
+    margin-right: 10px;
+    color: #0d6efd;
+}
+
+.italic-text {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #666;
+}
+
+.file-valid {
+    padding: 2rem 1rem;
+}
+
+.file-valid h4 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.file-valid p {
+    font-size: 0.95rem;
+}
+
+/* Premium Download Card */
+.premium-card {
+    background: linear-gradient(135deg, #003B73 0%, #00264d 100%);
+    padding: 30px;
+    border-radius: 15px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.premium-card-text h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: white;
+    border: none;
+    padding: 0;
+}
+
+.premium-card-text p {
+    margin: 10px 0 0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.btn-download {
+    background: #E9C46A;
+    color: #003B73;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-download:hover {
+    background: #d4ae52;
+    color: #003B73;
+    transform: translateY(-2px);
+}
+
+/* Quick Actions */
+.quick-actions h3 {
+    margin: 0 0 20px 0;
+    color: #003B73;
+    font-size: 1.1rem;
+}
+
+.action-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-link {
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+}
+
+.action-link:hover {
+    background: #e2e8f0;
+    color: #333;
+}
+
 /* Responsiveness */
 @media (max-width: 1024px) {
     .dashboard-container {
